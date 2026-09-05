@@ -101,6 +101,13 @@ int main() {
 			Check(!worker.attach(-1,100,true));
 			Check(!worker.attach(10,100,true));
 			Check(!worker.attach(0,0,true));
+			// Direct replacement goes through the vector-held handle. detach must
+			// copy it before clearing that vector element (no dangling alias).
+			const auto displaced = handles[1];
+			handles[1] = worker.attach(1,101,true);
+			Check(!worker.usable(displaced));
+			worker.read(handles[1],note,[&](auto result) { Check(result.ok && !result.text); });
+			mailbox.take()();
 		}
 		// Application restart restores existing data. Posted callbacks may outlive it.
 		auto calledAfterShutdown = false;

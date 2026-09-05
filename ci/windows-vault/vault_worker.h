@@ -34,7 +34,7 @@ public:
 	Worker &operator=(const Worker &) = delete;
 
 	[[nodiscard]] Handle attach(int slot, std::uint64_t owner, bool freshLogin);
-	void detach(const Handle &handle, bool loggedOut);
+	void detach(Handle handle, bool loggedOut);
 	void forgetAll();
 	void setLocked(bool locked);
 	[[nodiscard]] bool usable(const Handle &handle) const;

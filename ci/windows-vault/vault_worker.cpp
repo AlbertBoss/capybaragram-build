@@ -116,7 +116,7 @@ Worker::Handle Worker::attach(int slotIndex, std::uint64_t owner, bool freshLogi
 	return handle;
 }
 
-void Worker::detach(const Handle &handle, bool loggedOut) {
+void Worker::detach(Handle handle, bool loggedOut) {
 	checkThread();
 	// Compare the actual handle, not only the owner: the same user can log in
 	// again while an old session's logout callback remains in the UI queue.
