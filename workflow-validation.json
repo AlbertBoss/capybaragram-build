@@ -2,6 +2,11 @@
   "scope": "Local YAML parsing and workflow constraints, not a GitHub run or compilation",
   "checks": [
     {
+      "file": ".github\\workflows\\android-account-contracts.yml",
+      "yaml_and_workflow_constraints": "pass",
+      "sha256": "ec6fb680292187977db5df56f5c4d65ce135da4792f116d3187d75b0c127f6c0"
+    },
+    {
       "file": ".github\\workflows\\android-baseline.yml",
       "yaml_and_workflow_constraints": "pass",
       "sha256": "f93c53af2d5a94d98858fc9701985037179857ca65c7139ad2b85fcd9902b230"

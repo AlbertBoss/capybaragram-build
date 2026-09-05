@@ -1,0 +1,7 @@
+{
+  "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java": "0323493a83d2c3ab2bccefa4edb2765b1bbc00a9c278a21fc713541ab9675280",
+  "TMessagesProj/jni/tgnet/Defines.h": "01a30245620b002d7391a3d59934478b31faa7f17d352f3148227ef81049f964",
+  "TMessagesProj/jni/tgnet/ConnectionsManager.cpp": "5f48e5eea13fb31eac2b876ef6933b618d9c8e23e213e498b4b9e2ad7cb3e2e6",
+  "TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java": "31138c7b09415c65463d88aee1064d79c690efd1aba376d8806bf9d5e933e45a",
+  "TMessagesProj/src/main/java/org/telegram/ui/UserInfoActivity.java": "4cd012cf47585fe8db64f0eb69fa5469aa10acfeda298de7b959405ff7556d12"
+}
