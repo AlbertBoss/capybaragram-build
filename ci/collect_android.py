@@ -18,17 +18,22 @@ def checked(args):
 
 def locate_apk(source):
     """Use AGP's output manifest rather than assuming a variant directory layout."""
-    root = source / 'TMessagesProj_App/build/outputs/apk'
+    # AGP can place IDE-targeted APKs under intermediates instead of outputs/apk.
+    # The injected ABI option is an IDE build option; use the artifact type below.
+    root = source / 'TMessagesProj_App/build'
     if not root.is_dir():
-        raise RuntimeError('APK output directory is absent: TMessagesProj_App/build/outputs/apk')
+        raise RuntimeError('Application build directory is absent: TMessagesProj_App/build')
     manifests = list(root.rglob('output-metadata.json'))
-    print('APK output files: ' + ', '.join(str(p.relative_to(root)) for p in root.rglob('*') if p.is_file()))
+    files = sorted({str(p.relative_to(root)) for p in root.rglob('*.apk')} | {str(p.relative_to(root)) for p in manifests})
+    print('APK/metadata files (' + str(len(files)) + '): ' + ', '.join(files[:60]))
     matches = []
     for manifest in manifests:
         manifest.resolve(strict=True).relative_to(root.resolve(strict=True))
         if manifest.is_symlink() or manifest.stat().st_size > 65536:
             raise RuntimeError('Invalid APK output metadata.')
         data = json.loads(manifest.read_text(encoding='utf-8'))
+        if data.get('artifactType', {}).get('type') != 'APK':
+            continue
         if data.get('variantName') != 'afatDebug':
             continue
         if data.get('applicationId') != 'org.capybaragram.buildtest.beta':
