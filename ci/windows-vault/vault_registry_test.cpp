@@ -167,6 +167,23 @@ int main() {
 		Check(!std::filesystem::exists(root/"index"));
 		std::filesystem::rename(root/"index-held",root/"index");
 		Check(registry.open(9,1009)->read(note)=="slot9");
+		// Forgotten-passcode reset persists before cleanup and survives reopening.
+		const auto resetKey = Store::Note(2,1);
+		const auto resetGeneration = Generation(*index.read(Store::Note(1,10)));
+		{
+			const auto lock = Lock(root/"data"/resetGeneration/(note+".bin"));
+			Reject([&] { registry.forgetAll(); });
+			Check(index.read(resetKey) == "CPG-RESET-1");
+			Reject([&] { auto resetRestart = Registry(root,10); });
+			Reject([&] { (void)registry.open(0,100); });
+		}
+		{
+			auto resetRestart = Registry(root,10);
+			Check(!index.read(resetKey));
+			for (auto slot = 0; slot != 10; ++slot) {
+				Check(!resetRestart.open(slot,static_cast<std::uint64_t>(1000+slot))->read(note));
+			}
+		}
 		std::cout << "CAPY_WINDOWS_REGISTRY=PASS checks=" << Checks << '\n';
 		return 0;
 	} catch (const std::exception &) {

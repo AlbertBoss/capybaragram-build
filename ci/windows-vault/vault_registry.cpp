@@ -42,6 +42,7 @@ Registry::Registry(const std::filesystem::path &root, int slots)
 : _root(Root(root))
 , _slots(Slots(slots))
 , _index(_root / "index", 1, IndexGeneration, NewIndex(_root)) {
+	finishReset();
 	(void)retryCleanup();
 }
 
@@ -125,9 +126,32 @@ void Registry::logout(int slot, std::uint64_t expectedOwner) {
 	retire(*value);
 }
 
+void Registry::forgetAll() {
+	_index.write(Store::Note(2,1), "CPG-RESET-1");
+	finishReset();
+}
+
+void Registry::finishReset() {
+	const auto key = Store::Note(2,1);
+	const auto reset = _index.read(key);
+	if (!reset) return;
+	if (*reset != "CPG-RESET-1") Fail();
+	auto complete = true;
+	for (auto slot = 0; slot != _slots; ++slot) {
+		try {
+			if (const auto value = binding(slot)) retire(*value);
+		} catch (const std::exception &) {
+			complete = false;
+		}
+	}
+	if (!retryCleanup() || !complete) Fail();
+	_index.erase(key);
+}
+
 std::unique_ptr<Store> Registry::open(int slot, std::uint64_t owner, bool freshLogin) {
 	if (!owner) Fail();
 	(void)slotKey(slot);
+	finishReset();
 	(void)retryCleanup();
 	if (const auto value = binding(slot)) {
 		const auto pending = _index.read(Store::Template(value->generation));

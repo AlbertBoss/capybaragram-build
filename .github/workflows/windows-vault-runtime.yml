@@ -38,7 +38,13 @@ jobs:
             & .\registry-test.exe | Tee-Object -FilePath registry-runtime-result.txt
             if ($LASTEXITCODE -ne 0) { throw 'Registry runtime checks failed' }
             if (-not (Select-String -LiteralPath registry-runtime-result.txt -SimpleMatch 'CAPY_WINDOWS_REGISTRY=PASS')) { throw 'Missing registry test success' }
-            Get-FileHash vault_store.h,vault_store.cpp,vault_store_test.cpp,vault_registry.h,vault_registry.cpp,vault_registry_test.cpp -Algorithm SHA256 | Select-Object @{Name='name';Expression={Split-Path $_.Path -Leaf}},Hash | ConvertTo-Json | Set-Content source-hashes.json
+            $compileWorker = 'call "' + $vcvars + '" >nul && cl /nologo /std:c++20 /EHsc /W4 /WX /utf-8 vault_store.cpp vault_registry.cpp vault_worker.cpp vault_worker_test.cpp /Fe:worker-test.exe /link crypt32.lib bcrypt.lib'
+            & cmd.exe /d /s /c $compileWorker
+            if ($LASTEXITCODE -ne 0) { throw 'Worker compilation failed' }
+            & .\worker-test.exe | Tee-Object -FilePath worker-runtime-result.txt
+            if ($LASTEXITCODE -ne 0) { throw 'Worker runtime checks failed' }
+            if (-not (Select-String -LiteralPath worker-runtime-result.txt -SimpleMatch 'CAPY_WINDOWS_WORKER=PASS')) { throw 'Missing worker test success' }
+            Get-FileHash vault_store.h,vault_store.cpp,vault_store_test.cpp,vault_registry.h,vault_registry.cpp,vault_registry_test.cpp,vault_worker.h,vault_worker.cpp,vault_worker_test.cpp -Algorithm SHA256 | Select-Object @{Name='name';Expression={Split-Path $_.Path -Leaf}},Hash | ConvertTo-Json | Set-Content source-hashes.json
           } finally { Pop-Location }
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
@@ -47,6 +53,7 @@ jobs:
           path: |
             ci/windows-vault/runtime-result.txt
             ci/windows-vault/registry-runtime-result.txt
+            ci/windows-vault/worker-runtime-result.txt
             ci/windows-vault/source-hashes.json
           retention-days: 1
           if-no-files-found: error
