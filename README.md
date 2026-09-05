@@ -61,3 +61,10 @@ New orchestration scripts are MIT-licensed. Telegram source and derived binaries
 - [GitHub runner image inventory](https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-Readme.md)
 - [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
 - `workflow-validation.json`: local syntax/constraint validation only, not compilation.
+
+
+## Native Windows notes and templates
+
+The next Windows preview applies `ci/windows-notes/windows_notes_patch.py` after the identity and ten-account patches. It adds local chat/topic notes and response-template creation, editing, deletion, paginated browsing, preview and explicit draft insertion. Selected draft text is preserved; the callback verifies the current chat context and refuses message-editing/disabled-input modes. Nothing sends automatically. English/Russian labels follow the active app language and use native themed widgets.
+
+The source-preparation tests check the entire composed patch, reject drift before mutation and refuse overwriting existing source. They are not a substitute for compiling or testing the client UI. Native Store/Registry/Worker checks passed at [run33989959575](https://github.com/AlbertBoss/capybaragram-build/actions/runs/33989959575), with9 exact source hashes. Full notes/template client build and live UI/account acceptance remain required. DPAPI uses the current Windows user; app passcode gating is not separate passcode-derived encryption. This remains a preview, not a finished release.
