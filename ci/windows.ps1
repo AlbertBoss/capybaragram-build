@@ -54,7 +54,9 @@ echo [CAPY] Initializing Visual Studio environment
 call "%CAPY_VSDEVCMD%" -no_logo -arch=x64 -host_arch=x64 -winsdk=10.0.26100.0 -vcvars_ver=14.44
 if errorlevel 1 (echo [CAPY] VsDevCmd failed with %errorlevel% & exit /b 101)
 echo [CAPY] Platform="%Platform%"; target="%VSCMD_ARG_TGT_ARCH%"; host="%VSCMD_ARG_HOST_ARCH%"
-if /i not "%Platform%"=="x64" (echo [CAPY] Expected x64 Platform & exit /b 102)
+if /i not "%VSCMD_ARG_TGT_ARCH%"=="x64" (echo [CAPY] Expected x64 target architecture & exit /b 102)
+rem Current VsDevCmd can omit Platform; upstream prepare.py requires this legacy variable.
+set "Platform=%VSCMD_ARG_TGT_ARCH%"
 cd /d "%GITHUB_WORKSPACE%\TBuild"
 if errorlevel 1 (echo [CAPY] Build directory unavailable & exit /b 103)
 echo [CAPY] Preparing upstream dependencies
@@ -77,6 +79,8 @@ exit /b 0
 @echo off
 call "%CAPY_VSDEVCMD%" -no_logo -arch=x64 -host_arch=x64 -winsdk=10.0.26100.0 -vcvars_ver=14.44
 if errorlevel 1 exit /b 1
+if /i not "%VSCMD_ARG_TGT_ARCH%"=="x64" exit /b 102
+set "Platform=%VSCMD_ARG_TGT_ARCH%"
 cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target Telegram --config Debug --parallel 2
 if errorlevel 1 exit /b 1
 exit /b 0
