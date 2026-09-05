@@ -115,7 +115,11 @@ public final class AndroidVaultStore implements AutoCloseable {
         // The default Android corruption handler can delete the database. Preserve
         // it instead so recovery remains an explicit user decision.
         SQLiteDatabase db = SQLiteDatabase.openDatabase(file.getAbsolutePath(), null,
-                SQLiteDatabase.OPEN_READWRITE, corrupted -> { });
+                // Payloads are encrypted and ordering uses integer ids, so locale
+                // collators are unnecessary. This also prevents Android from
+                // creating/updating android_metadata before schema validation.
+                SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.NO_LOCALIZED_COLLATORS,
+                corrupted -> { });
         try {
             db.execSQL("PRAGMA synchronous=FULL");
             return db;
