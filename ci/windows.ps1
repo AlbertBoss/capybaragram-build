@@ -50,21 +50,25 @@ if ($Phase -eq 'Build') {
     $batch = Join-Path $env:RUNNER_TEMP 'capy-windows-build.cmd'
     @'
 @echo off
+echo [CAPY] Initializing Visual Studio environment
 call "%CAPY_VSDEVCMD%" -no_logo -arch=x64 -host_arch=x64 -winsdk=10.0.26100.0 -vcvars_ver=14.44
-if errorlevel 1 exit /b 1
-if /i not "%Platform%"=="x64" exit /b 1
+if errorlevel 1 (echo [CAPY] VsDevCmd failed with %errorlevel% & exit /b 101)
+echo [CAPY] Platform="%Platform%"; target="%VSCMD_ARG_TGT_ARCH%"; host="%VSCMD_ARG_HOST_ARCH%"
+if /i not "%Platform%"=="x64" (echo [CAPY] Expected x64 Platform & exit /b 102)
 cd /d "%GITHUB_WORKSPACE%\TBuild"
-if errorlevel 1 exit /b 1
+if errorlevel 1 (echo [CAPY] Build directory unavailable & exit /b 103)
+echo [CAPY] Preparing upstream dependencies
 call "tdesktop\Telegram\build\prepare\win.bat" skip-release silent qt6
-if errorlevel 1 exit /b 1
+if errorlevel 1 (echo [CAPY] Dependency preparation failed with %errorlevel% & exit /b 104)
 cd /d "%GITHUB_WORKSPACE%\TBuild\tdesktop\Telegram"
-if errorlevel 1 exit /b 1
+if errorlevel 1 (echo [CAPY] Telegram directory unavailable & exit /b 105)
+echo [CAPY] Configuring Ninja build
 call configure.bat -G "Ninja Multi-Config" qt6 -D TDESKTOP_API_TEST=ON -D CMAKE_CONFIGURATION_TYPES=Debug -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
-if errorlevel 1 exit /b 1
+if errorlevel 1 (echo [CAPY] CMake configuration failed with %errorlevel% & exit /b 106)
 exit /b 0
 '@ | Set-Content -LiteralPath $batch -Encoding ascii
     & $batch
-    if ($LASTEXITCODE -ne 0) { throw 'Dependency preparation or configuration failed.' }
+    if ($LASTEXITCODE -ne 0) { throw "Preparation batch failed with stage code $LASTEXITCODE; see the preceding CAPY message." }
     $cache = Get-Content -LiteralPath (Join-Path $src 'out\CMakeCache.txt') -Raw
     foreach ($key in 'TDESKTOP_API_TEST','DESKTOP_APP_DISABLE_AUTOUPDATE','DESKTOP_APP_DISABLE_CRASH_REPORTS') {
         if ($cache -notmatch ('(?m)^' + $key + ':BOOL=ON\r?$')) { throw "Configuration did not accept $key." }
