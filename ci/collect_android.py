@@ -2,6 +2,7 @@
 """Inspect a baseline APK without installing it or extracting archive entries."""
 import argparse
 import hashlib
+import json
 import os
 from pathlib import Path
 import re
@@ -15,12 +16,41 @@ def checked(args):
         raise RuntimeError(f"Artifact inspection failed: {Path(args[0]).name}")
     return p.stdout
 
+def locate_apk(source):
+    """Use AGP's output manifest rather than assuming a variant directory layout."""
+    root = source / 'TMessagesProj_App/build/outputs/apk'
+    if not root.is_dir():
+        raise RuntimeError('APK output directory is absent: TMessagesProj_App/build/outputs/apk')
+    manifests = list(root.rglob('output-metadata.json'))
+    print('APK output files: ' + ', '.join(str(p.relative_to(root)) for p in root.rglob('*') if p.is_file()))
+    matches = []
+    for manifest in manifests:
+        manifest.resolve(strict=True).relative_to(root.resolve(strict=True))
+        if manifest.is_symlink() or manifest.stat().st_size > 65536:
+            raise RuntimeError('Invalid APK output metadata.')
+        data = json.loads(manifest.read_text(encoding='utf-8'))
+        if data.get('variantName') != 'afatDebug':
+            continue
+        if data.get('applicationId') != 'org.capybaragram.buildtest.beta':
+            raise RuntimeError('Unexpected application ID in output metadata.')
+        elements = data.get('elements', [])
+        if len(elements) != 1:
+            raise RuntimeError('Expected one afatDebug output in metadata.')
+        name = elements[0].get('outputFile')
+        if not isinstance(name, str) or not name.endswith('.apk') or '/' in name or '\\' in name or ':' in name:
+            raise RuntimeError('APK metadata must name a local APK file.')
+        apk = manifest.parent / name
+        if apk.is_symlink() or not apk.is_file():
+            raise RuntimeError('APK output is not a regular file.')
+        apk.resolve(strict=True).relative_to(root.resolve(strict=True))
+        matches.append(apk)
+    if len(matches) != 1:
+        raise RuntimeError('Expected exactly one afatDebug APK output manifest.')
+    return matches[0].resolve(strict=True)
+
 def collect(source, output):
     source = source.resolve(strict=True)
-    apks = list((source / 'TMessagesProj_App/build/outputs/apk/afat/debug').glob('*.apk'))
-    if len(apks) != 1 or apks[0].is_symlink():
-        raise RuntimeError('Expected exactly one regular afat/debug APK.')
-    apk = apks[0].resolve(strict=True)
+    apk = locate_apk(source)
     apk.relative_to(source)
     sdk_env = os.environ.get('ANDROID_HOME') or os.environ.get('ANDROID_SDK_ROOT')
     if not sdk_env:
@@ -44,6 +74,11 @@ def collect(source, output):
             raise RuntimeError('Expected ARM64 libraries only.')
         if 'lib/arm64-v8a/libtmessages.49.so' not in libraries:
             raise RuntimeError('Telegram native library is absent.')
+        for name in libraries:
+            with archive.open(name) as library:
+                header = library.read(20)
+            if len(header) != 20 or header[:6] != b'\x7fELF\x02\x01' or header[18:20] != b'\xb7\x00':
+                raise RuntimeError('Native library is not a little-endian ARM64 ELF file.')
     if output.exists() or output.is_symlink():
         raise RuntimeError('Artifact directory must be new.')
     output.mkdir(parents=True)
@@ -56,7 +91,7 @@ def collect(source, output):
         'No INTERNET permission, API_ID=0, ephemeral debug signature.\n'
         'Source: https://github.com/DrKLO/Telegram/tree/62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c\n'
         'Modifications: ci/prepare_android_baseline.py in the build repository.\n'
-        'Verified: package ID, absence of INTERNET, APK signature verification and ARM64 library entries.\n'
+        'Verified: package ID, absence of INTERNET, APK signature verification and ARM64 ELF library headers.\n'
         'Not verified: installation, UI launch, actual login, notifications, calls.\n', encoding='utf-8')
     for name in ['LICENSE', 'LICENSE.md', 'LEGAL']:
         if (source / name).is_file():
