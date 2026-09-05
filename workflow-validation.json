@@ -17,6 +17,11 @@
       "sha256": "20e74b74ea45def65457f1b2b9d38c9e7f6fb963a97901bf62eaf1aa8abe4ac0"
     },
     {
+      "file": ".github\\workflows\\android-vault-runtime.yml",
+      "yaml_and_workflow_constraints": "pass",
+      "sha256": "bd7111747be22b48d60d641d780347d339127723339c0f29ea458feb3c1a66cd"
+    },
+    {
       "file": ".github\\workflows\\windows-baseline.yml",
       "yaml_and_workflow_constraints": "pass",
       "sha256": "5cb0960ecfe2c58d6bf70082473fa2411b9e167083946e78e6ed398ce243f09e"

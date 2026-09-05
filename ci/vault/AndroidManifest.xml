@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.capybaragram.vaulttest" android:versionCode="1" android:versionName="test">
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="30" />
+    <application android:label="CapybaraGram vault tests" android:allowBackup="false"
+        android:debuggable="true" android:hasCode="true" />
+    <instrumentation android:name="org.capybaragram.local.AndroidVaultDeviceInstrumentation"
+        android:targetPackage="org.capybaragram.vaulttest" />
+</manifest>
