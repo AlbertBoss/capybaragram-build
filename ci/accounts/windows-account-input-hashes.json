@@ -1,0 +1,17 @@
+{
+  "patch": {
+    "Telegram/SourceFiles/main/main_domain.h": "e027a8713a1c334965e179692ccba2b68f87ffcecd9ff7a3bbafb9a8313e00d8",
+    "Telegram/SourceFiles/main/main_domain.cpp": "d950c7035874ee55ab829b988c4520cca28d6bdaafab0b0bff2326ffe901a5fb",
+    "Telegram/SourceFiles/boxes/premium_preview_box.cpp": "b6c3fd0f0894dc4d779bedc3d696b7254b5183ad63f032a222d694e5105aaaaf",
+    "Telegram/SourceFiles/boxes/premium_limits_box.cpp": "c169ad719941f007116620993b26d5b65bcd0bab41274f54ea2f6714760c2c87"
+  },
+  "audit": {
+    "Telegram/SourceFiles/storage/storage_domain.cpp": "e1cfaf50db22441bafb59cc38df4cf9d3b2536088bd958e6b46ce2622c6866f4",
+    "Telegram/SourceFiles/main/main_account.cpp": "186bb3a47520297528c2848eaf8a3026f9674270385d3889b1662a45934f8f84",
+    "Telegram/SourceFiles/platform/win/notifications_manager_win.cpp": "6a21b5dd05cc3467be768f22755371394e258170910cc736323a74700a7b22f0",
+    "Telegram/SourceFiles/window/window_main_menu.cpp": "83245bb98fb4d1fe14e30d811570a891b980a2988066b49f6d1c74ab178a6d96",
+    "Telegram/SourceFiles/settings/sections/settings_information.cpp": "6fc4a7ee387e970076bf84f5bc799b1c487a27315f2845d56fe1e832aa211081",
+    "Telegram/SourceFiles/core/application.cpp": "4dc20d37b31541072345d4c2908f0bc1abcc2bc61227c1d6ddb76cbbc58bc2c7",
+    "Telegram/SourceFiles/core/local_url_handlers.cpp": "460d30fa9102e988af845d349a75fa3dedd0dea5fc87267ac8d46d7763698445"
+  }
+}

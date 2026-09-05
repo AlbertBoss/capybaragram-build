@@ -51,10 +51,16 @@ if ($Phase -eq 'Build') {
     if ($LASTEXITCODE -ne 0 -or @($subs | Where-Object { $_ -match '^[-+U]' }).Count -ne 0) { throw 'Submodule checkout mismatch.' }
     $env:CAPY_WINDOWS_PROFILE = $Profile
     if ($Profile -eq 'Preview') {
+        & python (Join-Path $PSScriptRoot 'accounts/test_windows_accounts.py') $src
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop account source checks failed.' }
         & python (Join-Path $PSScriptRoot 'prepare_windows_online.py') $src
         if ($LASTEXITCODE -ne 0) { throw 'Windows identity preparation failed.' }
         & python (Join-Path $PSScriptRoot 'prepare_windows_online.py') $src --check
         if ($LASTEXITCODE -ne 0) { throw 'Windows identity verification failed.' }
+        & python (Join-Path $PSScriptRoot 'accounts/windows_accounts_patch.py') $src
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop account preparation failed.' }
+        & python (Join-Path $PSScriptRoot 'accounts/windows_accounts_patch.py') $src --check
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop account preparation verification failed.' }
         $env:CAPY_WINDOWS_API_CACHE = Join-Path $env:RUNNER_TEMP 'capy-windows-owner-api.cmake'
         & python (Join-Path $PSScriptRoot 'api_credentials.py') --windows-cache $env:CAPY_WINDOWS_API_CACHE
         if ($LASTEXITCODE -ne 0) { throw 'Owner API cache creation failed.' }
@@ -133,7 +139,8 @@ if ($Profile -eq 'Preview') {
     @"
 ONLINE PREVIEW, not a release. Own Telegram application credentials; unsigned Windows executable.
 Source: telegramdesktop/tdesktop @ $($env:TDESKTOP_SHA)
-Changes: ci/prepare_windows_online.py; profile: APPDATA/CapybaraGram Preview.
+Changes: ci/prepare_windows_online.py and ci/accounts/windows_accounts_patch.py; profile: APPDATA/CapybaraGram Preview.
+Ten local account slots without Premium; multi-account UI, login and notification isolation require runtime verification.
 Own IPC, toast activator and shortcuts. No automatic legacy data migration or URL association changes.
 Auto-update and crash reports disabled. No Updater packaged. UI launch, login and DLL requirements unverified.
 Run: $($env:GITHUB_RUN_ID)
