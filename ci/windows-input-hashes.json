@@ -1,0 +1,10 @@
+{
+  "Telegram/SourceFiles/config.h": "202f31cde0915cf26ca560d97acce1fc53046dc675da9ea5fa844a6bbd42c5d3",
+  "Telegram/SourceFiles/core/version.h": "7fbdc8043475f6b4af03568bd33394173d3ba7dcc144ba53be604315b1d236d7",
+  "Telegram/SourceFiles/core/launcher.cpp": "663509e6644a12dd2b622e2ccad7e449c6cb0fdb85b40cff8571ec90c3a95b31",
+  "Telegram/SourceFiles/core/application.cpp": "4dc20d37b31541072345d4c2908f0bc1abcc2bc61227c1d6ddb76cbbc58bc2c7",
+  "Telegram/SourceFiles/logs.cpp": "226645748671e6691b2936d539e385614cbd5fd33723b2c5ca856340da46f3b4",
+  "Telegram/SourceFiles/platform/win/specific_win.cpp": "7b7edd4b1ca42d4a0780ebc92e580b73d80d66247330b32462f395c8508a6691",
+  "Telegram/SourceFiles/platform/win/windows_app_user_model_id.cpp": "5078ccdbb4934e4bcf8af9f033ab6bbca0c6db2db56886988f1d70c0762d8561",
+  "Telegram/SourceFiles/platform/win/windows_toast_activator.h": "925665c59b8239829ce74aedfe3dbb6c3daa355958827a146fca9d4bf87cfcd2"
+}

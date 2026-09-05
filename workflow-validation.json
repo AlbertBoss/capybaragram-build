@@ -15,6 +15,11 @@
       "file": ".github\\workflows\\windows-baseline.yml",
       "yaml_and_workflow_constraints": "pass",
       "sha256": "5cb0960ecfe2c58d6bf70082473fa2411b9e167083946e78e6ed398ce243f09e"
+    },
+    {
+      "file": ".github\\workflows\\windows-preview.yml",
+      "yaml_and_workflow_constraints": "pass",
+      "sha256": "8fc5ecd8f651193cf7267f7257c45288fb8e818fe60408ec1901076bcf9aec81"
     }
   ]
 }

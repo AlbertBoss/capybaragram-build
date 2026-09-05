@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: MIT
+name: Windows online preview
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-windows-baseline
+  cancel-in-progress: false
+jobs:
+  windows:
+    if: github.event.repository.private == false
+    runs-on: windows-2025
+    timeout-minutes: 330
+    env:
+      TDESKTOP_SHA: 80158983dba09d3bf5d96701f21473d6c34bf5f5
+      CMAKE_BUILD_PARALLEL_LEVEL: '2'
+      GIT_AUTHOR_NAME: CapybaraGram Build
+      GIT_COMMITTER_NAME: CapybaraGram Build
+      GIT_AUTHOR_EMAIL: build@example.invalid
+      GIT_COMMITTER_EMAIL: build@example.invalid
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: control
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.10'
+      - name: Validate owner API before expensive work
+        shell: pwsh
+        env:
+          CAPY_API_ID: ${{ secrets.CAPY_API_ID }}
+          CAPY_API_HASH: ${{ secrets.CAPY_API_HASH }}
+        run: |
+          python ./control/ci/api_credentials.py
+          if ($LASTEXITCODE -ne 0) { throw 'Missing or invalid owner API inputs.' }
+      - name: Check toolchain and resources
+        shell: pwsh
+        run: ./control/ci/windows.ps1 -Phase Preflight -Profile Preview
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: telegramdesktop/tdesktop
+          ref: ${{ env.TDESKTOP_SHA }}
+          path: TBuild/tdesktop
+          submodules: recursive
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Test pinned identity transformation
+        shell: pwsh
+        run: |
+          python ./control/ci/test_windows_prep.py ./TBuild/tdesktop
+          if ($LASTEXITCODE -ne 0) { throw 'Windows source-contract tests failed.' }
+      - name: Build isolated online preview
+        shell: pwsh
+        env:
+          CAPY_API_ID: ${{ secrets.CAPY_API_ID }}
+          CAPY_API_HASH: ${{ secrets.CAPY_API_HASH }}
+        run: ./control/ci/windows.ps1 -Phase Build -Profile Preview
+      - name: Verify and collect x64 executable
+        shell: pwsh
+        run: ./control/ci/windows.ps1 -Phase Collect -Profile Preview
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: capybaragram-windows-preview-x64
+          path: artifact-stage/*
+          retention-days: 1
+          if-no-files-found: error
+          compression-level: 0
+      - name: Remove temporary owner API cache
+        if: always()
+        shell: pwsh
+        run: |
+          $cache = Join-Path $env:RUNNER_TEMP 'capy-windows-owner-api.cmake'
+          if (Test-Path -LiteralPath $cache) { Remove-Item -LiteralPath $cache }

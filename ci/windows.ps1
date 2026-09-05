@@ -1,6 +1,9 @@
 # SPDX-License-Identifier: MIT
-# Adapted by Codex after review of Fable BUILD-001-WIN. Not yet build-validated.
-param([Parameter(Mandatory=$true)][ValidateSet('Preflight','Build','Collect')][string]$Phase)
+# Baseline build verified; online preview adds reviewed identity and owner API preparation.
+param(
+    [Parameter(Mandatory=$true)][ValidateSet('Preflight','Build','Collect')][string]$Phase,
+    [ValidateSet('Baseline','Preview')][string]$Profile = 'Baseline'
+)
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $sdk = '10.0.26100.0'
@@ -46,6 +49,16 @@ if ($Phase -eq 'Build') {
     if ($LASTEXITCODE -ne 0 -or $status.Count -ne 0) { throw 'Source checkout is not clean.' }
     $subs = @(& git -C $src submodule status --recursive)
     if ($LASTEXITCODE -ne 0 -or @($subs | Where-Object { $_ -match '^[-+U]' }).Count -ne 0) { throw 'Submodule checkout mismatch.' }
+    $env:CAPY_WINDOWS_PROFILE = $Profile
+    if ($Profile -eq 'Preview') {
+        & python (Join-Path $PSScriptRoot 'prepare_windows_online.py') $src
+        if ($LASTEXITCODE -ne 0) { throw 'Windows identity preparation failed.' }
+        & python (Join-Path $PSScriptRoot 'prepare_windows_online.py') $src --check
+        if ($LASTEXITCODE -ne 0) { throw 'Windows identity verification failed.' }
+        $env:CAPY_WINDOWS_API_CACHE = Join-Path $env:RUNNER_TEMP 'capy-windows-owner-api.cmake'
+        & python (Join-Path $PSScriptRoot 'api_credentials.py') --windows-cache $env:CAPY_WINDOWS_API_CACHE
+        if ($LASTEXITCODE -ne 0) { throw 'Owner API cache creation failed.' }
+    }
     New-Item -ItemType Directory -Force -Path (Join-Path $root 'Libraries\win64'), (Join-Path $root 'ThirdParty') | Out-Null
     $batch = Join-Path $env:RUNNER_TEMP 'capy-windows-build.cmd'
     @'
@@ -65,15 +78,29 @@ if errorlevel 1 (echo [CAPY] Dependency preparation failed with %errorlevel% & e
 cd /d "%GITHUB_WORKSPACE%\TBuild\tdesktop\Telegram"
 if errorlevel 1 (echo [CAPY] Telegram directory unavailable & exit /b 105)
 echo [CAPY] Configuring Ninja build
-call configure.bat -G "Ninja Multi-Config" qt6 -D TDESKTOP_API_TEST=ON -D CMAKE_CONFIGURATION_TYPES=Debug -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
+if /i "%CAPY_WINDOWS_PROFILE%"=="Preview" (
+    call configure.bat -G "Ninja Multi-Config" qt6 -C "%CAPY_WINDOWS_API_CACHE%" -D CMAKE_CONFIGURATION_TYPES=Debug -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
+) else (
+    call configure.bat -G "Ninja Multi-Config" qt6 -D TDESKTOP_API_TEST=ON -D CMAKE_CONFIGURATION_TYPES=Debug -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
+)
 if errorlevel 1 (echo [CAPY] CMake configuration failed with %errorlevel% & exit /b 106)
 exit /b 0
 '@ | Set-Content -LiteralPath $batch -Encoding ascii
     & $batch
     if ($LASTEXITCODE -ne 0) { throw "Preparation batch failed with stage code $LASTEXITCODE; see the preceding CAPY message." }
     $cache = Get-Content -LiteralPath (Join-Path $src 'out\CMakeCache.txt') -Raw
-    foreach ($key in 'TDESKTOP_API_TEST','DESKTOP_APP_DISABLE_AUTOUPDATE','DESKTOP_APP_DISABLE_CRASH_REPORTS') {
+    foreach ($key in 'DESKTOP_APP_DISABLE_AUTOUPDATE','DESKTOP_APP_DISABLE_CRASH_REPORTS') {
         if ($cache -notmatch ('(?m)^' + $key + ':BOOL=ON\r?$')) { throw "Configuration did not accept $key." }
+    }
+    if ($Profile -eq 'Preview') {
+        if ($cache -notmatch '(?m)^TDESKTOP_API_TEST:BOOL=OFF\r?$') { throw 'Owner build unexpectedly uses test API.' }
+        foreach ($pair in @(@('TDESKTOP_API_ID', $env:CAPY_API_ID), @('TDESKTOP_API_HASH', $env:CAPY_API_HASH))) {
+            if ([string]::IsNullOrEmpty($pair[1]) -or $cache -notmatch ('(?m)^' + $pair[0] + ':STRING=' + [regex]::Escape($pair[1]) + '\r?$')) {
+                throw 'CMake cache did not accept owner application credentials.'
+            }
+        }
+    } elseif ($cache -notmatch '(?m)^TDESKTOP_API_TEST:BOOL=ON\r?$') {
+        throw 'Baseline configuration did not accept test API.'
     }
     @'
 @echo off
@@ -98,9 +125,20 @@ $pe = [BitConverter]::ToInt32($bytes, 0x3c)
 if ($pe -lt 0 -or $pe -gt ($bytes.Length - 6) -or [BitConverter]::ToUInt32($bytes,$pe) -ne 0x00004550 -or [BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x8664) { throw 'Expected Windows PE x64 executable.' }
 $stage = Join-Path $env:GITHUB_WORKSPACE 'artifact-stage'
 New-Item -ItemType Directory -Force -Path $stage | Out-Null
-Copy-Item -LiteralPath $exe -Destination (Join-Path $stage 'Telegram.exe')
+$artifactName = if ($Profile -eq 'Preview') { 'CapybaraGram.exe' } else { 'Telegram.exe' }
+Copy-Item -LiteralPath $exe -Destination (Join-Path $stage $artifactName)
 $hash = (Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash.ToLowerInvariant()
-"$hash *Telegram.exe" | Set-Content -LiteralPath (Join-Path $stage 'SHA256SUMS.txt') -Encoding ascii
+"$hash *$artifactName" | Set-Content -LiteralPath (Join-Path $stage 'SHA256SUMS.txt') -Encoding ascii
+if ($Profile -eq 'Preview') {
+    @"
+ONLINE PREVIEW, not a release. Own Telegram application credentials; unsigned Windows executable.
+Source: telegramdesktop/tdesktop @ $($env:TDESKTOP_SHA)
+Changes: ci/prepare_windows_online.py; profile: APPDATA/CapybaraGram Preview.
+Own IPC, toast activator and shortcuts. No automatic legacy data migration or URL association changes.
+Auto-update and crash reports disabled. No Updater packaged. UI launch, login and DLL requirements unverified.
+Run: $($env:GITHUB_RUN_ID)
+"@ | Set-Content -LiteralPath (Join-Path $stage 'BUILD-INFO.txt') -Encoding utf8
+} else {
 @"
 TEST BASELINE ONLY, not a CapybaraGram release. Do not log into real accounts.
 Source: telegramdesktop/tdesktop @ $($env:TDESKTOP_SHA)
@@ -108,6 +146,7 @@ API_TEST selects upstream restricted test credentials; it does NOT force test da
 Auto-update and crash reports disabled. No Updater packaged. UI launch, networking and DLL requirements unverified.
 Run: $($env:GITHUB_RUN_ID)
 "@ | Set-Content -LiteralPath (Join-Path $stage 'BUILD-INFO.txt') -Encoding utf8
+}
 foreach ($name in 'LICENSE','LEGAL') {
     $notice = Join-Path $src $name
     if (Test-Path -LiteralPath $notice) { Copy-Item -LiteralPath $notice -Destination (Join-Path $stage $name) }

@@ -13,11 +13,21 @@ Each platform has its own concurrency group. Android and Windows may run togethe
 
 ## Android online preview preparation
 
-`android-preview.yml` prepares a separate `org.capybaragram.preview.beta` ARM64 debug app with owner API credentials and persistent signing. It is not yet verified by an actual online CI run, installation or login. It shares the Android concurrency group. Four repository Actions Secrets are required: `CAPY_API_ID`, `CAPY_API_HASH`, `CAPY_ANDROID_KEYSTORE_BASE64`, and `CAPY_ANDROID_KEYSTORE_PASSWORD`. The PKCS12 alias is `capybaragram-preview`; its public certificate SHA256 is pinned in the workflow. Missing inputs or a different signer stop the job.
+`android-preview.yml` prepares a separate `org.capybaragram.preview.beta` ARM64 debug app with owner API credentials and persistent signing. Its online CI run succeeded; installation and login remain unverified. It shares the Android concurrency group. Four repository Actions Secrets are required: `CAPY_API_ID`, `CAPY_API_HASH`, `CAPY_ANDROID_KEYSTORE_BASE64`, and `CAPY_ANDROID_KEYSTORE_PASSWORD`. The PKCS12 alias is `capybaragram-preview`; its public certificate SHA256 is pinned in the workflow. Missing inputs or a different signer stop the job.
 
 Credentials and signing passwords enter the relevant steps through the environment. Only the verified APK, checksums and notices are uploaded; do not upload source with embedded API credentials, build intermediates or signing material. GitHub Secrets does not make an application API ID/hash unextractable from a distributed APK. It is separate from a user's Telegram login/session.
 
 Local checks cover preparation, synthetic APK acceptance/rejection, and actual JDK restoration/certificate verification of the persistent key. They do not prove a working Telegram client, support for 10 accounts, folder synchronization, notifications or other planned features.
+
+## Verified builds and Windows preview preparation
+
+The [Android online preview run 33972555759 succeeded](https://github.com/AlbertBoss/capybaragram-build/actions/runs/33972555759), including APK package, INTERNET, signer and native ABI checks. The downloaded archive and APK checksums also passed locally; installation and login remain unverified. 
+
+The [Windows baseline run 33964398564 succeeded](https://github.com/AlbertBoss/capybaragram-build/actions/runs/33964398564). Downloaded archive/EXE checksums and x64 PE headers passed locally. The actual launch remains unverified; baseline toolchain compatibility is now demonstrated.
+
+`windows-preview.yml` uses the same toolchain with owner API credentials from an initial CMake cache outside the source/artifacts. Eight pinned source files separate the default profile (`APPDATA/CapybaraGram Preview`), portable folder (`CapybaraGramForcePortable`), IPC ID, notification activator, shortcuts and application identity. Automatic legacy Telegram data migration and automatic URL association registration are removed; manual URL association settings remain available. The collected executable is `CapybaraGram.exe`. The online Windows workflow has not yet passed a native build or runtime check. No paid code-signing certificate is configured.
+
+Ten source-contract tests cover identity separation, preservation of Windows system GUIDs and license headers, preparation/verification and rejection of changed inputs. They cannot prove runtime profile isolation. Before real account use, verify launch beside official Telegram, both profile paths, notifications, shortcuts, restart and manual link association behavior.
 
 ## Sources and tooling
 
@@ -26,7 +36,7 @@ Local checks cover preparation, synthetic APK acceptance/rejection, and actual J
 | Android | [DrKLO/Telegram](https://github.com/DrKLO/Telegram/tree/62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c) | AGP 8.10.1, Gradle 8.11.1, JDK 17, SDK 36, build-tools 36.0.0, NDK 27.2.12479018, CMake 3.22.1 |
 | Windows | [telegramdesktop/tdesktop](https://github.com/telegramdesktop/tdesktop/tree/80158983dba09d3bf5d96701f21473d6c34bf5f5) | VC 14.44, Windows SDK 10.0.26100.0, Python 3.10, Qt6 via upstream preparation, Ninja Multi-Config |
 
-The Windows documentation mentions Visual Studio 2026. The current standard Windows runner lists VS2022 17.14; the workflow checks the actual VC toolset and uses the upstream-supported explicit Ninja generator. That compatibility still needs a real build. Dependency preparation invokes upstream scripts and can download substantial data; a source SHA does not pin all external downloads. Final application compilation is limited to two workers; upstream preparation contains its own parallel commands. Disk thresholds are preliminary safeguards, not proven resource requirements.
+The Windows documentation mentions Visual Studio 2026. The current standard Windows runner lists VS2022 17.14; the workflow checks the actual VC toolset and uses the upstream-supported explicit Ninja generator. The baseline CI build demonstrated that compatibility. Dependency preparation invokes upstream scripts and can download substantial data; a source SHA does not pin all external downloads. Final application compilation is limited to two workers; upstream preparation contains its own parallel commands. Disk thresholds are preliminary safeguards, not proven resource requirements.
 
 Official Actions revisions are recorded in `action-pins.json`; the action metadata was read, but this is not a full audit of their bundled dependencies.
 
