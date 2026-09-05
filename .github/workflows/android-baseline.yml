@@ -21,7 +21,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          command -v sdkmanager
+          if ! command -v sdkmanager >/dev/null 2>&1; then
+            sdk_root="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+            test -n "$sdk_root" || { echo 'Android SDK root is not configured.'; exit 1; }
+            for manager in "$sdk_root/cmdline-tools/latest/bin/sdkmanager" "$sdk_root"/cmdline-tools/*/bin/sdkmanager; do
+              if test -x "$manager"; then
+                sdk_bin=$(dirname "$manager")
+                export PATH="$sdk_bin:$PATH"
+                printf '%s\n' "$sdk_bin" >> "$GITHUB_PATH"
+                break
+              fi
+            done
+          fi
+          command -v sdkmanager || { echo 'No executable sdkmanager found in PATH or Android SDK cmdline-tools.'; exit 1; }
           command -v python3
           df -h "$GITHUB_WORKSPACE"
           free -h
