@@ -66,9 +66,24 @@ void ShowNote(not_null<Main::Session*> session, std::shared_ptr<Ui::Show> show,
 			Text(u"Stored only on this computer for this account. Saving does not send a message. Save before closing; unsaved text is discarded on lock or logout."_q,
 				u"Хранится только на этом компьютере для этого аккаунта. Сохранение не отправляет сообщение. Сохраните текст перед закрытием: при блокировке или выходе несохранённый текст удаляется."_q),
 			st::aboutLabel), st::boxPadding);
-		struct State { bool loaded = false; bool pending = false; bool closed = false; };
+		struct State {
+			bool loaded = false;
+			bool pending = false;
+			bool closed = false;
+			QPointer<Ui::RoundButton> save;
+			QPointer<Ui::RoundButton> retry;
+		};
 		const auto state = box->lifetime().make_state<State>();
 		const auto weakBox = QPointer<Ui::GenericBox>(box.get());
+		const auto updateControls = [=] {
+			field->setDisabled(!state->loaded || state->pending || state->closed);
+			if (state->save) state->save->setDisabled(!state->loaded || state->pending || state->closed);
+			if (state->retry) {
+				state->retry->setVisible(!state->loaded && !state->closed);
+				state->retry->setDisabled(state->pending);
+			}
+			box->updateButtonsGeometry();
+		};
 		box->boxClosing(
 		) | rpl::on_next([=] {
 			state->closed = true;
@@ -90,6 +105,7 @@ void ShowNote(not_null<Main::Session*> session, std::shared_ptr<Ui::Show> show,
 		const auto reload = [=] {
 			if (state->loaded || state->pending || state->closed || !worker->usable(handle)) return;
 			state->pending = true;
+			updateControls();
 			status->setText(Text(u"Loading…"_q, u"Загрузка…"_q));
 			worker->read(handle, record, [=](Vault::Worker::Result result) {
 				if (!weakBox || state->closed) return;
@@ -98,18 +114,19 @@ void ShowNote(not_null<Main::Session*> session, std::shared_ptr<Ui::Show> show,
 				const auto text = QString::fromUtf8(bytes);
 				if (!result.ok || text.toUtf8() != bytes || text.size() > limit) {
 					status->setText(Failure());
+					updateControls();
 					return;
 				}
 				state->loaded = true;
 				field->setTextWithTags({ text, {} });
-				field->setDisabled(false);
+				updateControls();
 				if (weakBox->isBoxShown()) field->setFocus();
 				status->setText(isTemplate
 					? Text(u"Template · 4,096 characters maximum"_q, u"Шаблон · до 4096 символов"_q)
 					: Text(u"Local note · 16,000 characters maximum"_q, u"Локальная заметка · до 16 000 символов"_q));
 			});
 		};
-		box->addButton(tr::lng_settings_save(), [=] {
+		state->save = box->addButton(tr::lng_settings_save(), [=] {
 			if (!state->loaded || state->pending || state->closed || !worker->usable(handle)) return;
 			const auto text = field->getLastText().toUtf8().toStdString();
 			if (isTemplate && field->getLastText().trimmed().isEmpty()) {
@@ -117,7 +134,7 @@ void ShowNote(not_null<Main::Session*> session, std::shared_ptr<Ui::Show> show,
 				return;
 			}
 			state->pending = true;
-			field->setDisabled(true);
+			updateControls();
 			status->setText(Text(u"Saving…"_q, u"Сохранение…"_q));
 			const auto done = [=](Vault::Worker::Result result) {
 				if (!weakBox || state->closed) return;
@@ -126,7 +143,7 @@ void ShowNote(not_null<Main::Session*> session, std::shared_ptr<Ui::Show> show,
 					close();
 					if (saved) saved();
 				} else {
-					field->setDisabled(false);
+					updateControls();
 					status->setText(Failure());
 				}
 			};
@@ -134,7 +151,7 @@ void ShowNote(not_null<Main::Session*> session, std::shared_ptr<Ui::Show> show,
 			else worker->write(handle, record, text, done);
 		});
 		box->addButton(tr::lng_cancel(), close);
-		box->addLeftButton(rpl::single(Text(u"Retry loading"_q, u"Загрузить снова"_q)), reload);
+		state->retry = box->addLeftButton(rpl::single(Text(u"Retry loading"_q, u"Загрузить снова"_q)), reload);
 		reload();
 	}));
 }
@@ -263,6 +280,8 @@ void ShowTemplates(TemplateContext context, int page) {
 				const auto record = result.ids[i];
 				const auto label = box->lifetime().make_state<rpl::variable<QString>>(Text(u"Loading…"_q, u"Загрузка…"_q));
 				const auto button = box->addRow(object_ptr<Ui::RoundButton>(box, label->value(), st::defaultActiveButton), st::boxPadding);
+				button->setTextTransform(Ui::RoundButtonTextTransform::NoTransform);
+				button->setFullWidth(st::boxWideWidth - st::boxPadding.left() - st::boxPadding.right());
 				button->setDisabled(true);
 				Core::App().capyVaultWorker().read(context.handle, record, [=](Vault::Worker::Result loaded) {
 					if (!weak || *closed) return;
@@ -275,7 +294,7 @@ void ShowTemplates(TemplateContext context, int page) {
 					const auto shortText = text.simplified();
 					*label = shortText.isEmpty()
 						? Text(u"Empty template"_q, u"Пустой шаблон"_q)
-						: shortText.left(52) + (shortText.size() > 52 ? u"…"_q : QString());
+						: shortText;
 					button->setDisabled(false);
 					button->setClickedCallback([=] {
 						box->closeBox();
