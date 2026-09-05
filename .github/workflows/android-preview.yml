@@ -1,0 +1,118 @@
+# SPDX-License-Identifier: MIT
+name: Android online preview (owner API and stable signing)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-android-baseline
+  cancel-in-progress: false
+jobs:
+  android:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      CAPY_ANDROID_CERT_SHA256: 8254ebe4b00d6e4a95ee07dd27a30f8bd95b066b83c72affb39e4d25e7bff282
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: control
+          persist-credentials: false
+      - name: Validate required owner inputs before expensive work
+        shell: bash
+        env:
+          CAPY_API_ID: ${{ secrets.CAPY_API_ID }}
+          CAPY_API_HASH: ${{ secrets.CAPY_API_HASH }}
+          CAPY_ANDROID_KEYSTORE_BASE64: ${{ secrets.CAPY_ANDROID_KEYSTORE_BASE64 }}
+          CAPY_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.CAPY_ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          python3 control/ci/api_credentials.py
+          python3 control/ci/android_signing.py
+      - name: Check resources and SDK tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v sdkmanager >/dev/null 2>&1; then
+            sdk_root="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+            test -n "$sdk_root" || { echo 'Android SDK root is not configured.'; exit 1; }
+            for manager in "$sdk_root/cmdline-tools/latest/bin/sdkmanager" "$sdk_root"/cmdline-tools/*/bin/sdkmanager; do
+              if test -x "$manager"; then
+                sdk_bin=$(dirname "$manager")
+                export PATH="$sdk_bin:$PATH"
+                printf '%s\n' "$sdk_bin" >> "$GITHUB_PATH"
+                break
+              fi
+            done
+          fi
+          command -v sdkmanager || { echo 'No executable sdkmanager found in PATH or Android SDK cmdline-tools.'; exit 1; }
+          command -v python3
+          df -h "$GITHUB_WORKSPACE"
+          free -h
+          free_kb=$(df --output=avail -k "$GITHUB_WORKSPACE" | tail -1 | tr -d ' ')
+          test "$free_kb" -ge 36700160 || { echo 'Less than 35 GiB free; no files will be deleted.'; exit 1; }
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Restore persistent preview signer and verify its certificate
+        shell: bash
+        env:
+          CAPY_ANDROID_KEYSTORE_BASE64: ${{ secrets.CAPY_ANDROID_KEYSTORE_BASE64 }}
+          CAPY_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.CAPY_ANDROID_KEYSTORE_PASSWORD }}
+        run: python3 control/ci/android_signing.py --destination "$RUNNER_TEMP/capybaragram-preview.p12"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: DrKLO/Telegram
+          ref: 62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c
+          path: android
+          submodules: recursive
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Test preparation against the checked-out source files
+        shell: bash
+        env:
+          CAPY_ANDROID_SOURCE: ${{ github.workspace }}/android
+        run: python3 control/ci/test_android_prep.py
+      - name: Install exact Android SDK components
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Hosted image must already contain accepted SDK licenses. No 'yes | sdkmanager --licenses'.
+          sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1'
+      - name: Prepare separate online preview with owner application credentials
+        shell: bash
+        env:
+          CAPY_API_ID: ${{ secrets.CAPY_API_ID }}
+          CAPY_API_HASH: ${{ secrets.CAPY_API_HASH }}
+        run: |
+          set -euo pipefail
+          python3 control/ci/prepare_android_baseline.py --source android
+          python3 control/ci/prepare_android_online.py --source android --control-ci control/ci --check
+          python3 control/ci/prepare_android_online.py --source android --control-ci control/ci
+      - name: Build one ARM64 debug APK
+        env:
+          CAPY_ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/capybaragram-preview.p12
+          CAPY_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.CAPY_ANDROID_KEYSTORE_PASSWORD }}
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash ./gradlew :TMessagesProj_App:assembleAfatDebug --no-daemon --max-workers=2 -PAPP_PACKAGE=org.capybaragram.preview -Pandroid.injected.build.abi=arm64-v8a
+      - name: Verify manifest, signing and native ABI
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 control/ci/collect_android.py --source android --output artifact-stage --profile preview
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: capybaragram-android-preview-arm64
+          path: artifact-stage/*
+          retention-days: 1
+          if-no-files-found: error
+          compression-level: 0
+      - name: Remove temporary runner signing file
+        if: always()
+        shell: bash
+        run: python3 -c 'import os; from pathlib import Path; (Path(os.environ["RUNNER_TEMP"])/"capybaragram-preview.p12").unlink(missing_ok=True)'

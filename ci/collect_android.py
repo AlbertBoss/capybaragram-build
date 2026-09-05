@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Inspect a baseline APK without installing it or extracting archive entries."""
+"""Inspect an APK without installing it or extracting archive entries."""
 import argparse
 import hashlib
 import json
@@ -10,13 +10,18 @@ import shutil
 import subprocess
 import zipfile
 
+PROFILES = {
+    'offline': ('org.capybaragram.buildtest.beta', 'CapybaraGram-OFFLINE-BUILD-TEST.apk'),
+    'preview': ('org.capybaragram.preview.beta', 'CapybaraGram-Preview-arm64.apk'),
+}
+
 def checked(args):
     p = subprocess.run([str(a) for a in args], capture_output=True, text=True, timeout=90, check=False)
     if p.returncode:
         raise RuntimeError(f"Artifact inspection failed: {Path(args[0]).name}")
     return p.stdout
 
-def locate_apk(source):
+def locate_apk(source, package='org.capybaragram.buildtest.beta'):
     """Use AGP's output manifest rather than assuming a variant directory layout."""
     # AGP can place IDE-targeted APKs under intermediates instead of outputs/apk.
     # The injected ABI option is an IDE build option; use the artifact type below.
@@ -36,7 +41,7 @@ def locate_apk(source):
             continue
         if data.get('variantName') != 'afatDebug':
             continue
-        if data.get('applicationId') != 'org.capybaragram.buildtest.beta':
+        if data.get('applicationId') != package:
             raise RuntimeError('Unexpected application ID in output metadata.')
         elements = data.get('elements', [])
         if len(elements) != 1:
@@ -53,21 +58,31 @@ def locate_apk(source):
         raise RuntimeError('Expected exactly one afatDebug APK output manifest.')
     return matches[0].resolve(strict=True)
 
-def collect(source, output):
+def collect(source, output, profile='offline', certificate_sha256=None):
+    if profile not in PROFILES:
+        raise RuntimeError('Unknown APK profile.')
+    package, filename = PROFILES[profile]
+    online = profile == 'preview'
+    if online and (not isinstance(certificate_sha256, str) or not re.fullmatch(r'[0-9a-f]{64}', certificate_sha256)):
+        raise RuntimeError('Preview requires a pinned signing certificate SHA256.')
     source = source.resolve(strict=True)
-    apk = locate_apk(source)
+    apk = locate_apk(source, package)
     apk.relative_to(source)
     sdk_env = os.environ.get('ANDROID_HOME') or os.environ.get('ANDROID_SDK_ROOT')
     if not sdk_env:
         raise RuntimeError('Android SDK is not configured.')
     tools = Path(sdk_env) / 'build-tools/36.0.0'
     badging = checked([tools / 'aapt', 'dump', 'badging', apk])
-    if not re.search(r"^package: name='org\.capybaragram\.buildtest\.beta' ", badging, re.M):
+    if not re.search(r"^package: name='" + re.escape(package) + r"' ", badging, re.M):
         raise RuntimeError('Unexpected application ID; refusing to package.')
     permissions = checked([tools / 'aapt', 'dump', 'permissions', apk])
-    if 'android.permission.INTERNET' in permissions:
-        raise RuntimeError('Offline baseline must not request INTERNET permission.')
-    checked([tools / 'apksigner', 'verify', '--verbose', apk])
+    if ('android.permission.INTERNET' in permissions) != online:
+        raise RuntimeError('INTERNET permission does not match the requested APK profile.')
+    signature = checked([tools / 'apksigner', 'verify', '--verbose', '--print-certs', apk])
+    if online:
+        fingerprints = re.findall(r'^Signer #[0-9]+ certificate SHA-256 digest: ([0-9a-fA-F]{64})\s*$', signature, re.M)
+        if [value.lower() for value in fingerprints] != [certificate_sha256]:
+            raise RuntimeError('APK signer does not match the pinned preview certificate.')
     with zipfile.ZipFile(apk) as archive:
         names = archive.namelist()
         if len(names) != len(set(names)):
@@ -88,25 +103,33 @@ def collect(source, output):
     if output.exists() or output.is_symlink():
         raise RuntimeError('Artifact directory must be new.')
     output.mkdir(parents=True)
-    dest = output / 'CapybaraGram-OFFLINE-BUILD-TEST.apk'
+    dest = output / filename
     shutil.copyfile(apk, dest)
     digest = hashlib.sha256(dest.read_bytes()).hexdigest()
     (output / 'SHA256SUMS.txt').write_text(f'{digest} *{dest.name}\n', encoding='ascii')
-    (output / 'BUILD-INFO.txt').write_text(
+    description = (
+        'ONLINE PREVIEW, not a release. Owner application credentials and persistent preview signature.\n'
+        'Certificate SHA256: ' + certificate_sha256 + '\n'
+        'Modifications: ci/prepare_android_baseline.py and ci/prepare_android_online.py.\n'
+        'Verified: package ID, INTERNET permission, pinned APK signer and ARM64 ELF library headers.\n'
+    ) if online else (
         'OFFLINE BUILD TEST, not a working Telegram client or release.\n'
         'No INTERNET permission, API_ID=0, ephemeral debug signature.\n'
-        'Source: https://github.com/DrKLO/Telegram/tree/62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c\n'
         'Modifications: ci/prepare_android_baseline.py in the build repository.\n'
         'Verified: package ID, absence of INTERNET, APK signature verification and ARM64 ELF library headers.\n'
+    )
+    (output / 'BUILD-INFO.txt').write_text(description +
+        'Source: https://github.com/DrKLO/Telegram/tree/62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c\n'
         'Not verified: installation, UI launch, actual login, notifications, calls.\n', encoding='utf-8')
     for name in ['LICENSE', 'LICENSE.md', 'LEGAL']:
         if (source / name).is_file():
             shutil.copyfile(source / name, output / name)
-    print('PASS: offline APK structure, signature and package; runtime not tested.')
+    print('PASS: ' + profile + ' APK structure, signature and package; runtime not tested.')
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('--source', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--profile', choices=PROFILES, default='offline')
     args = p.parse_args()
-    collect(args.source, args.output)
+    collect(args.source, args.output, args.profile, os.environ.get('CAPY_ANDROID_CERT_SHA256'))

@@ -1,15 +1,23 @@
 # CapybaraGram build experiments
 
-This repository prepares initial Android and Windows builds from pinned Telegram sources. **It is not a CapybaraGram release or a working implementation of its planned features.** Android compilation succeeded in [run 33964193414](https://github.com/AlbertBoss/capybaragram-build/actions/runs/33964193414); subsequent artifact discovery failed and has been changed to use AGP output metadata. A verified artifact and runtime test are still pending.
+This repository prepares initial Android and Windows builds from pinned Telegram sources. **It is not a CapybaraGram release or a working implementation of its planned features.** The complete offline Android workflow succeeded in [run 33969421213](https://github.com/AlbertBoss/capybaragram-build/actions/runs/33969421213): compilation, manifest/signature/ARM64 checks and artifact upload passed. Installation and runtime testing remain pending.
 
 ## Scope
 
 - Android: offline ARM64 debug test, separate `org.capybaragram.buildtest.beta` application ID, no INTERNET permission, no usable Telegram API credentials, fresh debug signature. This verifies compilation and packaging before production configuration. It cannot exchange messages.
 - Windows: official x64 debug executable using upstream restricted test API credentials. `TDESKTOP_API_TEST` does not select test data centers or disable networking. Do not use real accounts. Auto-update and crash reports are disabled; the updater is not packaged.
 
-Both workflows run only when dispatched manually and only for public repositories. Standard `ubuntu-24.04` and `windows-2025` runners are used. No paid/larger runners, scheduled jobs, releases, shared caches or repository secrets are configured. Artifacts expire after one day. Standard public-runner execution is free under current GitHub rules; artifact storage remains quota-controlled. Do not enable paid overages.
+All workflows run only when dispatched manually and only for public repositories. Standard `ubuntu-24.04` and `windows-2025` runners are used. No paid/larger runners, scheduled jobs, releases or shared caches are configured. Artifacts expire after one day. Standard public-runner execution is free under current GitHub rules; artifact storage remains quota-controlled. Do not enable paid overages.
 
 Each platform has its own concurrency group. Android and Windows may run together; multiple builds of the same platform stay serialized without canceling an active build.
+
+## Android online preview preparation
+
+`android-preview.yml` prepares a separate `org.capybaragram.preview.beta` ARM64 debug app with owner API credentials and persistent signing. It is not yet verified by an actual online CI run, installation or login. It shares the Android concurrency group. Four repository Actions Secrets are required: `CAPY_API_ID`, `CAPY_API_HASH`, `CAPY_ANDROID_KEYSTORE_BASE64`, and `CAPY_ANDROID_KEYSTORE_PASSWORD`. The PKCS12 alias is `capybaragram-preview`; its public certificate SHA256 is pinned in the workflow. Missing inputs or a different signer stop the job.
+
+Credentials and signing passwords enter the relevant steps through the environment. Only the verified APK, checksums and notices are uploaded; do not upload source with embedded API credentials, build intermediates or signing material. GitHub Secrets does not make an application API ID/hash unextractable from a distributed APK. It is separate from a user's Telegram login/session.
+
+Local checks cover preparation, synthetic APK acceptance/rejection, and actual JDK restoration/certificate verification of the persistent key. They do not prove a working Telegram client, support for 10 accounts, folder synchronization, notifications or other planned features.
 
 ## Sources and tooling
 
