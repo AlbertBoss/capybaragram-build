@@ -70,6 +70,12 @@ def transform_settings(text):
     return text
 
 def transform_app(text):
+    # The IDE ABI hint limits native compilation, but does not replace the app
+    # flavor's packaging filters (including native libraries from dependency AARs).
+    # This disposable baseline builds only afatDebug; retain other flavors.
+    text = replace_once(text,
+        r'(?m)(^        afat \{\n            ndk \{\n                )abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"',
+        lambda m: m.group(1) + 'abiFilters "arm64-v8a"')
     pattern = r'(?ms)(signingConfigs\s*\{\s*debug\s*\{)(.*?)(^\s*\})'
     matches = list(re.finditer(pattern, text))
     if len(matches) != 1:

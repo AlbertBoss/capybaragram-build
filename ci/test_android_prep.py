@@ -28,6 +28,12 @@ class Tests(unittest.TestCase):
   import re
   pattern=r'(?ms)        release \{\n.*?^        \}'
   self.assertEqual(re.search(pattern,original).group(),re.search(pattern,text).group())
+  afat=r'(?ms)^        afat \{\n            ndk \{(.*?)^            \}'
+  self.assertEqual(re.findall(r'"([^"]+)"',re.search(afat,text).group(1)),['arm64-v8a'])
+  # Packaging filters of unrelated bundle flavors must remain unchanged.
+  for flavor in ['bundleAfat','bundleAfat_SDK23']:
+   block=rf'(?ms)^        {flavor} \{{\n            ndk \{{.*?^            \}}'
+   self.assertEqual(re.search(block,original).group(),re.search(block,text).group())
   for p in prep.PATHS:
    if p.endswith('.xml'):
     root=prep.ET.parse(self.root/p).getroot();app=root.find('application')

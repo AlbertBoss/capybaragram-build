@@ -75,6 +75,7 @@ def collect(source, output):
         if 'AndroidManifest.xml' not in names or 'classes.dex' not in names:
             raise RuntimeError('APK missing manifest or code.')
         libraries = [n for n in names if n.startswith('lib/') and n.endswith('.so')]
+        print('Packaged native libraries (' + str(len(libraries)) + '): ' + ', '.join(sorted(libraries)))
         if not libraries or any(not n.startswith('lib/arm64-v8a/') for n in libraries):
             raise RuntimeError('Expected ARM64 libraries only.')
         if 'lib/arm64-v8a/libtmessages.49.so' not in libraries:
