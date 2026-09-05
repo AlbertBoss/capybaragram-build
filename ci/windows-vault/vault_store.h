@@ -19,6 +19,9 @@ public:
 	[[nodiscard]] static std::string Note(int type, std::uint64_t peer,
 		std::uint64_t topic = 0);
 	[[nodiscard]] static std::string Template(const std::string &id);
+	// For the registry's durable cleanup queue, including after process restart.
+	static void RetireGeneration(const std::filesystem::path &root,
+		const std::string &generation);
 
 	Store(const std::filesystem::path &root, std::uint64_t owner,
 		const std::string &generation, bool create);

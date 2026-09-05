@@ -233,9 +233,20 @@ std::vector<std::string> Store::templates() const {
 
 void Store::retire() const {
 	checkThread();
-	Directory(_directory, false);
-	AtomicWrite(_directory / "retired", "CPG retired generation");
-	for (const auto &entry : std::filesystem::directory_iterator(_directory)) {
+	RetireGeneration(_directory.parent_path(), _directory.filename().string());
+}
+
+void Store::RetireGeneration(const std::filesystem::path &root,
+		const std::string &generation) {
+	const auto directory = GenerationPath(root, generation);
+	if (GetFileAttributesW(directory.c_str()) == INVALID_FILE_ATTRIBUTES) {
+		const auto error = GetLastError();
+		if (error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND) return;
+		Fail();
+	}
+	Directory(directory, false);
+	AtomicWrite(directory / "retired", "CPG retired generation");
+	for (const auto &entry : std::filesystem::directory_iterator(directory)) {
 		const auto name = entry.path().filename().string();
 		if (name == "retired") continue;
 		if (!DeleteFileW(entry.path().c_str()) && GetLastError() != ERROR_FILE_NOT_FOUND) Fail();

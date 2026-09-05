@@ -32,7 +32,13 @@ jobs:
             & .\vault-test.exe | Tee-Object -FilePath runtime-result.txt
             if ($LASTEXITCODE -ne 0) { throw 'Native runtime checks failed' }
             if (-not (Select-String -LiteralPath runtime-result.txt -SimpleMatch 'CAPY_WINDOWS_VAULT=PASS')) { throw 'Missing test success' }
-            Get-FileHash vault_store.h,vault_store.cpp,vault_store_test.cpp -Algorithm SHA256 | Select-Object @{Name='name';Expression={Split-Path $_.Path -Leaf}},Hash | ConvertTo-Json | Set-Content source-hashes.json
+            $compileRegistry = 'call "' + $vcvars + '" >nul && cl /nologo /std:c++20 /EHsc /W4 /WX /utf-8 vault_store.cpp vault_registry.cpp vault_registry_test.cpp /Fe:registry-test.exe /link crypt32.lib bcrypt.lib'
+            & cmd.exe /d /s /c $compileRegistry
+            if ($LASTEXITCODE -ne 0) { throw 'Registry compilation failed' }
+            & .\registry-test.exe | Tee-Object -FilePath registry-runtime-result.txt
+            if ($LASTEXITCODE -ne 0) { throw 'Registry runtime checks failed' }
+            if (-not (Select-String -LiteralPath registry-runtime-result.txt -SimpleMatch 'CAPY_WINDOWS_REGISTRY=PASS')) { throw 'Missing registry test success' }
+            Get-FileHash vault_store.h,vault_store.cpp,vault_store_test.cpp,vault_registry.h,vault_registry.cpp,vault_registry_test.cpp -Algorithm SHA256 | Select-Object @{Name='name';Expression={Split-Path $_.Path -Leaf}},Hash | ConvertTo-Json | Set-Content source-hashes.json
           } finally { Pop-Location }
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
@@ -40,6 +46,7 @@ jobs:
           name: capybaragram-windows-vault-runtime-results
           path: |
             ci/windows-vault/runtime-result.txt
+            ci/windows-vault/registry-runtime-result.txt
             ci/windows-vault/source-hashes.json
           retention-days: 1
           if-no-files-found: error

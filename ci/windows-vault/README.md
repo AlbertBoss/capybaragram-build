@@ -10,4 +10,15 @@ Writes encrypt before creating a unique temporary file, flush it, and replace th
 
 Retirement writes a durable marker before deleting records. Reopening a retired generation fails even if cleanup was interrupted. The marker remains intentionally; cleanup may be retried. The host coordinator still needs durable active-generation metadata and cleanup scheduling. Creation is exclusive and cannot silently overwrite an existing generation.
 
-Tests exercise the actual Windows APIs and filesystem with synthetic data, including owner/generation/record separation, tampering, reopen, locked-destination write failure, bounds, thread confinement, retirement and same-owner fresh generation. They do not establish Telegram UI, logout hook, passcode, real-account or final product acceptance. Native CI result pending.
+Tests exercise the actual Windows APIs and filesystem with synthetic data, including owner/generation/record separation, tampering, reopen, locked-destination write failure, bounds, thread confinement, retirement and same-owner fresh generation. They do not establish Telegram UI, logout hook, passcode, real-account or final product acceptance. The first Store revision passed native CI run 33984824455. Check exact source hashes in the separately recorded native verification; the registry changes require a new run.
+
+
+## Persistent registry
+
+Registry persists encrypted account-owner/generation bindings separately from the data records. A normal restart reopens the same generation. `freshLogin=true` retires it even when the Telegram owner is unchanged. The host must distinguish authorization restoration from a fresh login and call this method accordingly; those Telegram hooks are still pending.
+
+Logout records durable retirement intent before unlinking active bindings and deleting records. Failed cleanup remains queued for retry, and retired generations are never offered to the caller. Creation records a different journal type: a surviving creation journal with an active binding is committed and must preserve its data; an unreferenced creation is cleaned up. This distinction prevents a restart from destroying a successful save when only journal deletion was interrupted.
+
+All registry/store operations run on one serialized worker. Host account and app-lock epochs must still reject stale operations and callbacks. `logout(slot, expectedOwner)` checks the stable owner, but the host must additionally ensure the request belongs to the current login generation, including same-owner relogin. Do not call this API from a stale UI callback.
+
+The native registry tests use real DPAPI/files, reopen persistent state, isolate ten synthetic owners, inject interrupted journal phases, lock metadata/data files, and preserve malformed metadata without silent reset. They do not log into Telegram or prove its logout/passcode hooks.
