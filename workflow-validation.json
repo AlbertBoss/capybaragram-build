@@ -30,6 +30,11 @@
       "file": ".github\\workflows\\windows-preview.yml",
       "yaml_and_workflow_constraints": "pass",
       "sha256": "8fc5ecd8f651193cf7267f7257c45288fb8e818fe60408ec1901076bcf9aec81"
+    },
+    {
+      "file": ".github\\workflows\\windows-vault-runtime.yml",
+      "yaml_and_workflow_constraints": "pass",
+      "sha256": "566d829c1757cef01c0f57e87504bf2449f7c1c92315c5c820d5abe2b4b446c7"
     }
   ]
 }

@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: MIT
+name: Windows native vault runtime checks
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-windows-vault-runtime
+  cancel-in-progress: false
+jobs:
+  vault:
+    if: github.event.repository.private == false
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Compile and test actual DPAPI and atomic file operations
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+          $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if ($LASTEXITCODE -ne 0 -or -not $vs) { throw 'MSVC not found' }
+          $vcvars = Join-Path $vs 'VC\Auxiliary\Build\vcvars64.bat'
+          Push-Location ci/windows-vault
+          try {
+            $compile = 'call "' + $vcvars + '" >nul && cl /nologo /std:c++20 /EHsc /W4 /WX /utf-8 vault_store.cpp vault_store_test.cpp /Fe:vault-test.exe /link crypt32.lib bcrypt.lib'
+            & cmd.exe /d /s /c $compile
+            if ($LASTEXITCODE -ne 0) { throw 'Native compilation failed' }
+            & .\vault-test.exe | Tee-Object -FilePath runtime-result.txt
+            if ($LASTEXITCODE -ne 0) { throw 'Native runtime checks failed' }
+            if (-not (Select-String -LiteralPath runtime-result.txt -SimpleMatch 'CAPY_WINDOWS_VAULT=PASS')) { throw 'Missing test success' }
+            Get-FileHash vault_store.h,vault_store.cpp,vault_store_test.cpp -Algorithm SHA256 | Select-Object @{Name='name';Expression={Split-Path $_.Path -Leaf}},Hash | ConvertTo-Json | Set-Content source-hashes.json
+          } finally { Pop-Location }
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capybaragram-windows-vault-runtime-results
+          path: |
+            ci/windows-vault/runtime-result.txt
+            ci/windows-vault/source-hashes.json
+          retention-days: 1
+          if-no-files-found: error
