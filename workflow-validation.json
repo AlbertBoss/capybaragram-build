@@ -1,0 +1,15 @@
+{
+  "scope": "Local YAML parsing and workflow constraints, not a GitHub run or compilation",
+  "checks": [
+    {
+      "file": ".github\\workflows\\android-baseline.yml",
+      "yaml_and_workflow_constraints": "pass",
+      "sha256": "0b3934ffeed4f9c50155ed113013653f8f04323b8844bf5a47f4ea9d45da2b12"
+    },
+    {
+      "file": ".github\\workflows\\windows-baseline.yml",
+      "yaml_and_workflow_constraints": "pass",
+      "sha256": "cc306e9b19cc42d93c8bcf27d0ec7a415fc923eefe38a74bae2c171a0fd475a4"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.keystore
+*.jks
+.env*
+local.properties
+google-services.json
+android/
+TBuild/
+artifact-stage/
+.capybara-baseline-backup/

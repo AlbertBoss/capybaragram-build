@@ -1,0 +1,30 @@
+[
+  {
+    "repository": "actions/checkout",
+    "tag": "v7.0.1",
+    "sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "manifest_sha256": "d59219cb79590abdb877deaa14e3b65a00c05318bf5a6f3b989b9162b5d08c35",
+    "url": "https://github.com/actions/checkout/tree/3d3c42e5aac5ba805825da76410c181273ba90b1"
+  },
+  {
+    "repository": "actions/setup-python",
+    "tag": "v7.0.0",
+    "sha": "5fda3b95a4ea91299a34e894583c3862153e4b97",
+    "manifest_sha256": "e6dc8046c02bd3c9f7bf2fea6ba2e59b4e83c7de2b26ec2149a1627f5d66f96c",
+    "url": "https://github.com/actions/setup-python/tree/5fda3b95a4ea91299a34e894583c3862153e4b97"
+  },
+  {
+    "repository": "actions/setup-java",
+    "tag": "v6.0.0",
+    "sha": "dd06d9cba3e5552c54d9f8ea23572deb30010f7c",
+    "manifest_sha256": "f40a4bba30db4b4f29b18ad43f526d0e626455eff0f7ec6db14331caa363f57e",
+    "url": "https://github.com/actions/setup-java/tree/dd06d9cba3e5552c54d9f8ea23572deb30010f7c"
+  },
+  {
+    "repository": "actions/upload-artifact",
+    "tag": "v7.0.1",
+    "sha": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+    "manifest_sha256": "c5979822866a72362e609844b6ebe77d4b7e759af68cc1c2c425dcf51481fab4",
+    "url": "https://github.com/actions/upload-artifact/tree/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+  }
+]
