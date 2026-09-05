@@ -22,8 +22,15 @@ android = sdk / 'platforms/android-36/android.jar'
 java = Path(os.environ['JAVA_HOME']) / 'bin'
 report = source / 'test-results'
 report.mkdir(exist_ok=False)
+avd_home = out / 'avd'
+android_user = out / 'android-user'
+avd_home.mkdir()
+android_user.mkdir()
+tool_env = dict(os.environ, ANDROID_AVD_HOME=str(avd_home), ANDROID_USER_HOME=str(android_user))
+tool_env.pop('ANDROID_SDK_HOME', None)
 
 def run(args, *, timeout=120, **kwargs):
+    kwargs.setdefault('env', tool_env)
     return subprocess.run(list(map(str, args)), check=True, timeout=timeout, **kwargs)
 
 # Schema bytes are generated mechanically from the shared contract, not invented DDL.
@@ -63,15 +70,21 @@ run([build / 'apksigner', 'verify', apk])
 
 manager = sdk / 'cmdline-tools/latest/bin/avdmanager'
 run([manager, 'create', 'avd', '--name', 'capy-vault', '--package',
-     'system-images;android-30;google_apis;x86_64', '--force'], input='no\n', text=True)
+     'system-images;android-30;google_apis;x86_64', '--path', avd_home / 'capy-vault.avd',
+     '--force'], input='no\n', text=True)
 adb = sdk / 'platform-tools/adb'
 emulator = sdk / 'emulator/emulator'
+if not (avd_home / 'capy-vault.ini').is_file():
+    raise RuntimeError('AVD manager did not create the expected explicit AVD registration')
+available = run([emulator, '-list-avds'], capture_output=True, text=True).stdout.splitlines()
+if 'capy-vault' not in available:
+    raise RuntimeError('Emulator cannot see the created AVD in the shared explicit location')
 run([emulator, '-accel-check'])
 log = (report / 'emulator.log').open('w')
 process = subprocess.Popen([str(emulator), '-avd', 'capy-vault', '-no-window',
     '-no-audio', '-no-boot-anim', '-no-snapshot', '-gpu', 'swiftshader_indirect',
     '-memory', '2048', '-cores', '2', '-port', '5554', '-accel', 'on'],
-    stdout=log, stderr=subprocess.STDOUT)
+    stdout=log, stderr=subprocess.STDOUT, env=tool_env)
 try:
     deadline = time.monotonic() + 300
     booted = False
