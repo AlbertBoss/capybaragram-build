@@ -1,0 +1,77 @@
+# SPDX-License-Identifier: MIT
+name: Android baseline (offline test only)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-baseline
+  cancel-in-progress: false
+jobs:
+  android:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: control
+          persist-credentials: false
+      - name: Check resources and SDK tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v sdkmanager
+          command -v python3
+          df -h "$GITHUB_WORKSPACE"
+          free -h
+          free_kb=$(df --output=avail -k "$GITHUB_WORKSPACE" | tail -1 | tr -d ' ')
+          test "$free_kb" -ge 36700160 || { echo 'Less than 35 GiB free; no files will be deleted.'; exit 1; }
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: DrKLO/Telegram
+          ref: 62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c
+          path: android
+          submodules: recursive
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Test preparation against the checked-out source files
+        shell: bash
+        env:
+          CAPY_ANDROID_SOURCE: ${{ github.workspace }}/android
+        run: python3 control/ci/test_android_prep.py
+      - name: Install exact Android SDK components
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Hosted image must already contain accepted SDK licenses. No 'yes | sdkmanager --licenses'.
+          sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1'
+      - name: Prepare separate offline test app
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 control/ci/prepare_android_baseline.py --source android --check
+          python3 control/ci/prepare_android_baseline.py --source android
+          keytool -genkeypair -keystore android/TMessagesProj/config/capybara-debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 30 -dname 'CN=CapybaraGram Build Test' -noprompt
+      - name: Build one ARM64 debug APK
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash ./gradlew :TMessagesProj_App:assembleAfatDebug --no-daemon --max-workers=2 -PAPP_PACKAGE=org.capybaragram.buildtest -Pandroid.injected.build.abi=arm64-v8a
+      - name: Verify manifest, signing and native ABI
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 control/ci/collect_android.py --source android --output artifact-stage
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: capybaragram-android-baseline-OFFLINE-TEST
+          path: artifact-stage/*
+          retention-days: 1
+          if-no-files-found: error
+          compression-level: 0
