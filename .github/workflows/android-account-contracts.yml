@@ -26,9 +26,28 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java
-            /TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java
-            /TMessagesProj/src/main/java/org/telegram/ui/UserInfoActivity.java
             /TMessagesProj/jni/tgnet/Defines.h
             /TMessagesProj/jni/tgnet/ConnectionsManager.cpp
+            /TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java
+            /TMessagesProj/src/main/java/org/telegram/ui/UserInfoActivity.java
+            /TMessagesProj/src/main/java/org/telegram/messenger/WearReplyReceiver.java
+            /TMessagesProj/src/main/java/org/telegram/messenger/AutoMessageHeardReceiver.java
+            /TMessagesProj/src/main/java/org/telegram/messenger/NotificationCallbackReceiver.java
+            /TMessagesProj/src/main/java/org/telegram/messenger/PopupReplyReceiver.java
+            /TMessagesProj/src/main/java/org/telegram/messenger/NotificationDismissReceiver.java
+            /TMessagesProj/src/main/java/org/telegram/messenger/CopyCodeReceiver.java
+            /TMessagesProj/src/main/java/org/telegram/messenger/NotificationRepeat.java
+            /TMessagesProj/src/main/java/org/telegram/messenger/SendMessagesHelper.java
+            /TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java
       - name: Check source contracts and compile actual native selector
         run: python3 control/ci/accounts/test_android_accounts.py source --native
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Execute Java notification owner and receiver scenarios
+        run: python3 control/ci/accounts/test_notification_binding.py source
+      - name: Apply and verify the complete account transformation
+        run: |
+          python3 control/ci/accounts/android_accounts_patch.py source --apply
+          python3 control/ci/accounts/android_accounts_patch.py source --check

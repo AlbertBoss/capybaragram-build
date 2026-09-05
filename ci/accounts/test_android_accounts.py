@@ -46,6 +46,8 @@ class AccountSourceTests(unittest.TestCase):
 
     def test_copyright_headers_preserved(self):
         for name, result in self.planned.items():
+            if name == patch.BINDING:
+                continue
             original = (SOURCE/name).read_text(encoding='utf-8')
             if original.startswith('/*'):
                 self.assertEqual(original.split('*/', 1)[0], result.decode().split('*/', 1)[0])
@@ -65,6 +67,24 @@ class AccountSourceTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 patch.plan(root)
             self.assertEqual(before, {name: (root/name).read_bytes() for name in patch.FILES})
+
+    def test_all_notification_actions_are_bound(self):
+        text = self.planned[patch.NOTIFICATIONS].decode()
+        calls = re.findall(r'PendingIntent\.get(?:Activity|Broadcast|Service)\(ApplicationLoader\.applicationContext,[^\n]+', text)
+        self.assertEqual(len(calls), 13)
+        for call in calls:
+            self.assertIn('NotificationAccountBinding.bind(', call)
+
+    def test_async_receivers_revalidate_owner(self):
+        for name in ['WearReplyReceiver', 'AutoMessageHeardReceiver']:
+            text = self.planned[patch.JAVA+'messenger/'+name+'.java'].decode()
+            self.assertIn('NotificationAccountBinding.isCurrent(intent, currentAccount)', text)
+            for anchor in ['Utilities.globalQueue.postRunnable(() -> {', 'AndroidUtilities.runOnUIThread(() -> {']:
+                callbacks = text.split(anchor)[1:]
+                self.assertEqual(len(callbacks), 2)
+                for block in callbacks:
+                    first = block.lstrip().splitlines()[0]
+                    self.assertIn('NotificationAccountBinding.isCurrent(currentAccount, expectedUserId)', first)
 
 def test_native_selector():
     compiler = shutil.which('g++')

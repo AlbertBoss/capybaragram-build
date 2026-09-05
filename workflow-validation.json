@@ -4,7 +4,7 @@
     {
       "file": ".github\\workflows\\android-account-contracts.yml",
       "yaml_and_workflow_constraints": "pass",
-      "sha256": "ec6fb680292187977db5df56f5c4d65ce135da4792f116d3187d75b0c127f6c0"
+      "sha256": "2b1239147b4c9d354997e66320df14450b2c57b0612230b1ed8a903f951673f6"
     },
     {
       "file": ".github\\workflows\\android-baseline.yml",
@@ -14,7 +14,7 @@
     {
       "file": ".github\\workflows\\android-preview.yml",
       "yaml_and_workflow_constraints": "pass",
-      "sha256": "5f8208150a4fb8771e7834ed4e39af6838cd4410e78bcfa92a6af99e40d673c7"
+      "sha256": "20e74b74ea45def65457f1b2b9d38c9e7f6fb963a97901bf62eaf1aa8abe4ac0"
     },
     {
       "file": ".github\\workflows\\windows-baseline.yml",

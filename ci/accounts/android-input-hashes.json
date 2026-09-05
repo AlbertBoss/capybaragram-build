@@ -3,5 +3,14 @@
   "TMessagesProj/jni/tgnet/Defines.h": "01a30245620b002d7391a3d59934478b31faa7f17d352f3148227ef81049f964",
   "TMessagesProj/jni/tgnet/ConnectionsManager.cpp": "5f48e5eea13fb31eac2b876ef6933b618d9c8e23e213e498b4b9e2ad7cb3e2e6",
   "TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java": "31138c7b09415c65463d88aee1064d79c690efd1aba376d8806bf9d5e933e45a",
-  "TMessagesProj/src/main/java/org/telegram/ui/UserInfoActivity.java": "4cd012cf47585fe8db64f0eb69fa5469aa10acfeda298de7b959405ff7556d12"
+  "TMessagesProj/src/main/java/org/telegram/ui/UserInfoActivity.java": "4cd012cf47585fe8db64f0eb69fa5469aa10acfeda298de7b959405ff7556d12",
+  "TMessagesProj/src/main/java/org/telegram/messenger/WearReplyReceiver.java": "b2ead6e51328f22325a0ae9e5283a8d23bb2c42cd81c85ecd5ae63dadc0b0830",
+  "TMessagesProj/src/main/java/org/telegram/messenger/AutoMessageHeardReceiver.java": "18240f1d37b44a60af43e65197bebc76e15d04365def4732539b97cede73b8eb",
+  "TMessagesProj/src/main/java/org/telegram/messenger/NotificationCallbackReceiver.java": "2354d2f9fed4ebe83d86c7411a8805111f9624a1afef5f38edbede6c7d7ea30c",
+  "TMessagesProj/src/main/java/org/telegram/messenger/PopupReplyReceiver.java": "97bf5f3d3a79532760f32a2628a71e1c00a17285e827fc95050f58cb5d132687",
+  "TMessagesProj/src/main/java/org/telegram/messenger/NotificationDismissReceiver.java": "0bbe694957604978ed8ee299000dc65329af07c4a34a3facc897e57e2d885405",
+  "TMessagesProj/src/main/java/org/telegram/messenger/CopyCodeReceiver.java": "cd23f929271d6595f7b92fab7676917ac45b66a0a814b37cd439bc479e8ef9a6",
+  "TMessagesProj/src/main/java/org/telegram/messenger/NotificationRepeat.java": "3e23dfe2f5c945757618c8d5c8687a4d16f320ffb3007e3183d30075a8bd693a",
+  "TMessagesProj/src/main/java/org/telegram/messenger/SendMessagesHelper.java": "de93c9d8c59e21a84e6c9f1fa71dedfc1119578be55520172ca51e4252e6968b",
+  "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java": "85914bbeca6868b9f5278c3983d7576051ff87886181b7b815c93ce9e3d3c7f9"
 }
