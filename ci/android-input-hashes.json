@@ -1,0 +1,8 @@
+{
+  "settings.gradle": "14988a5e42bd5b8a8180c07171caac49a7557f9426379240e910d75b1883cc90",
+  "TMessagesProj_App/build.gradle": "5568da2335b9db1923335a048f319baea0a2e1e5fb82633dcc97dfdb1d712fae",
+  "gradle.properties": "26a1ee92e32298d634b38eef0a9a08e96555920af916d2bf1bf61a640c33611b",
+  "TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java": "ee903858e93130042105309e2b28fd3e1fd976c0e1f38c350449e90b24564884",
+  "TMessagesProj/config/debug/AndroidManifest.xml": "8f990fc2d5d3d8e0cd36a25bff0203e2b7543f3b49a188479bf9daeff17f6e2e",
+  "TMessagesProj/config/debug/AndroidManifest_SDK23.xml": "022f97cd5e8f942cd3c07df3b59ea7b0710cc6f58b54d399687f16296921d4bd"
+}
