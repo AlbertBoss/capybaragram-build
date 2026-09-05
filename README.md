@@ -1,6 +1,6 @@
 # CapybaraGram build experiments
 
-This repository prepares initial Android and Windows builds from pinned Telegram sources. **It is not a CapybaraGram release or a working implementation of its planned features.** No successful full build has been recorded yet.
+This repository prepares initial Android and Windows builds from pinned Telegram sources. **It is not a CapybaraGram release or a working implementation of its planned features.** Android compilation succeeded in [run 33964193414](https://github.com/AlbertBoss/capybaragram-build/actions/runs/33964193414); subsequent artifact discovery failed and has been changed to use AGP output metadata. A verified artifact and runtime test are still pending.
 
 ## Scope
 
@@ -8,6 +8,8 @@ This repository prepares initial Android and Windows builds from pinned Telegram
 - Windows: official x64 debug executable using upstream restricted test API credentials. `TDESKTOP_API_TEST` does not select test data centers or disable networking. Do not use real accounts. Auto-update and crash reports are disabled; the updater is not packaged.
 
 Both workflows run only when dispatched manually and only for public repositories. Standard `ubuntu-24.04` and `windows-2025` runners are used. No paid/larger runners, scheduled jobs, releases, shared caches or repository secrets are configured. Artifacts expire after one day. Standard public-runner execution is free under current GitHub rules; artifact storage remains quota-controlled. Do not enable paid overages.
+
+Each platform has its own concurrency group. Android and Windows may run together; multiple builds of the same platform stay serialized without canceling an active build.
 
 ## Sources and tooling
 
