@@ -5,7 +5,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: capybaragram-baseline
+  group: capybaragram-android-baseline
   cancel-in-progress: false
 jobs:
   android:

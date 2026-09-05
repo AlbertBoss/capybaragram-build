@@ -5,7 +5,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: capybaragram-baseline
+  group: capybaragram-windows-baseline
   cancel-in-progress: false
 jobs:
   windows:
