@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CapyNote">Заметка о чате</string>
+    <string name="CapyTemplates">Шаблоны ответов</string>
+    <string name="CapyTemplate">Шаблон ответа</string>
+    <string name="CapyNoteHint">Что важно запомнить?</string>
+    <string name="CapyTemplateHint">Введите текст шаблона</string>
+    <string name="CapyNotePrivacy">Только на этом устройстве. При выходе из аккаунта заметки удаляются. Сохраните изменения перед закрытием.</string>
+    <string name="CapyTemplatePrivacy">Только на этом устройстве, до выхода из аккаунта. Перед вставкой в черновик можно проверить текст.</string>
+    <string name="CapyLoading">Загрузка…</string>
+    <string name="CapyOpenFailed">Не удалось открыть локальные данные. Попробуйте ещё раз — существующие заметки не заменены.</string>
+    <string name="CapySaveFailed">Не удалось сохранить изменения. Текст остаётся в редакторе — попробуйте ещё раз.</string>
+    <string name="CapyRetry">Повторить</string>
+    <string name="CapyNoTemplates">Создайте ответ, который часто используете. Перед вставкой в черновик его можно проверить.</string>
+    <string name="CapyNewTemplate">Новый шаблон</string>
+    <string name="CapyMoreTemplates">Ещё шаблоны</string>
+    <string name="CapyPreview">Предпросмотр шаблона</string>
+    <string name="CapyInsertDraft">Вставить в черновик</string>
+</resources>

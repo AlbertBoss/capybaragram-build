@@ -110,7 +110,8 @@ def collect(source, output, profile='offline', certificate_sha256=None):
     description = (
         'ONLINE PREVIEW, not a release. Owner application credentials and persistent preview signature.\n'
         'Certificate SHA256: ' + certificate_sha256 + '\n'
-        'Modifications: ci/prepare_android_baseline.py, ci/prepare_android_online.py, ci/accounts/android_accounts_patch.py.\n'
+        'Modifications: ci/prepare_android_baseline.py, ci/prepare_android_online.py, ci/accounts/android_accounts_patch.py, ci/notes/prepare_android_notes.py.\n'
+        'Local notes and template UI included; full client login, UI and session lifecycle acceptance remains required.\n'
         'Verified: package ID, INTERNET permission, pinned APK signer and ARM64 ELF library headers.\n'
     ) if online else (
         'OFFLINE BUILD TEST, not a working Telegram client or release.\n'

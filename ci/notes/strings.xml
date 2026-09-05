@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CapyNote">Chat note</string>
+    <string name="CapyTemplates">Reply templates</string>
+    <string name="CapyTemplate">Reply template</string>
+    <string name="CapyNoteHint">What would you like to remember?</string>
+    <string name="CapyTemplateHint">Enter your reply template</string>
+    <string name="CapyNotePrivacy">Only on this device. Notes are deleted when you log out. Save your changes before closing.</string>
+    <string name="CapyTemplatePrivacy">Only on this device, until you log out. Preview a template before inserting it into a draft.</string>
+    <string name="CapyLoading">Loading…</string>
+    <string name="CapyOpenFailed">Could not open local data. Retry; existing notes have not been replaced.</string>
+    <string name="CapySaveFailed">Could not save changes. Your text is still here — try again.</string>
+    <string name="CapyRetry">Retry</string>
+    <string name="CapyNoTemplates">Create a reply you use often. You can review it before inserting it into a draft.</string>
+    <string name="CapyNewTemplate">New template</string>
+    <string name="CapyMoreTemplates">More templates</string>
+    <string name="CapyPreview">Template preview</string>
+    <string name="CapyInsertDraft">Insert into draft</string>
+</resources>

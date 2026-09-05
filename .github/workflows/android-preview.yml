@@ -95,10 +95,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 control/ci/notes/test_notes.py android
           python3 control/ci/accounts/test_android_accounts.py android --native
           python3 control/ci/accounts/test_notification_binding.py android
           python3 control/ci/accounts/android_accounts_patch.py android --apply
           python3 control/ci/accounts/android_accounts_patch.py android --check
+      - name: Prepare native notes, lifecycle hooks and draft-only template UI
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 control/ci/notes/prepare_android_notes.py android
+          python3 control/ci/notes/prepare_android_notes.py android --check
       - name: Build one ARM64 debug APK
         env:
           CAPY_ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/capybaragram-preview.p12

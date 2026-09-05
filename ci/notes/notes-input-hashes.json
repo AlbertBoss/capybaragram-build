@@ -1,0 +1,23 @@
+{
+  "pre": {
+    "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java": "514fcaf083062f933101907c16b108340bb31ac1d79d26493b72aab9e6fa36f6",
+    "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java": "cef3fa581f73dbd1cabbc34ac20913c4e48c8a38b7f06058af8dfc25461759f7",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "0a6f383216194c9faaa2418d7affb5642ee24ca698f37f7681820fe6960c03ac"
+  },
+  "post": {
+    "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java": "201d6a82abb0328ada3c6fbe692fcf6403edbf82b240ef54205d9f43f898e05d",
+    "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java": "4f629eedadea496fa8b327245ab6c9af2fedaed1a32bfdeb02d3f67f6a033ba4",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "a71ac870134df96b5349b752c2e3e5627d1f47e356212676fba29e5b1109dfa8"
+  },
+  "added": {
+    "TMessagesProj/src/main/java/org/capybaragram/local/PayloadCipher.java": "a7587a2684dab7a93814b57f05047f491123ce535913252799da0288d912dd03",
+    "TMessagesProj/src/main/java/org/capybaragram/local/AndroidVaultKeys.java": "2cbd7136a0d2585701b4b43dcfca6046bde749214716acf0a74678face6033fc",
+    "TMessagesProj/src/main/java/org/capybaragram/local/AndroidVaultStore.java": "0eefeaa12265014e80101a32895603a3d3fa904bb87d73e17db4809e8419dcc7",
+    "TMessagesProj/src/main/java/org/capybaragram/local/VaultSchema.java": "c1865cefa1863650189f999ae8d97231e128344638b157527223637833f04b5b",
+    "TMessagesProj/src/main/java/org/capybaragram/local/AndroidVaultCoordinator.java": "b25baeb204ea830e0276eed4014a195e2448fd8ae583d07bfc07b42fa7d5cae0",
+    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "d7983b33e4dee6fa7f0271a7bb2b449d505dd74cb8550d49d0e35d51342dfa05",
+    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyNotesUi.java": "bc32966063b311346470d1b9886609b67cd2b8bbc23754729061f078e4e0141b",
+    "TMessagesProj/src/main/res/values/capybaragram.xml": "2a8a5d85b87a682c59142f550e2b8bbd8760b5a1f2eebe4d4039fd05fd7c9257",
+    "TMessagesProj/src/main/res/values-ru/capybaragram.xml": "f3de31e925c5eb2705799fb8d759fe3df3beaf3df05fb1108d3830be804f9b16"
+  }
+}

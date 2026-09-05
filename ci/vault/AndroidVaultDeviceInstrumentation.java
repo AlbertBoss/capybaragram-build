@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -15,6 +16,11 @@ import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLongArray;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.crypto.SecretKey;
 
 /** Standalone synthetic Android runtime checks; never part of the product APK. */
@@ -39,6 +45,7 @@ public final class AndroidVaultDeviceInstrumentation extends Instrumentation {
         try {
             AndroidVaultKeysDeviceProbe.run();
             exerciseStore();
+            exerciseCoordinator();
             result.putString("stream", "CAPY_VAULT_TESTS=PASS checks=" + checks + "\n");
             finish(Activity.RESULT_OK, result);
         } catch (Throwable failure) {
@@ -48,6 +55,99 @@ public final class AndroidVaultDeviceInstrumentation extends Instrumentation {
                     + android.util.Log.getStackTraceString(failure));
             finish(Activity.RESULT_CANCELED, result);
         }
+    }
+
+    private <T> T call(AndroidVaultCoordinator coordinator, AndroidVaultCoordinator.Token token,
+            AndroidVaultCoordinator.Work<T> operation) throws Exception {
+        CountDownLatch done = new CountDownLatch(1);
+        AtomicReference<T> value = new AtomicReference<>();
+        AtomicBoolean failed = new AtomicBoolean();
+        coordinator.submit(token, operation, (result, failure) -> {
+            value.set(result); failed.set(failure); done.countDown();
+        });
+        if (!done.await(20, TimeUnit.SECONDS) || failed.get()) {
+            throw new AssertionError("Coordinator callback failed or timed out.");
+        }
+        return value.get();
+    }
+
+    private void exerciseCoordinator() throws Exception {
+        Context context = getTargetContext();
+        String prefix = "capy-test-" + UUID.randomUUID() + "-";
+        AtomicLongArray owners = new AtomicLongArray(new long[]{100, 200});
+        AtomicBoolean unlocked = new AtomicBoolean(true);
+        AndroidVaultCoordinator.Host host = new AndroidVaultCoordinator.Host() {
+            @Override public long currentOwner(int account) { return owners.get(account); }
+            @Override public boolean unlocked() { return unlocked.get(); }
+            @Override public SharedPreferences preferences(int account) {
+                return context.getSharedPreferences(prefix + account, Context.MODE_PRIVATE);
+            }
+            @Override public void storageProblem() { }
+        };
+        AndroidVaultCoordinator coordinator = new AndroidVaultCoordinator(context, host, 2);
+        AndroidVaultCoordinator.Token first = coordinator.capture(0);
+        call(coordinator, first, store -> { store.saveNote(1, 42, 0, "Первый владелец"); return true; });
+        require("Первый владелец".equals(call(coordinator, first, store -> store.getNote(1, 42, 0))));
+        require(call(coordinator, coordinator.capture(1), store -> store.getNote(1, 42, 0)).isEmpty());
+        require(coordinator.capture(-1) == null && coordinator.capture(2) == null);
+
+        CountDownLatch entered = new CountDownLatch(1), release = new CountDownLatch(1);
+        AtomicBoolean staleCallback = new AtomicBoolean(), queuedWrite = new AtomicBoolean();
+        coordinator.submit(first, store -> {
+            entered.countDown();
+            if (!release.await(20, TimeUnit.SECONDS)) throw new IOException("Test barrier timed out.");
+            return true;
+        }, (value, failed) -> staleCallback.set(true));
+        require(entered.await(20, TimeUnit.SECONDS));
+        coordinator.submit(first, store -> {
+            queuedWrite.set(true); store.saveNote(1, 42, 0, "STALE"); return true;
+        }, (value, failed) -> staleCallback.set(true));
+        unlocked.set(false);
+        coordinator.onLock();
+        require(coordinator.capture(0) == null);
+        unlocked.set(true);
+        release.countDown();
+        require("Первый владелец".equals(call(coordinator, coordinator.capture(0), store -> store.getNote(1, 42, 0))));
+        require(!queuedWrite.get() && !staleCallback.get() && !coordinator.isCurrent(first));
+
+        AndroidVaultCoordinator.Token old = coordinator.capture(0);
+        UUID oldGeneration = UUID.fromString(host.preferences(0).getString("capy_vault_generation", ""));
+        CountDownLatch inFlight = new CountDownLatch(1), finishOld = new CountDownLatch(1);
+        coordinator.submit(old, store -> {
+            inFlight.countDown();
+            if (!finishOld.await(20, TimeUnit.SECONDS)) throw new IOException("Test barrier timed out.");
+            store.saveNote(1, 42, 0, "Old generation only");
+            return true;
+        }, (value, failed) -> staleCallback.set(true));
+        require(inFlight.await(20, TimeUnit.SECONDS));
+        coordinator.onLogout(0);
+        require(!host.preferences(0).contains("capy_vault_generation"));
+        require(coordinator.capture(0) == null);
+        owners.set(0, 101);
+        coordinator.onOwnerChanged(0, 0, 101);
+        finishOld.countDown();
+        require(call(coordinator, coordinator.capture(0), store -> store.getNote(1, 42, 0)).isEmpty());
+        require(!AndroidVaultStore.file(context, oldGeneration).exists() && !staleCallback.get());
+        rejects(GeneralSecurityException.class, () -> AndroidVaultKeys.load(oldGeneration));
+
+        call(coordinator, coordinator.capture(0), store -> { store.saveNote(1, 42, 0, "New login"); return true; });
+        String previous = host.preferences(0).getString("capy_vault_generation", "");
+        coordinator.onLogout(0);
+        coordinator.onOwnerChanged(0, 0, 101); // Same Telegram owner logs in again.
+        require(call(coordinator, coordinator.capture(0), store -> store.getNote(1, 42, 0)).isEmpty());
+        require(!previous.equals(host.preferences(0).getString("capy_vault_generation", "")));
+
+        // Simulate process termination between retirement and queued cleanup.
+        UUID retiredGeneration = UUID.fromString(host.preferences(0).getString("capy_vault_generation", ""));
+        require(context.getSharedPreferences("capy_vault_cleanup", Context.MODE_PRIVATE)
+                .edit().putBoolean(retiredGeneration.toString(), true).commit());
+        AndroidVaultCoordinator recovered = new AndroidVaultCoordinator(context, host, 2);
+        require(call(recovered, recovered.capture(0), store -> store.getNote(1, 42, 0)).isEmpty());
+        require(!AndroidVaultStore.file(context, retiredGeneration).exists());
+        rejects(GeneralSecurityException.class, () -> AndroidVaultKeys.load(retiredGeneration));
+        require(!retiredGeneration.toString().equals(host.preferences(0).getString("capy_vault_generation", "")));
+        recovered.onLogout(0);
+        recovered.onLogout(1);
     }
 
     private void exerciseStore() throws Exception {
