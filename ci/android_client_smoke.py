@@ -185,12 +185,12 @@ try:
         # Source LoginActivity.fillNumber and the captured first-run UI show a
         # rationale before Android's phone permission. Continue only that exact
         # rationale; always deny the system permission. No auto-filled SIM number.
-        rationale = any(n.get('text') == 'Please allow Telegram to receive calls so that we can automatically confirm your phone number.'
+        rationale = any(n.get('text') in {'Please allow Telegram to receive calls so that we can automatically confirm your phone number.', 'Разрешите приложению принимать звонки, чтобы мы могли подтвердить Ваш номер телефона автоматически.'}
                         and n.get('package') == PACKAGE for n in hierarchy.iter('node'))
         action = None
         if rationale:
             action = next((n for n in hierarchy.iter('node') if n.get('package') == PACKAGE
-                           and n.get('text') == 'Continue' and n.get('clickable') == 'true'),None)
+                           and n.get('text') in {'Continue','Продолжить'} and n.get('clickable') == 'true'),None)
         else:
             action = next((n for n in hierarchy.iter('node')
                            if n.get('package') in {'com.android.permissioncontroller','com.google.android.permissioncontroller'}
