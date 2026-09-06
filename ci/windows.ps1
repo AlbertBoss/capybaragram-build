@@ -2,7 +2,7 @@
 # Baseline build verified; online preview adds reviewed identity and owner API preparation.
 param(
     [Parameter(Mandatory=$true)][ValidateSet('Preflight','Build','Collect')][string]$Phase,
-    [ValidateSet('Baseline','Preview')][string]$Profile = 'Baseline'
+    [ValidateSet('Baseline','Preview','Candidate')][string]$Profile = 'Baseline'
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -11,6 +11,7 @@ $toolset = '14.44'
 if (-not $env:GITHUB_WORKSPACE -or -not $env:RUNNER_TEMP) { throw 'Run only on the disposable GitHub runner.' }
 $root = Join-Path $env:GITHUB_WORKSPACE 'TBuild'
 $src = Join-Path $root 'tdesktop'
+$configuration = if ($Profile -eq 'Candidate') { 'Release' } else { 'Debug' }
 
 if ($Phase -eq 'Preflight') {
     foreach ($name in 'git','cmake','ninja','python') {
@@ -50,7 +51,8 @@ if ($Phase -eq 'Build') {
     $subs = @(& git -C $src submodule status --recursive)
     if ($LASTEXITCODE -ne 0 -or @($subs | Where-Object { $_ -match '^[-+U]' }).Count -ne 0) { throw 'Submodule checkout mismatch.' }
     $env:CAPY_WINDOWS_PROFILE = $Profile
-    if ($Profile -eq 'Preview') {
+    $env:CAPY_WINDOWS_CONFIGURATION = $configuration
+    if ($Profile -ne 'Baseline') {
         & python (Join-Path $PSScriptRoot 'windows-notes/test_windows_notes.py') $src
         if ($LASTEXITCODE -ne 0) { throw 'Desktop notes/template source checks failed.' }
         & python (Join-Path $PSScriptRoot 'accounts/test_windows_accounts.py') $src
@@ -89,15 +91,19 @@ set "Platform=%VSCMD_ARG_TGT_ARCH%"
 cd /d "%GITHUB_WORKSPACE%\TBuild"
 if errorlevel 1 (echo [CAPY] Build directory unavailable & exit /b 103)
 echo [CAPY] Preparing upstream dependencies
-call "tdesktop\Telegram\build\prepare\win.bat" skip-release silent qt6
+if /i "%CAPY_WINDOWS_PROFILE%"=="Candidate" (
+    call "tdesktop\Telegram\build\prepare\win.bat" silent qt6
+) else (
+    call "tdesktop\Telegram\build\prepare\win.bat" skip-release silent qt6
+)
 if errorlevel 1 (echo [CAPY] Dependency preparation failed with %errorlevel% & exit /b 104)
 cd /d "%GITHUB_WORKSPACE%\TBuild\tdesktop\Telegram"
 if errorlevel 1 (echo [CAPY] Telegram directory unavailable & exit /b 105)
 echo [CAPY] Configuring Ninja build
-if /i "%CAPY_WINDOWS_PROFILE%"=="Preview" (
-    call configure.bat -G "Ninja Multi-Config" qt6 -C "%CAPY_WINDOWS_API_CACHE%" -D CMAKE_CONFIGURATION_TYPES=Debug -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
+if /i not "%CAPY_WINDOWS_PROFILE%"=="Baseline" (
+    call configure.bat -G "Ninja Multi-Config" qt6 -C "%CAPY_WINDOWS_API_CACHE%" -D CMAKE_CONFIGURATION_TYPES=%CAPY_WINDOWS_CONFIGURATION% -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
 ) else (
-    call configure.bat -G "Ninja Multi-Config" qt6 -D TDESKTOP_API_TEST=ON -D CMAKE_CONFIGURATION_TYPES=Debug -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
+    call configure.bat -G "Ninja Multi-Config" qt6 -D TDESKTOP_API_TEST=ON -D CMAKE_CONFIGURATION_TYPES=%CAPY_WINDOWS_CONFIGURATION% -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
 )
 if errorlevel 1 (echo [CAPY] CMake configuration failed with %errorlevel% & exit /b 106)
 exit /b 0
@@ -105,10 +111,13 @@ exit /b 0
     & $batch
     if ($LASTEXITCODE -ne 0) { throw "Preparation batch failed with stage code $LASTEXITCODE; see the preceding CAPY message." }
     $cache = Get-Content -LiteralPath (Join-Path $src 'out\CMakeCache.txt') -Raw
+    if ($cache -notmatch ('(?m)^CMAKE_CONFIGURATION_TYPES:STRING=' + $configuration + '\r?$')) {
+        throw 'Configured build type differs from the requested profile.'
+    }
     foreach ($key in 'DESKTOP_APP_DISABLE_AUTOUPDATE','DESKTOP_APP_DISABLE_CRASH_REPORTS') {
         if ($cache -notmatch ('(?m)^' + $key + ':BOOL=ON\r?$')) { throw "Configuration did not accept $key." }
     }
-    if ($Profile -eq 'Preview') {
+    if ($Profile -ne 'Baseline') {
         if ($cache -notmatch '(?m)^TDESKTOP_API_TEST:BOOL=OFF\r?$') { throw 'Owner build unexpectedly uses test API.' }
         foreach ($pair in @(@('TDESKTOP_API_ID', $env:CAPY_API_ID), @('TDESKTOP_API_HASH', $env:CAPY_API_HASH))) {
             if ([string]::IsNullOrEmpty($pair[1]) -or $cache -notmatch ('(?m)^' + $pair[0] + ':STRING=' + [regex]::Escape($pair[1]) + '\r?$')) {
@@ -124,14 +133,14 @@ call "%CAPY_VSDEVCMD%" -no_logo -arch=x64 -host_arch=x64 -winsdk=10.0.26100.0 -v
 if errorlevel 1 exit /b 1
 if /i not "%VSCMD_ARG_TGT_ARCH%"=="x64" exit /b 102
 set "Platform=%VSCMD_ARG_TGT_ARCH%"
-if /i "%CAPY_WINDOWS_PROFILE%"=="Preview" (
-    cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target capy-auth-test --config Debug --parallel 2
+if /i not "%CAPY_WINDOWS_PROFILE%"=="Baseline" (
+    cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target capy-auth-test --config %CAPY_WINDOWS_CONFIGURATION% --parallel 2
     if errorlevel 1 exit /b 1
-    "%GITHUB_WORKSPACE%\TBuild\tdesktop\out\capy-tests\Debug\capy-auth-test.exe" > "%RUNNER_TEMP%\capy-auth-runtime-result.txt"
+    "%GITHUB_WORKSPACE%\TBuild\tdesktop\out\capy-tests\%CAPY_WINDOWS_CONFIGURATION%\capy-auth-test.exe" > "%RUNNER_TEMP%\capy-auth-runtime-result.txt"
     if errorlevel 1 exit /b 1
     type "%RUNNER_TEMP%\capy-auth-runtime-result.txt"
 )
-cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target Telegram --config Debug --parallel 2
+cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target Telegram --config %CAPY_WINDOWS_CONFIGURATION% --parallel 2
 if errorlevel 1 exit /b 1
 exit /b 0
 '@ | Set-Content -LiteralPath $batch -Encoding ascii
@@ -140,7 +149,7 @@ exit /b 0
     exit 0
 }
 
-$exe = Join-Path $src 'out\Debug\Telegram.exe'
+$exe = Join-Path $src ('out\' + $configuration + '\Telegram.exe')
 if (-not (Test-Path -LiteralPath $exe)) { throw 'Expected executable is missing.' }
 $bytes = [IO.File]::ReadAllBytes($exe)
 if ($bytes.Length -lt 64 -or $bytes[0] -ne 0x4d -or $bytes[1] -ne 0x5a) { throw 'Invalid executable header.' }
@@ -148,20 +157,22 @@ $pe = [BitConverter]::ToInt32($bytes, 0x3c)
 if ($pe -lt 0 -or $pe -gt ($bytes.Length - 6) -or [BitConverter]::ToUInt32($bytes,$pe) -ne 0x00004550 -or [BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x8664) { throw 'Expected Windows PE x64 executable.' }
 $stage = Join-Path $env:GITHUB_WORKSPACE 'artifact-stage'
 New-Item -ItemType Directory -Force -Path $stage | Out-Null
-if ($Profile -eq 'Preview') {
+if ($Profile -ne 'Baseline') {
     $authResult = Join-Path $env:RUNNER_TEMP 'capy-auth-runtime-result.txt'
     if (-not (Test-Path -LiteralPath $authResult) -or (Get-Content -LiteralPath $authResult -Raw) -notmatch '^CAPY_QT_AUTHORIZATION=PASS checks=[0-9]+\s*$') {
         throw 'Missing successful native authorization serialization check.'
     }
     Copy-Item -LiteralPath $authResult -Destination (Join-Path $stage 'AUTHORIZATION-TEST.txt')
 }
-$artifactName = if ($Profile -eq 'Preview') { 'CapybaraGram.exe' } else { 'Telegram.exe' }
+$artifactName = if ($Profile -ne 'Baseline') { 'CapybaraGram.exe' } else { 'Telegram.exe' }
 Copy-Item -LiteralPath $exe -Destination (Join-Path $stage $artifactName)
 $hash = (Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash.ToLowerInvariant()
 "$hash *$artifactName" | Set-Content -LiteralPath (Join-Path $stage 'SHA256SUMS.txt') -Encoding ascii
-if ($Profile -eq 'Preview') {
+if ($Profile -ne 'Baseline') {
+    $buildLabel = if ($Profile -eq 'Candidate') { 'RELEASE CANDIDATE, not approved for final delivery.' } else { 'ONLINE PREVIEW, not a release.' }
     @"
-ONLINE PREVIEW, not a release. Own Telegram application credentials; unsigned Windows executable.
+$buildLabel Build configuration: $configuration.
+Own Telegram application credentials; unsigned Windows executable.
 Source: telegramdesktop/tdesktop @ $($env:TDESKTOP_SHA)
 Changes: identity, accounts and windows-notes patches; profile: APPDATA/CapybaraGram Preview.
 Ten local account slots without Premium; multi-account UI, login and notification isolation require runtime verification.
