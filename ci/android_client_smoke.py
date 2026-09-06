@@ -11,8 +11,8 @@ import xml.etree.ElementTree as ET
 
 LOCALE = os.environ.get('CAPY_TEST_LOCALE','en-US')
 if LOCALE not in {'en-US','ru-RU'}: raise ValueError('Unsupported test locale')
-PACKAGE = 'org.capybaragram.preview.beta'
-APK_SHA = 'bc368ad62725fc867e819bbe5655cf8133d7cf5027c0d6fd19aa6130df9d35d8'
+PACKAGE = 'org.capybaragram'
+APK_SHA = 'd676e99a31d12bcf1313cdbdd45bd00b1edc23adaea885deec255f113c814c60'
 CERT_SHA = '8254ebe4b00d6e4a95ee07dd27a30f8bd95b066b83c72affb39e4d25e7bff282'
 sdk = Path(os.environ['ANDROID_HOME'])
 scratch = Path(os.environ['RUNNER_TEMP'])/'capy-client-smoke'
@@ -63,6 +63,10 @@ apk = apks[0]
 certificate = run([sdk/'build-tools/36.0.0/apksigner','verify','--print-certs',apk],capture_output=True,text=True).stdout
 if f'Signer #1 certificate SHA-256 digest: {CERT_SHA}' not in certificate:
     raise RuntimeError('APK signing identity differs')
+from collect_android import require_disabled_flag
+manifest = run([sdk/'build-tools/36.0.0/aapt','dump','xmltree',apk,'AndroidManifest.xml'],capture_output=True,text=True).stdout
+for flag in ('testOnly','debuggable','allowBackup'):
+    require_disabled_flag(manifest,flag)
 run([sdk/'cmdline-tools/latest/bin/avdmanager','create','avd','--name','capy-client',
      '--package','system-images;android-30;google_apis;x86_64','--path',avds/'capy-client.avd'],input='no\n',text=True)
 run([emulator,'-accel-check'])
@@ -70,7 +74,8 @@ log = (report/'emulator.log').open('w')
 process = subprocess.Popen([str(emulator),'-avd','capy-client','-no-window','-no-audio',
     '-no-boot-anim','-no-snapshot','-gpu','swiftshader_indirect','-memory','2048',
     '-cores','2','-port','5554','-accel','on','-change-locale',LOCALE],stdout=log,stderr=subprocess.STDOUT,env=env)
-result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':34005401918,
+result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':34005792612,
+          'package':PACKAGE,'release_manifest_flags':'PASS (testOnly/debuggable/allowBackup disabled)',
           'real_account_login_tested':False,'notes_ui_tested':False,'visual_review':'PENDING',
           'install':'PENDING','launch':'PENDING','login_screen':'PENDING','cold_restart':'PENDING'}
 try:
@@ -194,6 +199,9 @@ try:
     fields = [n for n in hierarchy.iter('node') if n.get('package') == PACKAGE
               and n.get('class','').endswith('EditText') and n.get('enabled') == 'true']
     if not fields: raise RuntimeError('Phone entry fields were not exposed; inspect screenshot')
+    if any('test backend' in n.get('text','').casefold() for n in hierarchy.iter('node')):
+        raise RuntimeError('Release login must not expose the debug test backend option')
+    result['debug_backend_option_absent'] = 'PASS (visible phone form)'
     result['login_screen'] = 'PASS (entry fields only; no phone entered)'
     device('shell','am','force-stop',PACKAGE)
     device('shell','am','start','-W','-n',component)

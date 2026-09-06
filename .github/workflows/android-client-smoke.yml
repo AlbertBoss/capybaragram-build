@@ -24,8 +24,8 @@ jobs:
       - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
         with:
           repository: AlbertBoss/capybaragram-build
-          run-id: 34005401918
-          name: capybaragram-android-preview-arm64
+          run-id: 34005792612
+          name: capybaragram-android-candidate-arm64
           path: ${{ runner.temp }}/client-input
           github-token: ${{ github.token }}
       - name: Prepare standard runner emulator
@@ -35,7 +35,7 @@ jobs:
           test -c /dev/kvm
           sudo chmod 666 /dev/kvm
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;36.0.0' 'platform-tools' 'emulator' 'system-images;android-30;google_apis;x86_64'
-      - name: Install reviewed client and check Russian first-run UI
+      - name: Install signed release candidate and check Russian first-run UI
         env:
           CAPY_TEST_LOCALE: ru-RU
         run: python3 ci/android_client_smoke.py
