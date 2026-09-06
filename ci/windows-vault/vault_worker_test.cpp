@@ -130,6 +130,34 @@ int main() {
 		}
 		afterShutdown();
 		Check(!calledAfterShutdown);
+		const auto oldAuth = Store::NewId();
+		const auto newAuth = Store::NewId();
+		{
+			auto worker = Worker(root,10,post);
+			auto handle = worker.attach(0,700,false,oldAuth);
+			worker.write(handle,note,"old authorization",[&](auto result) { Check(result.ok); });
+			mailbox.take()();
+			Check(!worker.attach(0,700,false,"invalid"));
+			Check(worker.usable(handle)); // malformed replacement cannot invalidate it
+		}
+		{
+			auto worker = Worker(root,10,post);
+			auto handle = worker.attach(0,700,false,newAuth);
+			worker.read(handle,note,[&](auto result) { Check(result.ok && !result.text); });
+			mailbox.take()();
+			worker.write(handle,note,"new authorization",[&](auto result) { Check(result.ok); });
+			mailbox.take()();
+		}
+		{
+			auto worker = Worker(root,10,post);
+			auto handle = worker.attach(0,700,false,newAuth);
+			worker.read(handle,note,[&](auto result) { Check(result.ok && result.text == "new authorization"); });
+			mailbox.take()();
+			worker.detach(handle,true);
+			handle = worker.attach(0,700,false,newAuth);
+			worker.read(handle,note,[&](auto result) { Check(result.ok && !result.text); });
+			mailbox.take()();
+		}
 		std::cout << "CAPY_WINDOWS_WORKER=PASS checks=" << Checks << '\n';
 		return 0;
 	} catch (const std::exception &) {

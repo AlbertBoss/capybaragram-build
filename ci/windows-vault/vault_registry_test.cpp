@@ -184,6 +184,57 @@ int main() {
 				Check(!resetRestart.open(slot,static_cast<std::uint64_t>(1000+slot))->read(note));
 			}
 		}
+		// Simulate a stop after new Telegram authorization persisted but before
+		// queued vault logout/attach ran: restore sees the new nonce, fresh=false.
+		const auto oldAuth = Store::NewId();
+		const auto newAuth = Store::NewId();
+		auto oldLogin = registry.open(0,800,false,oldAuth);
+		oldLogin->write(note,"must not survive a new authorization");
+		const auto oldBinding = *index.read(zero);
+		{
+			auto restart = Registry(root,10);
+			auto restoredNewLogin = restart.open(0,800,false,newAuth);
+			Check(!restoredNewLogin->read(note));
+			Check(*index.read(zero) != oldBinding);
+			Reject([&] { (void)oldLogin->read(note); });
+			restoredNewLogin->write(note,"same authorization survives");
+			Reject([&] { restart.logout(0,800,oldAuth); });
+			Check(restoredNewLogin->read(note) == "same authorization survives");
+		}
+		{
+			auto restart = Registry(root,10);
+			Check(restart.open(0,800,false,newAuth)->read(note) == "same authorization survives");
+			const auto authBinding = *index.read(zero);
+			Reject([&] { (void)restart.open(0,800,false,""); });
+			Reject([&] { (void)restart.open(0,800,false,std::string(32,'Z')); });
+			Check(*index.read(zero) == authBinding);
+			// Readable binding, but its atomic replacement is locked: fail closed.
+			{
+				const auto lock = Lock(root/"index"/indexId/(zero+".bin"),FILE_SHARE_READ);
+				Reject([&] { (void)restart.open(0,800,false,oldAuth); });
+				Reject([&] { (void)restart.open(0,800,false,newAuth); });
+			}
+			Check(!restart.open(0,800,false,oldAuth)->read(note));
+		}
+		// A real legacy CPGB1 binding remains readable with the reserved identity.
+		const auto legacyGeneration = Store::NewId();
+		auto legacyStore = Store(root/"data",900,legacyGeneration,true);
+		legacyStore.write(note,"legacy survives upgrade");
+		registry.logout(0,800,oldAuth);
+		index.write(zero,"CPGB1\n900\n"+legacyGeneration);
+		{
+			auto restart = Registry(root,10);
+			Check(restart.open(0,900)->read(note) == "legacy survives upgrade");
+			Check(!restart.open(0,900,false,newAuth)->read(note));
+			Reject([&] { (void)legacyStore.read(note); });
+			const auto valid = *index.read(zero);
+			index.write(zero,"CPGB2\n900\nshort\n"+legacyGeneration);
+			const auto malformed = *index.read(zero);
+			Reject([&] { (void)restart.open(0,900,false,newAuth); });
+			Check(index.read(zero) == malformed);
+			index.write(zero,valid);
+			Check(!restart.open(0,900,false,newAuth)->read(note));
+		}
 		std::cout << "CAPY_WINDOWS_REGISTRY=PASS checks=" << Checks << '\n';
 		return 0;
 	} catch (const std::exception &) {

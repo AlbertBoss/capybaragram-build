@@ -10,10 +10,12 @@ namespace Capy::Vault {
 // UI lock/account epochs are additionally required at the Telegram host boundary.
 class Registry final {
 public:
+	static constexpr auto LegacyAuthorization = "00000000000000000000000000000000";
 	Registry(const std::filesystem::path &root, int slots);
 	[[nodiscard]] std::unique_ptr<Store> open(int slot, std::uint64_t owner,
-		bool freshLogin = false);
-	void logout(int slot, std::uint64_t expectedOwner);
+		bool freshLogin = false, const std::string &authorization = LegacyAuthorization);
+	void logout(int slot, std::uint64_t expectedOwner,
+		const std::string &authorization = LegacyAuthorization);
 	// Forgotten app passcode: no authenticated owner/session is available.
 	// Persists a reset barrier before retiring any generation.
 	void forgetAll();
@@ -23,6 +25,7 @@ public:
 private:
 	struct Binding {
 		std::uint64_t owner;
+		std::string authorization;
 		std::string generation;
 	};
 	[[nodiscard]] static std::string Encode(const Binding &binding);

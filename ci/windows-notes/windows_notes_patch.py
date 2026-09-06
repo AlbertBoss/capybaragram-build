@@ -108,8 +108,10 @@ void Application::lockByPasscode() {
         text = before + 'private:' + after
         return replace(text, '\tconst not_null<Domain*> _domain;', '''\tconst int _capyAccountIndex;
 \tCapy::Vault::Worker::Handle _capyVaultHandle;
+\tstd::string _capyAuthorization = Capy::Vault::Registry::LegacyAuthorization;
 \tconst not_null<Domain*> _domain;''')
     if name == PREFIX + 'main/main_account.cpp':
+        text = replace(text, '#include "main/main_account.h"', '#include "main/main_account.h"\n#include <stdexcept>')
         text = replace(text, ': _domain(domain)\n', ': _capyAccountIndex(index)\n, _domain(domain)\n')
         text = replace(text,
             '\t\tsettings ? std::move(settings) : std::make_unique<SessionSettings>());',
@@ -126,8 +128,41 @@ void Application::lockByPasscode() {
 \t\tint streamVersion,
 \t\tstd::unique_ptr<SessionSettings> settings,
 \t\tbool freshLogin) {''')
+        text = replace(text, '\t_session = std::make_unique<Session>(this, user, std::move(settings));', '''\t// Rotate before constructing or exposing a fresh Telegram session. Persist
+\t// this identity inside the same encrypted blob as its MTP authorization.
+\tif (freshLogin) {
+\t\ttry { _capyAuthorization = Capy::Vault::Store::NewId(); }
+\t\tcatch (const std::exception &) { _capyAuthorization.clear(); }
+\t}
+\t_session = std::make_unique<Session>(this, user, std::move(settings));''')
+        text = replace(text, '\t\t\twriteKeys(stream, keysToDestroy);', '''\t\t\twriteKeys(stream, keysToDestroy);
+\t\t\tstream << quint32(0x43504731); // CPG1 authorization identity trailer
+\t\t\tconst auto identity = (_capyAuthorization.size() == 32)
+\t\t\t\t? _capyAuthorization : std::string(32, '-');
+\t\t\tstream.writeRawData(identity.data(), 32);''')
+        text = replace(text, '\tQDataStream stream(serialized);\n', '''\t_capyAuthorization.clear(); // malformed new metadata must never restore old notes
+\tQDataStream stream(serialized);
+''')
+        text = replace(text, '\treadKeys(_mtpKeysToDestroy);', '''\treadKeys(_mtpKeysToDestroy);
+\tif (stream.status() == QDataStream::Ok) {
+\t\tif (stream.atEnd()) {
+\t\t\t// Stable identity for pre-Capy profiles: do not regenerate on restart.
+\t\t\t_capyAuthorization = Capy::Vault::Registry::LegacyAuthorization;
+\t\t} else {
+\t\t\tauto tag = quint32();
+\t\t\tstream >> tag;
+\t\t\tauto identity = std::string(32, '\\0');
+\t\t\tif (tag == 0x43504731 && stream.readRawData(identity.data(), 32) == 32
+\t\t\t\t&& stream.status() == QDataStream::Ok && stream.atEnd()) {
+\t\t\t\ttry {
+\t\t\t\t\t(void)Capy::Vault::Store::Template(identity); // strict 32-hex
+\t\t\t\t\t_capyAuthorization = std::move(identity);
+\t\t\t\t} catch (const std::exception &) { }
+\t\t\t}
+\t\t}
+\t}''')
         text = replace(text, '\t_sessionValue = _session.get();', '''\t_capyVaultHandle = Core::App().capyVaultWorker().attach(
-\t\t_capyAccountIndex, _session->uniqueId(), freshLogin);
+\t\t_capyAccountIndex, _session->uniqueId(), freshLogin, _capyAuthorization);
 \t_sessionValue = _session.get();''')
         return replace(text, 'void Account::destroySession(DestroyReason reason) {\n', '''void Account::destroySession(DestroyReason reason) {
 \tif (_capyVaultHandle) {

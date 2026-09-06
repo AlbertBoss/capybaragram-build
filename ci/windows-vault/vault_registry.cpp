@@ -51,11 +51,13 @@ Registry::Registry(const std::filesystem::path &root, int slots)
 }
 
 std::string Registry::Encode(const Binding &binding) {
-	return "CPGB1\n" + std::to_string(binding.owner) + '\n' + binding.generation;
+	return "CPGB2\n" + std::to_string(binding.owner) + '\n'
+		+ binding.authorization + '\n' + binding.generation;
 }
 
 Registry::Binding Registry::Decode(const std::string &value) {
-	if (!value.starts_with("CPGB1\n") || value.size() > 80) Fail();
+	const auto legacy = value.starts_with("CPGB1\n");
+	if ((!legacy && !value.starts_with("CPGB2\n")) || value.size() > 120) Fail();
 	const auto separator = value.find('\n',6);
 	if (separator == std::string::npos || separator == 6) Fail();
 	auto owner = std::uint64_t();
@@ -64,9 +66,13 @@ Registry::Binding Registry::Decode(const std::string &value) {
 	const auto parsed = std::from_chars(first,last,owner);
 	if (parsed.ec != std::errc() || parsed.ptr != last || !owner
 		|| std::to_string(owner) != value.substr(6,separator-6)) Fail();
-	const auto generation = value.substr(separator+1);
+	const auto authorization = legacy ? std::string(LegacyAuthorization)
+		: value.substr(separator+1,32);
+	if (!legacy && (value.size() <= separator+33 || value[separator+33] != '\n')) Fail();
+	const auto generation = value.substr(separator + (legacy ? 1 : 34));
+	(void)Store::Template(authorization);
 	(void)Store::Template(generation); // strict 32-hex validation
-	return {owner,generation};
+	return {owner,authorization,generation};
 }
 
 std::string Registry::slotKey(int slot) const {
@@ -122,11 +128,12 @@ void Registry::retire(const Binding &value) {
 	clean(pending);
 }
 
-void Registry::logout(int slot, std::uint64_t expectedOwner) {
+void Registry::logout(int slot, std::uint64_t expectedOwner, const std::string &authorization) {
 	if (!expectedOwner) Fail();
+	(void)Store::Template(authorization);
 	const auto value = binding(slot);
 	if (!value) return;
-	if (value->owner != expectedOwner) Fail();
+	if (value->owner != expectedOwner || value->authorization != authorization) Fail();
 	retire(*value);
 }
 
@@ -152,8 +159,10 @@ void Registry::finishReset() {
 	_index.erase(key);
 }
 
-std::unique_ptr<Store> Registry::open(int slot, std::uint64_t owner, bool freshLogin) {
+std::unique_ptr<Store> Registry::open(int slot, std::uint64_t owner, bool freshLogin,
+		const std::string &authorization) {
 	if (!owner) Fail();
+	(void)Store::Template(authorization); // reject before touching existing data
 	(void)slotKey(slot);
 	finishReset();
 	(void)retryCleanup();
@@ -162,18 +171,19 @@ std::unique_ptr<Store> Registry::open(int slot, std::uint64_t owner, bool freshL
 		if (pending) {
 			if (pending->empty() || ((*pending)[0] != 'C' && (*pending)[0] != 'R')) Fail();
 			const auto journal = Decode(pending->substr(1));
-			if (journal.owner != value->owner || journal.generation != value->generation) Fail();
+			if (journal.owner != value->owner || journal.generation != value->generation
+				|| journal.authorization != value->authorization) Fail();
 		}
 		if (pending && pending->starts_with("R")) {
 			// Cleanup failed earlier: this generation is never available again.
 			retire(*value);
-		} else if (value->owner != owner || freshLogin) {
+		} else if (value->owner != owner || value->authorization != authorization || freshLogin) {
 			retire(*value);
 		} else {
 			return std::make_unique<Store>(_root/"data",owner,value->generation,false);
 		}
 	}
-	const auto next = Binding{owner,Store::NewId()};
+	const auto next = Binding{owner,authorization,Store::NewId()};
 	const auto pending = Store::Template(next.generation);
 	_index.write(pending,'C'+Encode(next));
 	auto store = std::make_unique<Store>(_root/"data",owner,next.generation,true);

@@ -33,7 +33,8 @@ public:
 	Worker(const Worker &) = delete;
 	Worker &operator=(const Worker &) = delete;
 
-	[[nodiscard]] Handle attach(int slot, std::uint64_t owner, bool freshLogin);
+	[[nodiscard]] Handle attach(int slot, std::uint64_t owner, bool freshLogin,
+		std::string authorization = Registry::LegacyAuthorization);
 	void detach(Handle handle, bool loggedOut);
 	void forgetAll();
 	void setLocked(bool locked);

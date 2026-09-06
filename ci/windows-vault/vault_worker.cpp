@@ -6,11 +6,13 @@
 namespace Capy::Vault {
 
 struct Worker::Session {
-	Session(int slotValue, std::uint64_t ownerValue, std::shared_ptr<Gate> gateValue)
-	: slot(slotValue), owner(ownerValue), gate(std::move(gateValue)) {
+	Session(int slotValue, std::uint64_t ownerValue, std::string authorizationValue,
+		std::shared_ptr<Gate> gateValue)
+	: slot(slotValue), owner(ownerValue), authorization(std::move(authorizationValue)), gate(std::move(gateValue)) {
 	}
 	const int slot;
 	const std::uint64_t owner;
+	const std::string authorization;
 	const std::shared_ptr<Gate> gate;
 	std::atomic<bool> live = true;
 };
@@ -93,18 +95,21 @@ Store &Worker::store(const Handle &handle) {
 	auto &slot = _storage[handle->slot];
 	if (slot.session != handle) throw std::logic_error("Stale vault session");
 	if (!slot.store) {
-		slot.store = registry().open(handle->slot, handle->owner, slot.fresh);
+		slot.store = registry().open(handle->slot, handle->owner, slot.fresh, handle->authorization);
 		// A failed open must not turn fresh-login intent into restoration.
 		slot.fresh = false;
 	}
 	return *slot.store;
 }
 
-Worker::Handle Worker::attach(int slotIndex, std::uint64_t owner, bool freshLogin) {
+Worker::Handle Worker::attach(int slotIndex, std::uint64_t owner, bool freshLogin,
+		std::string authorization) {
 	checkThread();
 	if (slotIndex < 0 || slotIndex >= _slots || !owner) return {};
+	try { (void)Store::Template(authorization); }
+	catch (const std::exception &) { return {}; }
 	if (_sessions[slotIndex]) detach(_sessions[slotIndex], false);
-	const auto handle = std::make_shared<Session>(slotIndex, owner, _gate);
+	const auto handle = std::make_shared<Session>(slotIndex, owner, std::move(authorization), _gate);
 	_sessions[slotIndex] = handle;
 	enqueue([this, handle, freshLogin] {
 		auto &slot = _storage[handle->slot];
@@ -128,7 +133,7 @@ void Worker::detach(Handle handle, bool loggedOut) {
 		if (slot.session != handle) return;
 		slot.store.reset();
 		slot.session.reset();
-		if (loggedOut) registry().logout(handle->slot, handle->owner);
+		if (loggedOut) registry().logout(handle->slot, handle->owner, handle->authorization);
 	});
 }
 

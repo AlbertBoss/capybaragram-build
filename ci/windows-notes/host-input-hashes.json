@@ -15,11 +15,11 @@
     },
     "Telegram/SourceFiles/main/main_account.h": {
       "before": "966e9f76f8bcbec3a03ffbdf6321c2b358213ccdbaccbe1ad7dfc51ba1bdf067",
-      "after": "0f9a5550fbd88a8227cc1bd4ea36556b76471f76952c32c2506998fee601a3fd"
+      "after": "a324b6a3451a50950a6f05b5d639c475dc0a96f60ad2ef5eab788b83facb0099"
     },
     "Telegram/SourceFiles/main/main_account.cpp": {
       "before": "186bb3a47520297528c2848eaf8a3026f9674270385d3889b1662a45934f8f84",
-      "after": "9076fbe5631ea4cea04ba4307dad0a7f9b96cd9a6d6ab94274bfcc006d9cad8c"
+      "after": "98dc19b111a5536636cbba2ca21e4c8f9b0b5e70bfab916462305ed131aed530"
     },
     "Telegram/SourceFiles/main/main_domain.cpp": {
       "before": "6cb294778eccf4c5a5ec18016200bb51adef731b5ee760bac01439618d378eeb",
@@ -55,12 +55,12 @@
     }
   },
   "added": {
-    "vault_registry.cpp": "d2bb2d6b29a5efbfcfee2287bd7d24599e1e0da97e9c4bbbf864d08468e50684",
-    "vault_registry.h": "5257b4eca9595bf19264c1bf0e0472dc5bcfbfae7868c36a1d8a75752647c634",
+    "vault_registry.cpp": "2e6e6093ea6c5e901a6984334f3119da24aa1cd58892eb36308013e112912b6f",
+    "vault_registry.h": "715084d8dbb057652d74259f18e1a107154214784180b5964fbba05286bf2495",
     "vault_store.cpp": "7a8880872d88fad193df2a5549fd5e36e39563e46501875bbe29314366b7d880",
     "vault_store.h": "5ad0419bedb66bbd89b7c44c90d86fc5136e5f3e325bf52a8923a9483d6e7548",
-    "vault_worker.cpp": "b42c4cecb473b0045840089bef71abde953ee7f2164d111b24653cd11c376a5e",
-    "vault_worker.h": "71033ab122a7f7065410c400362d883b0ac509dfca6ace47b5e31a6dec41cec7",
+    "vault_worker.cpp": "9ae5cde3cde354480156c7e12e1b967feb407c13f9d6927ddb33b03435333f50",
+    "vault_worker.h": "71b677f4149b8e5aa1262197fbaaa0c6632093ff1cabcc0322992bd42b4eb445",
     "capy_notes_ui.cpp": "d49b987f3be5214deabd1208b954e79f378d40b8b88768d4f318135cdd53a67f",
     "capy_notes_ui.h": "e7506c2994ad12e4fb1254d7265e77002906c3ecf92fafd0fc31c542726a6011"
   }
