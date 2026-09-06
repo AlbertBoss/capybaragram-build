@@ -11,7 +11,8 @@ import subprocess
 SOURCE_SHA = '80158983dba09d3bf5d96701f21473d6c34bf5f5'
 HERE = Path(__file__).resolve().parent
 ADDED = ('vault_store.h', 'vault_store.cpp', 'vault_registry.h', 'vault_registry.cpp',
-         'vault_worker.h', 'vault_worker.cpp', 'capy_notes_ui.h', 'capy_notes_ui.cpp')
+         'vault_worker.h', 'vault_worker.cpp', 'capy_notes_ui.h', 'capy_notes_ui.cpp',
+         'capy_authorization.h', 'capy_authorization_test.cpp')
 
 PREFIX = 'Telegram/SourceFiles/'
 FILES = ['Telegram/CMakeLists.txt'] + [PREFIX + name for name in (
@@ -46,6 +47,7 @@ if (WIN32)
         ${src_loc}/capybara/vault_worker.h
         ${src_loc}/capybara/capy_notes_ui.cpp
         ${src_loc}/capybara/capy_notes_ui.h
+        ${src_loc}/capybara/capy_authorization.h
     )
     # Plain Win32 storage units do not consume Telegram's Qt precompiled header.
     # They inherit the same /EHsc and static MSVC runtime as the Telegram target.
@@ -56,6 +58,12 @@ if (WIN32)
         PROPERTIES SKIP_PRECOMPILE_HEADERS ON
     )
     target_link_libraries(Telegram PRIVATE crypt32 bcrypt)
+    add_executable(capy-auth-test EXCLUDE_FROM_ALL
+        ${src_loc}/capybara/capy_authorization_test.cpp)
+    init_target(capy-auth-test)
+    target_link_libraries(capy-auth-test PRIVATE desktop-app::external_qt)
+    set_target_properties(capy-auth-test PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/capy-tests")
 endif()
 ''')
     if name == PREFIX + 'core/application.h':
@@ -111,7 +119,7 @@ void Application::lockByPasscode() {
 \tstd::string _capyAuthorization = Capy::Vault::Registry::LegacyAuthorization;
 \tconst not_null<Domain*> _domain;''')
     if name == PREFIX + 'main/main_account.cpp':
-        text = replace(text, '#include "main/main_account.h"', '#include "main/main_account.h"\n#include <stdexcept>')
+        text = replace(text, '#include "main/main_account.h"', '#include "main/main_account.h"\n#include "capybara/capy_authorization.h"\n#include <stdexcept>')
         text = replace(text, ': _domain(domain)\n', ': _capyAccountIndex(index)\n, _domain(domain)\n')
         text = replace(text,
             '\t\tsettings ? std::move(settings) : std::make_unique<SessionSettings>());',
@@ -136,31 +144,12 @@ void Application::lockByPasscode() {
 \t}
 \t_session = std::make_unique<Session>(this, user, std::move(settings));''')
         text = replace(text, '\t\t\twriteKeys(stream, keysToDestroy);', '''\t\t\twriteKeys(stream, keysToDestroy);
-\t\t\tstream << quint32(0x43504731); // CPG1 authorization identity trailer
-\t\t\tconst auto identity = (_capyAuthorization.size() == 32)
-\t\t\t\t? _capyAuthorization : std::string(32, '-');
-\t\t\tstream.writeRawData(identity.data(), 32);''')
+\t\t\tCapy::Authorization::Write(stream, _capyAuthorization);''')
         text = replace(text, '\tQDataStream stream(serialized);\n', '''\t_capyAuthorization.clear(); // malformed new metadata must never restore old notes
 \tQDataStream stream(serialized);
 ''')
         text = replace(text, '\treadKeys(_mtpKeysToDestroy);', '''\treadKeys(_mtpKeysToDestroy);
-\tif (stream.status() == QDataStream::Ok) {
-\t\tif (stream.atEnd()) {
-\t\t\t// Stable identity for pre-Capy profiles: do not regenerate on restart.
-\t\t\t_capyAuthorization = Capy::Vault::Registry::LegacyAuthorization;
-\t\t} else {
-\t\t\tauto tag = quint32();
-\t\t\tstream >> tag;
-\t\t\tauto identity = std::string(32, '\\0');
-\t\t\tif (tag == 0x43504731 && stream.readRawData(identity.data(), 32) == 32
-\t\t\t\t&& stream.status() == QDataStream::Ok && stream.atEnd()) {
-\t\t\t\ttry {
-\t\t\t\t\t(void)Capy::Vault::Store::Template(identity); // strict 32-hex
-\t\t\t\t\t_capyAuthorization = std::move(identity);
-\t\t\t\t} catch (const std::exception &) { }
-\t\t\t}
-\t\t}
-\t}''')
+\t_capyAuthorization = Capy::Authorization::Read(stream);''')
         text = replace(text, '\t_sessionValue = _session.get();', '''\t_capyVaultHandle = Core::App().capyVaultWorker().attach(
 \t\t_capyAccountIndex, _session->uniqueId(), freshLogin, _capyAuthorization);
 \t_sessionValue = _session.get();''')
@@ -264,7 +253,7 @@ def payloads():
     expected = read_manifest()['added']
     result = {}
     for name in ADDED:
-        path = (HERE if name.startswith('capy_notes_ui.') else storage)/name
+        path = (HERE if name.startswith('capy_') else storage)/name
         if path.is_symlink() or not path.resolve(strict=True).is_relative_to(path.parent.resolve(strict=True)):
             raise ValueError('Payload path escapes package')
         raw = normalized(path)

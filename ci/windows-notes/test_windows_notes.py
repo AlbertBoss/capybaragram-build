@@ -52,7 +52,7 @@ class Preparation(unittest.TestCase):
         self.temp.cleanup()
 
     def test_full_composition_and_check(self):
-        self.assertEqual(patch.apply(self.root),21)
+        self.assertEqual(patch.apply(self.root),23)
         self.assertEqual(patch.plan(self.root,check=True),{})
         for name,raw in patch.payloads().items():
             self.assertEqual(patch.normalized(self.root/name),raw)

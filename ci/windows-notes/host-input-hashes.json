@@ -3,7 +3,7 @@
   "patch": {
     "Telegram/CMakeLists.txt": {
       "before": "fc9e3f2945ca54efb7229a10b4cf436969b93e6ddfc640b1d07426a8907a2411",
-      "after": "8a0dbfba6d29115c4fa1402df7ad8fb228122df7c33e06857131f16c88395a4c"
+      "after": "6490f16ccd6f0a0bfdeeb3648fb06101c9d99ba19781e3fb434ad857d85a9504"
     },
     "Telegram/SourceFiles/core/application.h": {
       "before": "b3862bd82cceae4452606d16547526addc16e0cd412eb53a5de547040c3e26a1",
@@ -19,7 +19,7 @@
     },
     "Telegram/SourceFiles/main/main_account.cpp": {
       "before": "186bb3a47520297528c2848eaf8a3026f9674270385d3889b1662a45934f8f84",
-      "after": "98dc19b111a5536636cbba2ca21e4c8f9b0b5e70bfab916462305ed131aed530"
+      "after": "a740853f342b641a53414c8c27a6bf0a1b0c0b199af919a9e71882d918f4e727"
     },
     "Telegram/SourceFiles/main/main_domain.cpp": {
       "before": "6cb294778eccf4c5a5ec18016200bb51adef731b5ee760bac01439618d378eeb",
@@ -61,6 +61,8 @@
     "vault_store.h": "5ad0419bedb66bbd89b7c44c90d86fc5136e5f3e325bf52a8923a9483d6e7548",
     "vault_worker.cpp": "9ae5cde3cde354480156c7e12e1b967feb407c13f9d6927ddb33b03435333f50",
     "vault_worker.h": "71b677f4149b8e5aa1262197fbaaa0c6632093ff1cabcc0322992bd42b4eb445",
+    "capy_authorization.h": "4c75c871f3e160e9b163c5129fd2f992e4819f0d7f98216e1bb46f063ce8d0e3",
+    "capy_authorization_test.cpp": "2adb40ba32092ea94433dcc20a49cd26ee3862efeb715c479aac8a75b1909735",
     "capy_notes_ui.cpp": "d49b987f3be5214deabd1208b954e79f378d40b8b88768d4f318135cdd53a67f",
     "capy_notes_ui.h": "e7506c2994ad12e4fb1254d7265e77002906c3ecf92fafd0fc31c542726a6011"
   }

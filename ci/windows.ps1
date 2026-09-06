@@ -120,6 +120,13 @@ call "%CAPY_VSDEVCMD%" -no_logo -arch=x64 -host_arch=x64 -winsdk=10.0.26100.0 -v
 if errorlevel 1 exit /b 1
 if /i not "%VSCMD_ARG_TGT_ARCH%"=="x64" exit /b 102
 set "Platform=%VSCMD_ARG_TGT_ARCH%"
+if /i "%CAPY_WINDOWS_PROFILE%"=="Preview" (
+    cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target capy-auth-test --config Debug --parallel 2
+    if errorlevel 1 exit /b 1
+    "%GITHUB_WORKSPACE%\TBuild\tdesktop\out\capy-tests\Debug\capy-auth-test.exe" > "%RUNNER_TEMP%\capy-auth-runtime-result.txt"
+    if errorlevel 1 exit /b 1
+    type "%RUNNER_TEMP%\capy-auth-runtime-result.txt"
+)
 cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target Telegram --config Debug --parallel 2
 if errorlevel 1 exit /b 1
 exit /b 0
@@ -137,6 +144,13 @@ $pe = [BitConverter]::ToInt32($bytes, 0x3c)
 if ($pe -lt 0 -or $pe -gt ($bytes.Length - 6) -or [BitConverter]::ToUInt32($bytes,$pe) -ne 0x00004550 -or [BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x8664) { throw 'Expected Windows PE x64 executable.' }
 $stage = Join-Path $env:GITHUB_WORKSPACE 'artifact-stage'
 New-Item -ItemType Directory -Force -Path $stage | Out-Null
+if ($Profile -eq 'Preview') {
+    $authResult = Join-Path $env:RUNNER_TEMP 'capy-auth-runtime-result.txt'
+    if (-not (Test-Path -LiteralPath $authResult) -or (Get-Content -LiteralPath $authResult -Raw) -notmatch '^CAPY_QT_AUTHORIZATION=PASS checks=[0-9]+\s*$') {
+        throw 'Missing successful native authorization serialization check.'
+    }
+    Copy-Item -LiteralPath $authResult -Destination (Join-Path $stage 'AUTHORIZATION-TEST.txt')
+}
 $artifactName = if ($Profile -eq 'Preview') { 'CapybaraGram.exe' } else { 'Telegram.exe' }
 Copy-Item -LiteralPath $exe -Destination (Join-Path $stage $artifactName)
 $hash = (Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash.ToLowerInvariant()
