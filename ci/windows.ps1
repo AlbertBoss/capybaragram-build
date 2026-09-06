@@ -73,6 +73,10 @@ if ($Phase -eq 'Build') {
         if ($LASTEXITCODE -ne 0) { throw 'Desktop folder response preparation failed.' }
         & python (Join-Path $PSScriptRoot 'folders/prepare_windows_folders.py') $src --check
         if ($LASTEXITCODE -ne 0) { throw 'Desktop folder response verification failed.' }
+        & python (Join-Path $PSScriptRoot 'folders/prepare_windows_reconcile.py') $src
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop folder reconciliation preparation failed.' }
+        & python (Join-Path $PSScriptRoot 'folders/prepare_windows_reconcile.py') $src --check
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop folder reconciliation verification failed.' }
         & python (Join-Path $PSScriptRoot 'windows-brand/prepare_windows_brand.py') $src
         if ($LASTEXITCODE -ne 0) { throw 'Desktop brand preparation failed.' }
         & python (Join-Path $PSScriptRoot 'windows-brand/prepare_windows_brand.py') $src --check

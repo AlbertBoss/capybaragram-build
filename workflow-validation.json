@@ -52,6 +52,11 @@
       "sha256": "380fd2457cf1930c2791c4542a8dd19f19536d20025dbc4f6a7ce45a76ff06aa"
     },
     {
+      "file": ".github\\workflows\\windows-folder-contracts.yml",
+      "yaml_and_workflow_constraints": "pass",
+      "sha256": "3318099ac47ff5134472bbbc3e11132ef3ab40242d3dc25d539edf45fd0626aa"
+    },
+    {
       "file": ".github\\workflows\\windows-installer.yml",
       "yaml_and_workflow_constraints": "pass",
       "sha256": "d857e3e78f81cf732085204b7f55dcc9e9ee0431038280e16283062d2355fafe"

@@ -1,0 +1,12 @@
+{
+  "pre": {
+    "Telegram/SourceFiles/boxes/choose_filter_box.cpp": "3b570752a02dfe143699e919d5f8ab5e0fdfb970f3103c09f970c7dd3f870150",
+    "Telegram/SourceFiles/data/data_chat_filters.cpp": "99b3a148e478adca60b6a529c734e897fc7c6122c51113497bcff34a19f51699",
+    "Telegram/SourceFiles/data/data_chat_filters.h": "f66b3c7e4963bcaf6b21916e726cca001f93caf375817e04317c67d11b02af6d"
+  },
+  "post": {
+    "Telegram/SourceFiles/boxes/choose_filter_box.cpp": "7221b6032aa50368f24bb329e2160048305ab52b417c42c3baa6df8b62819aa0",
+    "Telegram/SourceFiles/data/data_chat_filters.cpp": "e28295ebed364633fd885137409f87f6d9f43bb4c07ade3159e0bab1f58e5980",
+    "Telegram/SourceFiles/data/data_chat_filters.h": "2d18f2ccc281acc2ecb530d68caef530f895434479ac0170fdf729fc8d940ce7"
+  }
+}
