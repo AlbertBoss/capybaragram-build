@@ -43,14 +43,27 @@ public static class CapyTestWindows {
 
 $result = @{ source_run=34031740962; exe_sha256=$expected; login_tested=$false; phone_entered=$false; visual_review='NOT PERFORMED'; screenshots=@(); preauth='PENDING' }
 $startupWatch = [Diagnostics.Stopwatch]::StartNew()
+$result.uia_retry_count = 0
 $app = Start-Process -FilePath $exe -WorkingDirectory $inputRoot -WindowStyle Hidden -PassThru
 function Observe([string]$label) {
     $app.Refresh()
     if ($app.HasExited) { throw "Native client exited: $($app.ExitCode)" }
     $nodes = @()
     foreach ($handle in [CapyTestWindows]::ForProcess([uint32]$app.Id)) {
-        $element = [System.Windows.Automation.AutomationElement]::FromHandle($handle)
-        if ($element) { $nodes += @($element.FindAll([System.Windows.Automation.TreeScope]::Descendants,[System.Windows.Automation.Condition]::TrueCondition)) }
+        try {
+            $element = [System.Windows.Automation.AutomationElement]::FromHandle($handle)
+            if ($element) { $nodes += @($element.FindAll([System.Windows.Automation.TreeScope]::Descendants,[System.Windows.Automation.Condition]::TrueCondition)) }
+        } catch {
+            $cause = $_.Exception
+            while ($cause.InnerException) { $cause = $cause.InnerException }
+            if ($cause -is [System.Runtime.InteropServices.COMException] -or $cause -is [System.Windows.Automation.ElementNotAvailableException]) {
+                # Qt can replace a window/provider during startup. The outer bounded
+                # observation loop retries; required controls still must be found.
+                $result.uia_retry_count++
+                continue
+            }
+            throw
+        }
     }
     # Only names and control types from this exact fresh process; never session files.
     @($nodes | ForEach-Object { "$($_.Current.ControlType.ProgrammaticName): $($_.Current.Name)" }) | Set-Content -LiteralPath (Join-Path $out ($label+'.txt')) -Encoding utf8
