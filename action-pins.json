@@ -26,5 +26,12 @@
     "sha": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
     "manifest_sha256": "c5979822866a72362e609844b6ebe77d4b7e759af68cc1c2c425dcf51481fab4",
     "url": "https://github.com/actions/upload-artifact/tree/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+  },
+  {
+    "repository": "actions/download-artifact",
+    "tag": "v5",
+    "sha": "634f93cb2916e3fdff6788551b99b062d0335ce0",
+    "manifest_sha256": "f81d687a5bb7c2c9428a2cfc32fc099c823d56faf533e7d0e1f3cdc0e10f9cc7",
+    "url": "https://github.com/actions/download-artifact/tree/634f93cb2916e3fdff6788551b99b062d0335ce0"
   }
 ]
