@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CapyReadMode">CapybaraGram · Нечиталка</string>
+    <string name="CapyReadModeOn">Нечиталка включена</string>
+    <string name="CapyReadModeOff">Нечиталка выключена</string>
+    <string name="CapyReadModeDescription">Действует для этого аккаунта. Отключает автоматические отметки о прочтении сообщений. Статус онлайн и набор текста работают как обычно. Чтение в другом клиенте по-прежнему может отмечать сообщения прочитанными.</string>
+    <string name="CapyReadModeEnable">Включить</string>
+    <string name="CapyReadModeDisable">Выключить</string>
+    <string name="CapyReadLoaded">Отметить загруженные сообщения</string>
+    <string name="CapyReadLoadedConfirm">Отправить отметку о прочтении до последнего сообщения, загруженного к моменту открытия этого меню? Собеседник увидит прочтение, отменить его нельзя. Режим нечиталки останется прежним.</string>
+    <string name="CapyReadAccepted">Сервер подтвердил отметку о прочтении</string>
+    <string name="CapyReadFailed">Прочтение не подтверждено. Попробуйте ещё раз.</string>
+</resources>

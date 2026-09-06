@@ -1,0 +1,24 @@
+{
+  "pre": {
+    "TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java": "9b1f713e9cce80b75810b911cc64f783ddd59d40638f144879cfcfc6096e6ffb",
+    "TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java": "86e21235b2967f3eae1b6f98957c3f369f19ec5a8ef55b5b688de49df7ba475d",
+    "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java": "201d6a82abb0328ada3c6fbe692fcf6403edbf82b240ef54205d9f43f898e05d",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "a71ac870134df96b5349b752c2e3e5627d1f47e356212676fba29e5b1109dfa8",
+    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "d7983b33e4dee6fa7f0271a7bb2b449d505dd74cb8550d49d0e35d51342dfa05"
+  },
+  "post": {
+    "TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java": "a4732d0775630bc0c90a90765b8cab0f7df8cd0655a56489ce4f0f444ca2473e",
+    "TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java": "50b0f62a6a1a4c1f15907881a321b00821f965646888723a08d5b36800660c42",
+    "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java": "3137df15d84755dd36928887a546fc8bf278f7133c5655536a795e945cff250a",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "225b05489508e22b45035082c86a76865567c16345ad6d5cc5a69ce63aa221ec",
+    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "abc584e8e3097b307dc73a4a05f07914b5067c1587b641baf75bd2a7b9147968"
+  },
+  "added": {
+    "TMessagesProj/src/main/java/org/capybaragram/readmode/ReadReceiptPolicy.java": "ca7b241673aa9c48b114b12cfb41cf0a8bccd46653f8d8a5c7c1d935acd91ac0",
+    "TMessagesProj/src/main/java/org/capybaragram/readmode/CapyReadReceipts.java": "13992dd8063b2cbf7d797856c349b16eff3eb5b5385788e9ddc67ba959c79fc6",
+    "TMessagesProj/src/main/java/org/capybaragram/readmode/CapyReadModeUi.java": "31b780b33c772207e4e9e0af0760020cabf732f6af04f957ca7ce2905005d660",
+    "TMessagesProj/src/main/java/org/capybaragram/readmode/CapyReadRequest.java": "063a8180de3d1a0f1e6485a5feb45cdbff247557a0f2747c92f13e7d12357f66",
+    "TMessagesProj/src/main/res/values/capy_read_mode.xml": "e7603b54d34ae8e557a6ac1f78957fa0bced558e23e27a20d354be8bcd131496",
+    "TMessagesProj/src/main/res/values-ru/capy_read_mode.xml": "e51029cef676dc67d2dc204150a5ac283b371d2bd4fadf6711be62d2229fc533"
+  }
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CapyReadMode">CapybaraGram · Silent reading</string>
+    <string name="CapyReadModeOn">Silent reading is on</string>
+    <string name="CapyReadModeOff">Silent reading is off</string>
+    <string name="CapyReadModeDescription">Applies to this account. Suppresses automatic message read receipts. Online and typing status remain unchanged. Reading in another client can still mark messages as read.</string>
+    <string name="CapyReadModeEnable">Enable</string>
+    <string name="CapyReadModeDisable">Disable</string>
+    <string name="CapyReadLoaded">Mark loaded messages as read</string>
+    <string name="CapyReadLoadedConfirm">Send a read receipt up to the latest message loaded when you opened this menu? This action is visible to the other participant and cannot be undone. Silent reading stays in its current state.</string>
+    <string name="CapyReadAccepted">The server accepted the read receipt</string>
+    <string name="CapyReadFailed">The read receipt was not confirmed. Try again.</string>
+</resources>

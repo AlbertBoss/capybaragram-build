@@ -126,6 +126,17 @@ jobs:
           python3 control/ci/folders/test_android_callbacks.py android
           python3 control/ci/folders/prepare_android_callbacks.py android
           python3 control/ci/folders/prepare_android_callbacks.py android --check
+      - name: Prepare and test native read controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 control/ci/read-mode/prepare_android_read_mode.py android
+          python3 control/ci/read-mode/prepare_android_read_mode.py android --check
+          python3 control/ci/read-mode/test_read_adapter.py android
+          python3 control/ci/read-mode/test_read_request.py android
+          mkdir -p "$RUNNER_TEMP/capy-read-policy"
+          javac --release 8 -Xlint:all -Werror -d "$RUNNER_TEMP/capy-read-policy" control/ci/read-mode/ReadReceiptPolicy.java control/ci/read-mode/ReadReceiptPolicyTest.java
+          java -cp "$RUNNER_TEMP/capy-read-policy" org.capybaragram.readmode.ReadReceiptPolicyTest
       - name: Build one ARM64 release candidate
         env:
           CAPY_ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/capybaragram-preview.p12
