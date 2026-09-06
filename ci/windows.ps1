@@ -124,9 +124,9 @@ cd /d "%GITHUB_WORKSPACE%\TBuild\tdesktop\Telegram"
 if errorlevel 1 (echo [CAPY] Telegram directory unavailable & exit /b 105)
 echo [CAPY] Configuring Ninja build
 if /i not "%CAPY_WINDOWS_PROFILE%"=="Baseline" (
-    call configure.bat -G "Ninja Multi-Config" qt6 -C "%CAPY_WINDOWS_API_CACHE%" -D CMAKE_CONFIGURATION_TYPES=%CAPY_WINDOWS_CONFIGURATION% -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
+    call configure.bat -G "Ninja Multi-Config" qt6 -C "%CAPY_WINDOWS_API_CACHE%" -D CMAKE_CONFIGURATION_TYPES:STRING=%CAPY_WINDOWS_CONFIGURATION% -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
 ) else (
-    call configure.bat -G "Ninja Multi-Config" qt6 -D TDESKTOP_API_TEST=ON -D CMAKE_CONFIGURATION_TYPES=%CAPY_WINDOWS_CONFIGURATION% -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
+    call configure.bat -G "Ninja Multi-Config" qt6 -D TDESKTOP_API_TEST=ON -D CMAKE_CONFIGURATION_TYPES:STRING=%CAPY_WINDOWS_CONFIGURATION% -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
 )
 if errorlevel 1 (echo [CAPY] CMake configuration failed with %errorlevel% & exit /b 106)
 exit /b 0
@@ -134,9 +134,7 @@ exit /b 0
     & $batch
     if ($LASTEXITCODE -ne 0) { throw "Preparation batch failed with stage code $LASTEXITCODE; see the preceding CAPY message." }
     $cache = Get-Content -LiteralPath (Join-Path $src 'out\CMakeCache.txt') -Raw
-    if ($cache -notmatch ('(?m)^CMAKE_CONFIGURATION_TYPES:STRING=' + $configuration + '\r?$')) {
-        throw 'Configured build type differs from the requested profile.'
-    }
+    & (Join-Path $PSScriptRoot 'verify_windows_configuration.ps1') -BuildDirectory (Join-Path $src 'out') -Configuration $configuration
     foreach ($key in 'DESKTOP_APP_DISABLE_AUTOUPDATE','DESKTOP_APP_DISABLE_CRASH_REPORTS') {
         if ($cache -notmatch ('(?m)^' + $key + ':BOOL=ON\r?$')) { throw "Configuration did not accept $key." }
     }
