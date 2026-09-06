@@ -50,8 +50,15 @@ def transform(name,text):
         del removals[0].attrib[tools+'node']
         app = doc.find('application')
         app.set(android+'label','CapybaraGram')
-        app.set(android+'icon','@drawable/capy_intro')
-        app.set(android+'roundIcon','@drawable/capy_intro')
+        app.set(android+'icon','@drawable/capy_icon_sand')
+        app.set(android+'roundIcon','@drawable/capy_icon_sand')
+        for alias,key in [('DefaultIcon','sand'),('VintageIcon','forest'),('AquaIcon','water'),
+                          ('PremiumIcon','clay'),('TurboIcon','lilac'),('NoxIcon','night')]:
+            ET.SubElement(app,'activity-alias',{
+                android+'name':'org.telegram.messenger.'+alias,
+                android+'icon':'@drawable/capy_icon_'+key,
+                android+'roundIcon':'@drawable/capy_icon_'+key,
+                tools+'replace':'android:icon,android:roundIcon'})
         app.set(android+'allowBackup','false')
         app.set(android+'debuggable','false')
         app.set(android+'testOnly','false')

@@ -4,7 +4,36 @@
   "post": "c2773d2a4cb3eccac55fe7f607a1acb5217335de5bdbbcbe9d0752e426368446",
   "added": {
     "TMessagesProj/src/main/res/drawable/capy_intro.xml": "5b8f7893ef5803930186909500b3593b7ff80067cddd7fb32aa662db7bb0f275",
-    "TMessagesProj/src/main/res/values/capy_brand.xml": "82671dd0c3884c93494e38da12c81829ab089b755be87750e1763c05fa34f5e3",
-    "TMessagesProj/src/main/res/values-ru/capy_brand.xml": "a0e6f08381854e1c01434feb273a3eb32e550a9ddfb0955a911431c92dc588e3"
+    "TMessagesProj/src/main/res/values/capy_brand.xml": "538f988e44cb1c6a099ee212412ea590245c0124f7d8b2042dd1de6978c16bef",
+    "TMessagesProj/src/main/res/values-ru/capy_brand.xml": "c5e13955166bb16358e3ff70efb4ce4f5c0ccd7e3872117e7856af71fb06cda7",
+    "TMessagesProj/src/main/res/drawable/capy_icon_foreground.xml": "3133dc54fdefb0d75773f61050b247665f46786f3b5c46afeba7333015a4e95d",
+    "TMessagesProj/src/main/res/drawable/capy_icon_bg_sand.xml": "316affdda93f3101f87e6cb8ecbe67beac1b64bf3ec930daffc7b1ffd9d143cd",
+    "TMessagesProj/src/main/res/drawable/capy_icon_sand.xml": "96ba2c1ac504dc6411d4870e75d460b83ad169bda9f066f6f4070537cf54f0bd",
+    "TMessagesProj/src/main/res/drawable-v26/capy_icon_sand.xml": "5c741d9b29cd28f2a9496a82d916ce9440db159df9e54bb2cd3d2a5f64ddf65a",
+    "TMessagesProj/src/main/res/drawable/capy_icon_bg_forest.xml": "ea0905693c06ed968ef9ba32b4f6f66d286ec0d7c2d3d25c801d41a38c2d243e",
+    "TMessagesProj/src/main/res/drawable/capy_icon_forest.xml": "830fc1e1196ad39a51a51ea7ef7d3e728906d4c7802a71abf2ac644b8c006aec",
+    "TMessagesProj/src/main/res/drawable-v26/capy_icon_forest.xml": "3ae0cafc05eb7adb2e80b55185e51800b524f7d67b68d9439660884fcde6975a",
+    "TMessagesProj/src/main/res/drawable/capy_icon_bg_water.xml": "518b33e6c15193de37017ea9e6c0fb3d25b60143c813be2ac2fe4bc55e86bf70",
+    "TMessagesProj/src/main/res/drawable/capy_icon_water.xml": "11e616f65897e27a0ec03a05998080ab28df4493b1febfd7d423db2d0c347b63",
+    "TMessagesProj/src/main/res/drawable-v26/capy_icon_water.xml": "63793bda9daef13ae1ada48cd73e26dd146c69c3fbb9892088bfab104ad166f6",
+    "TMessagesProj/src/main/res/drawable/capy_icon_bg_clay.xml": "dd18a8bf2a89d71799bb8d2f04df19e2c08367898bfe3ad883ff06da2b359411",
+    "TMessagesProj/src/main/res/drawable/capy_icon_clay.xml": "6ad6460529464f2ea542733e2ad7ef9a2fe3e05e8e1f3ad027a05a798e7fe10c",
+    "TMessagesProj/src/main/res/drawable-v26/capy_icon_clay.xml": "87ba1d8857196df696351776175b2e62d0eb45d4be112762e784a61334471d76",
+    "TMessagesProj/src/main/res/drawable/capy_icon_bg_lilac.xml": "78d8b4e612f53ac770d58f7d3111bc834e318640a9d1af7efa45f99c020b953e",
+    "TMessagesProj/src/main/res/drawable/capy_icon_lilac.xml": "1c874dd5d8569c2c6c96791c11d3377f8a4c1c446a71b50c11eb8cdf4d4bf886",
+    "TMessagesProj/src/main/res/drawable-v26/capy_icon_lilac.xml": "e30401aade088396b477b8e47386525d483d474805ccc545ba8c0902d9a866df",
+    "TMessagesProj/src/main/res/drawable/capy_icon_bg_night.xml": "3196573afdaede07514c658a8007349a17827cf6f07eeddab6d7a2dfe2b45d26",
+    "TMessagesProj/src/main/res/drawable/capy_icon_night.xml": "df1f7e281e9406366c1eca9371b3572994cbe724eba370f1238da0729b2d748d",
+    "TMessagesProj/src/main/res/drawable-v26/capy_icon_night.xml": "bc91050b6ce6cad6441e070a8f2a008789f0bb97c2eebd355c77036fca955cb6"
+  },
+  "identity": {
+    "TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java": {
+      "pre": "3875b2abe5f8c06a5ab9aed338b21d79db0632cc60d7d2449b551de1223c4ea6",
+      "post": "e063a6be57a88c4c3cc65457494a73df86f49f7caedee0bd754288d6772d8a2b"
+    },
+    "TMessagesProj/src/main/java/org/telegram/ui/LauncherIconController.java": {
+      "pre": "f81dcd8d50bb5d45de98161386066fed68d42a7bc8e5bf26da42cbd8667bb900",
+      "post": "1eb47ce121823610e95879fca8f043438509e3e904369067422081d1d2297c07"
+    }
   }
 }

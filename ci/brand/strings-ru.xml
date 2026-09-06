@@ -13,4 +13,12 @@
     <string name="CapyIntroMessage5">Пользуйтесь своими папками Telegram.\nЛимиты аккаунта сохраняются.</string>
     <string name="CapyIntroTitle6">Как вам удобно</string>
     <string name="CapyIntroMessage6">Выберите тему и уведомления\nпод свой распорядок дня.</string>
+    <string name="CapyPermissionContinue">Продолжить</string>
+    <string name="CapyPhonePermission">CapybaraGram может подставить номер телефона с SIM-карты. На следующем экране можно запретить доступ и ввести номер самостоятельно.</string>
+    <string name="CapyIconSand">Песок</string>
+    <string name="CapyIconForest">Лес</string>
+    <string name="CapyIconWater">Вода</string>
+    <string name="CapyIconClay">Глина</string>
+    <string name="CapyIconLilac">Сирень</string>
+    <string name="CapyIconNight">Ночь</string>
 </resources>

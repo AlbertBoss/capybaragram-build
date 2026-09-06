@@ -13,4 +13,12 @@
     <string name="CapyIntroMessage5">Use your Telegram chat folders.\nTelegram account limits still apply.</string>
     <string name="CapyIntroTitle6">Make it yours</string>
     <string name="CapyIntroMessage6">Choose a theme and notifications\nthat suit your day.</string>
+    <string name="CapyPermissionContinue">Continue</string>
+    <string name="CapyPhonePermission">CapybaraGram can fill in the phone number from your SIM card. You can deny access on the next screen and enter the number yourself.</string>
+    <string name="CapyIconSand">Sand</string>
+    <string name="CapyIconForest">Forest</string>
+    <string name="CapyIconWater">Water</string>
+    <string name="CapyIconClay">Clay</string>
+    <string name="CapyIconLilac">Lilac</string>
+    <string name="CapyIconNight">Night</string>
 </resources>

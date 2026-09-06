@@ -8,7 +8,7 @@
   "post": {
     "TMessagesProj_App/build.gradle": "7936f8ba9dc4fbc1a34187c6e33b38144e25f76f8b225db2daf6dc9dde115579",
     "gradle.properties": "2c6d9ea20f525d667ec77eb5e24f6726e5ead98a6a938f92687527c505a7f4bc",
-    "TMessagesProj/config/release/AndroidManifest.xml": "95e69fd92b32bd0a0cd8cd4871906112fcb30da30490ca854320925c3ab90d16",
-    "TMessagesProj/config/release/AndroidManifest_SDK23.xml": "bc441788839a29375a75c562067f71d827a7d56c5dc88942febefa9093e8955a"
+    "TMessagesProj/config/release/AndroidManifest.xml": "cd99f3b20c36068fe44fcee34e443df6c77e4a85a4630a04a9c12d86bc952a49",
+    "TMessagesProj/config/release/AndroidManifest_SDK23.xml": "88a88e8ed54da3adf19ef46db06f5f88eb1ae6750357c6d08fa38a42cc7c1298"
   }
 }
