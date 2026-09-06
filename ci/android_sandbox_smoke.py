@@ -68,8 +68,13 @@ if f'Signer #1 certificate SHA-256 digest: {CERT_SHA}' not in certificate:
     raise RuntimeError('APK signing identity differs')
 from collect_android import require_disabled_flag
 manifest = run([sdk/'build-tools/36.0.0/aapt','dump','xmltree',apk,'AndroidManifest.xml'],capture_output=True,text=True).stdout
-for flag in ('testOnly','allowBackup'):
-    require_disabled_flag(manifest,flag)
+require_disabled_flag(manifest,'testOnly')
+# This exact older Debug preview permits Android backups. It is never used with
+# private data here; disable the fresh emulator's backup manager before login.
+# Release-candidate smoke retains the separate strict allowBackup=false check.
+(report/'preview-manifest-flags.txt').write_text('\n'.join(
+    line for line in manifest.splitlines() if any('android:'+flag in line for flag in ('testOnly','debuggable','allowBackup'))
+),encoding='utf-8')
 run([sdk/'cmdline-tools/latest/bin/avdmanager','create','avd','--name','capy-client',
      '--package','system-images;android-30;google_apis;x86_64','--path',avds/'capy-client.avd'],input='no\n',text=True)
 run([emulator,'-accel-check'])
@@ -94,6 +99,11 @@ try:
         if time.monotonic() > deadline: raise RuntimeError('Emulator boot timed out')
         time.sleep(5)
     time.sleep(10)  # Locale selection restarts the disposable emulator framework.
+    device('shell','bmgr','enable','false')
+    backup_state = device('shell','bmgr','enabled').strip()
+    if 'disabled' not in backup_state.casefold():
+        raise RuntimeError('Disposable emulator backup manager did not disable')
+    result['emulator_backup_manager'] = backup_state
     result['locale'] = device('shell','getprop','persist.sys.locale').strip()
     result['fingerprint'] = device('shell','getprop','ro.build.fingerprint').strip()
     result['abi_list'] = device('shell','getprop','ro.product.cpu.abilist').strip()
