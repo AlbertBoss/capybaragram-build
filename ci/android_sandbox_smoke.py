@@ -218,11 +218,28 @@ try:
     time.sleep(3)
     hierarchy = snapshot('05-number-confirmation')
     action(hierarchy,'Yes')
-    result['test_code_request'] = 'submitted once on selected Test Backend'
+    result['test_phone_confirmation'] = 'confirmed on selected Test Backend; code request not yet observed'
     time.sleep(12)
     hierarchy = snapshot('06-code-response')
     for attempt in range(10):
         check_server_errors(hierarchy)
+        # The confirmed phone flow asks separately for call-log access. Deny it,
+        # just as a user can, and continue only the exact observed explanation.
+        call_rationale = any(n.get('text') == 'Please allow Telegram to receive calls and read the call log so that we can automatically enter your code for you.'
+                             for n in own_nodes(hierarchy))
+        permission_action = None
+        if call_rationale:
+            permission_action = next((n for n in own_nodes(hierarchy) if n.get('text') == 'Continue'
+                                      and n.get('clickable') == 'true'),None)
+        else:
+            permission_action = next((n for n in hierarchy.iter('node')
+                if n.get('package') in {'com.android.permissioncontroller','com.google.android.permissioncontroller'}
+                and n.get('text','').casefold() in {'deny',"don't allow"} and n.get('clickable') == 'true'),None)
+        if permission_action is not None:
+            tap(permission_action)
+            time.sleep(4)
+            hierarchy = snapshot('06-extra-permission-'+str(attempt+1))
+            continue
         code_fields = [n for n in own_nodes(hierarchy) if n.get('class','').endswith('EditText')
                        and n.get('enabled') == 'true']
         # Never enter a code into the phone form, password, email or another flow.
@@ -232,6 +249,7 @@ try:
         hierarchy = snapshot('06-code-wait-'+str(attempt+1))
     if not is_code_screen or not code_fields:
         raise RuntimeError('Expected native test-code input did not appear; inspect server response')
+    result['test_code_request'] = 'native code input observed after optional phone permissions denied'
     if any(n.get('text') or n.get('password') == 'true' for n in code_fields):
         raise RuntimeError('Unexpected code input state')
     tap(code_fields[0])
