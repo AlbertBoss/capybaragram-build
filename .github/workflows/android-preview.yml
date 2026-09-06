@@ -112,6 +112,11 @@ jobs:
           set -euo pipefail
           python3 control/ci/brand/prepare_android_brand.py android
           python3 control/ci/brand/prepare_android_brand.py android --check
+      - name: Verify folder mutation responses before local success
+        run: |
+          python3 control/ci/folders/test_android_folders.py android
+          python3 control/ci/folders/prepare_android_folders.py android
+          python3 control/ci/folders/prepare_android_folders.py android --check
       - name: Build one ARM64 debug APK
         env:
           CAPY_ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/capybaragram-preview.p12
