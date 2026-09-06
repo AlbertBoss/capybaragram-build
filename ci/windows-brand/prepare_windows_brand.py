@@ -6,6 +6,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 PREFIX = 'Telegram/SourceFiles/intro/'
 FILES = [PREFIX+'intro_start.cpp',PREFIX+'intro_step.cpp',PREFIX+'intro_step.h','Telegram/Resources/winrc/Telegram.rc']
+TITLE_FILES = [
+    'Telegram/SourceFiles/window/main_window.cpp',
+    'Telegram/SourceFiles/window/window_restore_shell.cpp',
+    'Telegram/SourceFiles/window/window_saved_windows.cpp',
+    'Telegram/SourceFiles/boxes/about_box.cpp',
+]
+FILES += TITLE_FILES
 ASSETS = {'Telegram/Resources/art/icon256.ico':'capy-icon.ico',
     'Telegram/Resources/art/logo_256.png':'capy-logo.png',
     'Telegram/Resources/art/logo_256_no_margin.png':'capy-logo.png'}
@@ -46,6 +53,11 @@ def transform(name,text):
         text = replace(text,'VALUE "CompanyName", "Telegram FZ-LLC"','VALUE "CompanyName", "CapybaraGram"')
         text = replace(text,'VALUE "FileDescription", "Telegram Desktop"','VALUE "FileDescription", "CapybaraGram - unofficial Telegram client"')
         return replace(text,'VALUE "ProductName", "Telegram Desktop"','VALUE "ProductName", "CapybaraGram"')
+    if name in TITLE_FILES[:3]:
+        return replace(text, 'u"Telegram"_q', 'u"CapybaraGram"_q')
+    if name == TITLE_FILES[3]:
+        return replace(text, 'box->setTitle(u"Telegram Desktop"_q);',
+            'box->setTitle(u"CapybaraGram"_q);')
     raise ValueError('Unexpected brand source')
 
 def digest(raw,text=False):
