@@ -42,6 +42,11 @@
       "sha256": "1950f29c24d855d9d8422be669b3b0ffdf7de7bd634fbbdb7fc69bef84e9ad45"
     },
     {
+      "file": ".github\\workflows\\windows-installer.yml",
+      "yaml_and_workflow_constraints": "pass",
+      "sha256": "d857e3e78f81cf732085204b7f55dcc9e9ee0431038280e16283062d2355fafe"
+    },
+    {
       "file": ".github\\workflows\\windows-preview.yml",
       "yaml_and_workflow_constraints": "pass",
       "sha256": "8fc5ecd8f651193cf7267f7257c45288fb8e818fe60408ec1901076bcf9aec81"

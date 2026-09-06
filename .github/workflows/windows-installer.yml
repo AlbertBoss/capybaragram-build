@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: MIT
+name: Windows installer verification
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: capybaragram-windows-installer
+  cancel-in-progress: false
+jobs:
+  installer:
+    if: github.event.repository.private == false
+    runs-on: windows-2025
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          repository: AlbertBoss/capybaragram-build
+          run-id: 34001919263
+          name: capybaragram-windows-preview-x64
+          path: ${{ runner.temp }}/installer-input
+          github-token: ${{ github.token }}
+      - name: Verify native artifact and compile installer
+        run: python ci/windows-installer/prepare_installer.py
+      - name: Test installation, reinstallation and uninstall
+        shell: pwsh
+        run: ./ci/windows-installer/verify_installer.ps1
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capybaragram-windows-installer-verification
+          path: ci/installer-results/
+          retention-days: 3
+          if-no-files-found: error
+          compression-level: 0
