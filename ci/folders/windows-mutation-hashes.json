@@ -1,0 +1,10 @@
+{
+  "pre": {
+    "Telegram/SourceFiles/boxes/filters/edit_filter_box.cpp": "9abdd0ba21fb149bec042677a37167be28e5df8afa838b784755f7c28b1c4745",
+    "Telegram/SourceFiles/api/api_chat_filters.cpp": "cf1efc6fc8f620af316cf50811c6caef5e8ea862253b2ce91e1d0bbeda42cf9d"
+  },
+  "post": {
+    "Telegram/SourceFiles/boxes/filters/edit_filter_box.cpp": "dc0e18cb62f2e260154c809ea6dbc160955919410f56eacdcc1d9c30abcca7ec",
+    "Telegram/SourceFiles/api/api_chat_filters.cpp": "3327c793a32753ea63444cd82ab3f0499ed8ce8210a7e12a078bc74d2b540c66"
+  }
+}
