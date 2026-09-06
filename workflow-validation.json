@@ -19,7 +19,7 @@
     {
       "file": ".github\\workflows\\android-client-smoke.yml",
       "yaml_and_workflow_constraints": "pass",
-      "sha256": "38a23507ae1e0e5c1b21315bc09997f03724ae5cf4e253632fbcfae5e1f9c57c"
+      "sha256": "e7de4ce2212ebf72b3941d716230984598f042894581c7b13447cbb270184d8b"
     },
     {
       "file": ".github\\workflows\\android-preview.yml",
@@ -29,7 +29,7 @@
     {
       "file": ".github\\workflows\\android-sandbox-smoke.yml",
       "yaml_and_workflow_constraints": "pass",
-      "sha256": "307ee05c7bf6699834d51d22118c20e2e29c9de1ae3ac2c0d8a9a39dd3636fd2"
+      "sha256": "9e9f612b9a4625d8655a15f04cf25d538c4d22aa4241e4ccd874bfb1d4861c3b"
     },
     {
       "file": ".github\\workflows\\android-vault-runtime.yml",

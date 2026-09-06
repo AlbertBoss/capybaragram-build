@@ -28,6 +28,8 @@ jobs:
           name: capybaragram-android-candidate-arm64
           path: ${{ runner.temp }}/client-input
           github-token: ${{ github.token }}
+      - name: Reject stale UI observation regressions
+        run: python3 ci/test_android_observer.py
       - name: Prepare standard runner emulator
         shell: bash
         run: |
