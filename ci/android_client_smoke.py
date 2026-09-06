@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 LOCALE = os.environ.get('CAPY_TEST_LOCALE','en-US')
 if LOCALE not in {'en-US','ru-RU'}: raise ValueError('Unsupported test locale')
 PACKAGE = 'org.capybaragram'
-APK_SHA = 'fe2d4504c9772ad1c0e83438fa5fe5591dce94542aa0dabcc4e2255b9ea821d4'
+APK_SHA = '3e7a61a234f04fffe76cd55a7dce99b6e2258963523a94da9bc590a0938102f0'
 CERT_SHA = '8254ebe4b00d6e4a95ee07dd27a30f8bd95b066b83c72affb39e4d25e7bff282'
 sdk = Path(os.environ['ANDROID_HOME'])
 scratch = Path(os.environ['RUNNER_TEMP'])/'capy-client-smoke'
@@ -74,7 +74,7 @@ log = (report/'emulator.log').open('w')
 process = subprocess.Popen([str(emulator),'-avd','capy-client','-no-window','-no-audio',
     '-no-boot-anim','-no-snapshot','-gpu','swiftshader_indirect','-memory','2048',
     '-cores','2','-port','5554','-accel','on','-change-locale',LOCALE],stdout=log,stderr=subprocess.STDOUT,env=env)
-result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':34007280482,
+result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':34008202572,
           'package':PACKAGE,'release_manifest_flags':'PASS (testOnly/debuggable/allowBackup disabled)',
           'real_account_login_tested':False,'notes_ui_tested':False,'visual_review':'PENDING',
           'install':'PENDING','launch':'PENDING','login_screen':'PENDING','cold_restart':'PENDING'}
@@ -103,6 +103,19 @@ try:
     (report/'install.txt').write_text(install)
     if 'Success' not in install: raise RuntimeError('APK installation did not succeed')
     result['install'] = 'PASS'
+    device('shell','input','keyevent','KEYCODE_HOME')
+    time.sleep(5)
+    home = snapshot('00-home')
+    screen = next((n for n in home.iter('node') if re.fullmatch(r'\[0,0\]\[\d+,\d+\]',n.get('bounds',''))),None)
+    if screen is None: raise RuntimeError('Launcher screen bounds unavailable')
+    _,_,width,height = map(int,re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',screen.get('bounds')).groups())
+    device('shell','input','swipe',str(width//2),str(height*9//10),str(width//2),str(height//5),'450')
+    time.sleep(3)
+    drawer = snapshot('00-launcher')
+    launcher_icon = next((n for n in drawer.iter('node') if n.get('text') == 'CapybaraGram'
+                          and n.get('package') != PACKAGE),None)
+    if launcher_icon is None: raise RuntimeError('CapybaraGram launcher icon is not visible in app drawer')
+    result['launcher_entry'] = 'PASS (label present; icon visual review pending)'
     component = device('shell','cmd','package','resolve-activity','--brief',PACKAGE).strip().splitlines()[-1]
     if not component.startswith(PACKAGE+'/'): raise RuntimeError('No package launcher activity')
     launch = device('shell','am','start','-W','-n',component)
@@ -185,7 +198,7 @@ try:
         # Source LoginActivity.fillNumber and the captured first-run UI show a
         # rationale before Android's phone permission. Continue only that exact
         # rationale; always deny the system permission. No auto-filled SIM number.
-        rationale = any(n.get('text') in {'Please allow Telegram to receive calls so that we can automatically confirm your phone number.', 'Разрешите приложению принимать звонки, чтобы мы могли подтвердить Ваш номер телефона автоматически.'}
+        rationale = any(n.get('text') in {'CapybaraGram может подставить номер телефона с SIM-карты. На следующем экране можно запретить доступ и ввести номер самостоятельно.', 'CapybaraGram can fill in the phone number from your SIM card. You can deny access on the next screen and enter the number yourself.'}
                         and n.get('package') == PACKAGE for n in hierarchy.iter('node'))
         action = None
         if rationale:
