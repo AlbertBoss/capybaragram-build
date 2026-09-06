@@ -33,8 +33,8 @@ def device(*args, timeout=60):
     try:
         return run([adb,'-s','emulator-5554',*args],timeout=timeout,capture_output=True,text=True).stdout
     except subprocess.CalledProcessError as failure:
-        (report/'adb-failure.txt').write_text(
-            'operation='+str(args[0])+'\n'+(failure.stdout or '')+(failure.stderr or ''),encoding='utf-8')
+        with (report/'adb-failure.txt').open('a',encoding='utf-8') as log:
+            log.write('operation='+str(args[0])+'\n'+(failure.stdout or '')+(failure.stderr or '')+'\n')
         raise
 
 def snapshot(name):
@@ -92,7 +92,10 @@ try:
     if not component.startswith(PACKAGE+'/'): raise RuntimeError('No package launcher activity')
     launch = device('shell','am','start','-W','-n',component)
     (report/'launch.txt').write_text(launch)
-    if 'Status: ok' not in launch: raise RuntimeError('Launcher did not report success')
+    # am's own first-frame wait can time out under ARM translation. It is not
+    # sufficient evidence that the app exited: verify process and actual UI next.
+    if 'Status: ok' not in launch and 'Status: timeout' not in launch:
+        raise RuntimeError('Launcher rejected the activity start')
     time.sleep(20)
     if not device('shell','pidof',PACKAGE).strip(): raise RuntimeError('Client exited after launch')
     hierarchy = snapshot('01-onboarding')
@@ -129,6 +132,14 @@ try:
     print('CAPY_ANDROID_CLIENT_SMOKE=PASS (fresh install, onboarding, phone entry, cold restart)',flush=True)
 finally:
     (report/'verification.json').write_text(json.dumps(result,indent=2)+'\n')
+    # Capture failure evidence before emulator shutdown. No account is logged in.
+    for name,args in [('crash-buffer.txt',('logcat','-b','crash','-d')),
+                      ('activity-state.txt',('shell','dumpsys','activity','activities'))]:
+        try: (report/name).write_text(device(*args,timeout=15),encoding='utf-8')
+        except (subprocess.TimeoutExpired,subprocess.CalledProcessError): pass
+    if result['cold_restart'] != 'PASS':
+        try: snapshot('failure')
+        except (subprocess.TimeoutExpired,subprocess.CalledProcessError,RuntimeError,ET.ParseError): pass
     try: device('emu','kill',timeout=20)
     except (subprocess.TimeoutExpired,subprocess.CalledProcessError): pass
     if process.poll() is None:
