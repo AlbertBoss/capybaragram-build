@@ -67,6 +67,10 @@ if ($Phase -eq 'Build') {
         if ($LASTEXITCODE -ne 0) { throw 'Desktop notes/template preparation failed.' }
         & python (Join-Path $PSScriptRoot 'windows-notes/windows_notes_patch.py') $src --check
         if ($LASTEXITCODE -ne 0) { throw 'Desktop notes/template preparation verification failed.' }
+        & python (Join-Path $PSScriptRoot 'windows-brand/prepare_windows_brand.py') $src
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop brand preparation failed.' }
+        & python (Join-Path $PSScriptRoot 'windows-brand/prepare_windows_brand.py') $src --check
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop brand verification failed.' }
         $env:CAPY_WINDOWS_API_CACHE = Join-Path $env:RUNNER_TEMP 'capy-windows-owner-api.cmake'
         & python (Join-Path $PSScriptRoot 'api_credentials.py') --windows-cache $env:CAPY_WINDOWS_API_CACHE
         if ($LASTEXITCODE -ne 0) { throw 'Owner API cache creation failed.' }

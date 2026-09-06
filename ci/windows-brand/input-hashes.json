@@ -1,0 +1,20 @@
+{
+  "pre": {
+    "Telegram/SourceFiles/intro/intro_start.cpp": "f440e53b518fe67b9febdaba5b52b0d2e6bcb16349630d985f1bfd2a0ce87d3e",
+    "Telegram/SourceFiles/intro/intro_step.cpp": "ebbafd8feac26e266671337ba560555154d23cf523272d953b6279d5a9aa8f72",
+    "Telegram/SourceFiles/intro/intro_step.h": "d9154922f190c88482f63d19abc4386b41ad9c52615a9bad8c9755b60c1006b3",
+    "Telegram/Resources/winrc/Telegram.rc": "b4bc63a53717267c7fb9256b59058b6e4438cc198729d8a4ff1cf09d429ce150",
+    "Telegram/Resources/art/icon256.ico": "6d27da5cf7669e32dc2cf09e331befe8e39045f75f95e0cbfe02c16e675d81bb",
+    "Telegram/Resources/art/logo_256.png": "3fb1400c7dc9bbc3b5cb3ffedcbf4a9b09c53e28b57a7ff33a8a6b9048864090",
+    "Telegram/Resources/art/logo_256_no_margin.png": "44af9a76a532559ef8cb450b48096713be819103ab79a19d7e4abb9b32ff4cb7"
+  },
+  "post": {
+    "Telegram/SourceFiles/intro/intro_start.cpp": "1179d0bc29f36a772838a5f6c55106b234da120e70e9d1131db03c3da151fe63",
+    "Telegram/SourceFiles/intro/intro_step.cpp": "0be6d49d3b4ae26b64cdb3abda589e3434566b69551a38aa2b84ad9e3e32383e",
+    "Telegram/SourceFiles/intro/intro_step.h": "51ed039293de3411150610c9310daded192cdb6d64e556846619b95511c9272c",
+    "Telegram/Resources/winrc/Telegram.rc": "844ea6e7309924e3f4a5b85b6a1e550477e66b62aa1f2d5c00a91fe0ae05e074",
+    "Telegram/Resources/art/icon256.ico": "3db5f835e22acd4992f1c5e7b464a0fe308dd534efcd5cc12a503e662c489eec",
+    "Telegram/Resources/art/logo_256.png": "5c9f6f9c04ee2a27b491ef8606e4c0f0adf67f3033372dac8e116335053a82b0",
+    "Telegram/Resources/art/logo_256_no_margin.png": "5c9f6f9c04ee2a27b491ef8606e4c0f0adf67f3033372dac8e116335053a82b0"
+  }
+}
