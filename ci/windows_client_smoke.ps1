@@ -15,6 +15,7 @@ $env:APPDATA = Join-Path $profile 'Roaming'
 $env:LOCALAPPDATA = Join-Path $profile 'Local'
 New-Item -ItemType Directory -Path $env:APPDATA,$env:LOCALAPPDATA | Out-Null
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
+Add-Type -AssemblyName System.Drawing
     Add-Type -TypeDefinition @'
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,10 @@ public static class CapyTestWindows {
     [DllImport("user32.dll", CharSet=CharSet.Unicode)] static extern int GetWindowText(IntPtr window, StringBuilder text, int size);
     [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr window);
     [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr window, int command);
+    [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr window);
+    [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+    [StructLayout(LayoutKind.Sequential)] public struct Rect { public int Left, Top, Right, Bottom; }
+    [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr window, out Rect rect);
     public static IntPtr[] ForProcess(uint process) {
         var result = new List<IntPtr>();
         EnumWindows((window, unused) => { uint owner; GetWindowThreadProcessId(window, out owner); if (owner == process) result.Add(window); return true; }, IntPtr.Zero);
@@ -68,6 +73,7 @@ try {
     # Display only the identified app window on this disposable CI desktop so
     # we can test actual interactive UI, rather than a permanently hidden tree.
     $shown = $false
+    $testWindow = [IntPtr]::Zero
     foreach ($handle in [CapyTestWindows]::ForProcess([uint32]$app.Id)) {
         $element = [System.Windows.Automation.AutomationElement]::FromHandle($handle)
         if (-not $element) { continue }
@@ -75,6 +81,7 @@ try {
         if ($element.FindFirst([System.Windows.Automation.TreeScope]::Descendants,$startCondition)) {
             $null = [CapyTestWindows]::ShowWindow($handle,9)
             $shown = [CapyTestWindows]::IsWindowVisible($handle)
+            $testWindow = $handle
             break
         }
     }
@@ -95,6 +102,22 @@ try {
     if (-not $phone[0].TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern,[ref]$value)) { throw 'Phone control has no readable native value.' }
     if (([System.Windows.Automation.ValuePattern]$value).Current.Value -ne '') { throw 'Phone input is not empty.' }
     $result.preauth = 'PASS: native Start Messaging and phone navigation invoked; empty accessible phone input observed'
+    # Capture only the observed empty phone screen, never a QR login token.
+    $null = [CapyTestWindows]::SetForegroundWindow($testWindow)
+    Start-Sleep -Seconds 2
+    if ([CapyTestWindows]::GetForegroundWindow() -ne $testWindow) { throw 'Own test window is not foreground for capture.' }
+    $rect = [CapyTestWindows+Rect]::new()
+    if (-not [CapyTestWindows]::GetWindowRect($testWindow,[ref]$rect)) { throw 'Test window bounds unavailable.' }
+    $width = $rect.Right - $rect.Left
+    $height = $rect.Bottom - $rect.Top
+    if ($width -le 0 -or $height -le 0 -or $width -gt 3840 -or $height -gt 2160) { throw 'Unexpected test window bounds.' }
+    $bitmap = [System.Drawing.Bitmap]::new($width,$height)
+    $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+    try {
+        $graphics.CopyFromScreen($rect.Left,$rect.Top,0,0,$bitmap.Size)
+        $bitmap.Save((Join-Path $out 'phone-screen.png'),[System.Drawing.Imaging.ImageFormat]::Png)
+        $result.visual_review = 'PENDING: actual empty phone window captured on disposable CI desktop'
+    } finally { $graphics.Dispose(); $bitmap.Dispose() }
     Write-Output 'CAPY_WINDOWS_PREAUTH_NAVIGATION=PASS'
 } finally {
     $result | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $out 'verification.json') -Encoding utf8
