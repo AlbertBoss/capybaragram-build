@@ -24,7 +24,7 @@ jobs:
       - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
         with:
           repository: AlbertBoss/capybaragram-build
-          run-id: 34005792612
+          run-id: 34007280482
           name: capybaragram-android-candidate-arm64
           path: ${{ runner.temp }}/client-input
           github-token: ${{ github.token }}

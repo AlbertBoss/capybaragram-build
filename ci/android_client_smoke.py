@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 LOCALE = os.environ.get('CAPY_TEST_LOCALE','en-US')
 if LOCALE not in {'en-US','ru-RU'}: raise ValueError('Unsupported test locale')
 PACKAGE = 'org.capybaragram'
-APK_SHA = 'd676e99a31d12bcf1313cdbdd45bd00b1edc23adaea885deec255f113c814c60'
+APK_SHA = 'fe2d4504c9772ad1c0e83438fa5fe5591dce94542aa0dabcc4e2255b9ea821d4'
 CERT_SHA = '8254ebe4b00d6e4a95ee07dd27a30f8bd95b066b83c72affb39e4d25e7bff282'
 sdk = Path(os.environ['ANDROID_HOME'])
 scratch = Path(os.environ['RUNNER_TEMP'])/'capy-client-smoke'
@@ -74,7 +74,7 @@ log = (report/'emulator.log').open('w')
 process = subprocess.Popen([str(emulator),'-avd','capy-client','-no-window','-no-audio',
     '-no-boot-anim','-no-snapshot','-gpu','swiftshader_indirect','-memory','2048',
     '-cores','2','-port','5554','-accel','on','-change-locale',LOCALE],stdout=log,stderr=subprocess.STDOUT,env=env)
-result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':34005792612,
+result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':34007280482,
           'package':PACKAGE,'release_manifest_flags':'PASS (testOnly/debuggable/allowBackup disabled)',
           'real_account_login_tested':False,'notes_ui_tested':False,'visual_review':'PENDING',
           'install':'PENDING','launch':'PENDING','login_screen':'PENDING','cold_restart':'PENDING'}
