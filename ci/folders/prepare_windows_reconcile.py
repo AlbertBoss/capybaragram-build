@@ -33,7 +33,7 @@ def transform(name,text):
 			_capyReloadPending = false;
 			reload();
 		}""")
-        return once(text,"""		if (_reloading) {
+        text=once(text,"""		if (_reloading) {
 			_reloading = false;
 			_listChanged.fire({});
 		}
@@ -46,6 +46,26 @@ def transform(name,text):
 			reload();
 		}
 	}).send();""")
+        text=once(text,'#include "apiwrap.h"','#include "apiwrap.h"\n#include "lang/lang_keys.h"\n#include "ui/toast/toast.h"')
+        text=once(text,'\tapply(MTP_updateDialogFilterOrder(wrapped));','''\tconst auto capyOrderFinished = [=](mtpRequestId requestId, bool accepted) {
+\t\tif (requestId != _saveOrderRequestId) {
+\t\t\treturn;
+\t\t}
+\t\t_saveOrderRequestId = 0;
+\t\t_saveOrderAfterId = 0;
+\t\treload();
+\t\tif (!accepted) {
+\t\t\tUi::Toast::Show(Lang::Id().startsWith(u"ru"_q)
+\t\t\t\t? u"Не удалось сохранить порядок папок. Попробуйте ещё раз."_q
+\t\t\t\t: u"Could not save folder order. Please try again."_q);
+\t\t}
+\t};
+\tapply(MTP_updateDialogFilterOrder(wrapped));''')
+        return once(text,'\t)).afterRequest(_saveOrderAfterId).send();','''\t)).done([=](const MTPBool &result, mtpRequestId id) {
+\t\tcapyOrderFinished(id, mtpIsTrue(result));
+\t}).fail([=](const MTP::Error &, mtpRequestId id) {
+\t\tcapyOrderFinished(id, false);
+\t}).afterRequest(_saveOrderAfterId).send();''')
     raise ValueError('Unexpected source')
 def plan(source,check=False):
     source=Path(source).resolve(strict=True);hashes=json.loads((ROOT/'windows-reconcile-hashes.json').read_text());result={}
