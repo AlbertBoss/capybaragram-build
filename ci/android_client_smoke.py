@@ -135,10 +135,14 @@ try:
     device('shell','input','keyevent','KEYCODE_HOME')
     time.sleep(5)
     home = snapshot('00-home')
-    screen = next((n for n in home.iter('node') if re.fullmatch(r'\[0,0\]\[\d+,\d+\]',n.get('bounds',''))),None)
-    if screen is None: raise RuntimeError('Launcher screen bounds unavailable')
-    _,_,width,height = map(int,re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',screen.get('bounds')).groups())
-    device('shell','input','swipe',str(width//2),str(height*9//10),str(width//2),str(height//5),'450')
+    # The dock swipe can leave Pixel Launcher on its home screen. Open the
+    # observed accessibility control, then require a fresh drawer hierarchy.
+    drawer_button = next((n for n in home.iter('node')
+                          if n.get('package') == 'com.google.android.apps.nexuslauncher'
+                          and n.get('content-desc') in {'Список приложений', 'Apps list', 'All apps'}
+                          and n.get('clickable') == 'true' and n.get('enabled') == 'true'), None)
+    if drawer_button is None: raise RuntimeError('Launcher app-list control is not visible')
+    tap(drawer_button)
     time.sleep(3)
     drawer = snapshot('00-launcher')
     launcher_icon = next((n for n in drawer.iter('node') if n.get('text') == 'CapybaraGram'
