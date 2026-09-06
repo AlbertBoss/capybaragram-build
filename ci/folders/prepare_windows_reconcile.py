@@ -12,10 +12,20 @@ def once(text,old,new):
     return text.replace(old,new)
 def transform(name,text):
     if name==FILES[0]:
+        text=once(text,'\t\thistory->session().api().request(MTPmessages_UpdateDialogFilter(','''\t\tconst auto capyUpdateFinished = [=](bool accepted) {
+\t\t\thistory->owner().chatsFilters().reload();
+\t\t\tif (!accepted) {
+\t\t\t\tUi::Toast::Show(Lang::Id().startsWith(u"ru"_q)
+\t\t\t\t\t? u"Не удалось изменить папку. Попробуйте ещё раз."_q
+\t\t\t\t\t: u"Could not update folder. Please try again."_q);
+\t\t\t}
+\t\t\treturn accepted;
+\t\t};
+\t\thistory->session().api().request(MTPmessages_UpdateDialogFilter(''')
         text=once(text,'			// Revert filter on fail.\n			history->owner().chatsFilters().set(was);',
-          '			// A late failure must not restore a snapshot over a newer edit.\n			history->owner().chatsFilters().reload();')
+          '			// A late failure must not restore a snapshot over a newer edit.\n\t\t\tcapyUpdateFinished(false);')
         return once(text,'		)).done([=, chat = history->peer->name(), name = filter.title()] {',
-          '		)).done([=, chat = history->peer->name(), name = filter.title()] {\n			history->owner().chatsFilters().reload();')
+          '\t\t)).done([=, chat = history->peer->name(), name = filter.title()](const MTPBool &result) {\n\t\t\tif (!capyUpdateFinished(mtpIsTrue(result))) {\n\t\t\t\treturn;\n\t\t\t}')
     if name==FILES[2]:
         return once(text,'	bool _reloading = false;','	bool _reloading = false;\n	bool _capyReloadPending = false;')
     if name==FILES[1]:

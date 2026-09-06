@@ -37,6 +37,7 @@ jobs:
           mkdir -p reports
           python3 control/ci/folders/test_windows_reconcile.py desktop 2>&1 | tee reports/native-reload-test.txt
           python3 control/ci/folders/test_windows_order.py desktop 2>&1 | tee reports/native-order-test.txt
+          python3 control/ci/folders/test_windows_membership.py desktop 2>&1 | tee reports/native-membership-test.txt
           python3 control/ci/folders/prepare_windows_reconcile.py desktop
           python3 control/ci/folders/prepare_windows_reconcile.py desktop --check
           python3 control/ci/folders/test_windows_save_share.py desktop 2>&1 | tee reports/native-save-share-test.txt
