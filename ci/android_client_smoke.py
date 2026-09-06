@@ -9,6 +9,8 @@ import subprocess
 import time
 import xml.etree.ElementTree as ET
 
+LOCALE = os.environ.get('CAPY_TEST_LOCALE','en-US')
+if LOCALE not in {'en-US','ru-RU'}: raise ValueError('Unsupported test locale')
 PACKAGE = 'org.capybaragram.preview.beta'
 APK_SHA = 'bc368ad62725fc867e819bbe5655cf8133d7cf5027c0d6fd19aa6130df9d35d8'
 CERT_SHA = '8254ebe4b00d6e4a95ee07dd27a30f8bd95b066b83c72affb39e4d25e7bff282'
@@ -67,7 +69,7 @@ run([emulator,'-accel-check'])
 log = (report/'emulator.log').open('w')
 process = subprocess.Popen([str(emulator),'-avd','capy-client','-no-window','-no-audio',
     '-no-boot-anim','-no-snapshot','-gpu','swiftshader_indirect','-memory','2048',
-    '-cores','2','-port','5554','-accel','on'],stdout=log,stderr=subprocess.STDOUT,env=env)
+    '-cores','2','-port','5554','-accel','on','-change-locale',LOCALE],stdout=log,stderr=subprocess.STDOUT,env=env)
 result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':34005401918,
           'real_account_login_tested':False,'notes_ui_tested':False,'visual_review':'PENDING',
           'install':'PENDING','launch':'PENDING','login_screen':'PENDING','cold_restart':'PENDING'}
@@ -77,11 +79,14 @@ try:
         if process.poll() is not None:
             raise RuntimeError('Emulator stopped before boot')
         try:
-            if device('shell','getprop','sys.boot_completed',timeout=15).strip() == '1': break
+            if (device('shell','getprop','sys.boot_completed',timeout=15).strip() == '1'
+                and device('shell','getprop','persist.sys.locale',timeout=15).strip() == LOCALE): break
         except (subprocess.TimeoutExpired,subprocess.CalledProcessError):
             pass
         if time.monotonic() > deadline: raise RuntimeError('Emulator boot timed out')
         time.sleep(5)
+    time.sleep(10)  # Locale selection restarts the disposable emulator framework.
+    result['locale'] = device('shell','getprop','persist.sys.locale').strip()
     result['fingerprint'] = device('shell','getprop','ro.build.fingerprint').strip()
     result['abi_list'] = device('shell','getprop','ro.product.cpu.abilist').strip()
     result['native_bridge'] = device('shell','getprop','ro.dalvik.vm.native.bridge').strip()
@@ -141,7 +146,8 @@ try:
     hierarchy = change_theme(hierarchy,'switch to night theme','switch to day theme','01-theme-dark')
     hierarchy = change_theme(hierarchy,'switch to day theme','switch to night theme','01-theme-light')
     result['theme_switch'] = 'PASS (both directions; visual review pending)'
-    titles = ['CapybaraGram','Keep the context','Prepare your reply','Separate accounts','Familiar folders','Make it yours']
+    titles = (['CapybaraGram','Всё под рукой','Ответ без спешки','Каждому своё','Знакомые папки','Как вам удобно']
+              if LOCALE == 'ru-RU' else ['CapybaraGram','Keep the context','Prepare your reply','Separate accounts','Familiar folders','Make it yours'])
     result['intro_pages'] = [titles[0]]
     for index,title in enumerate(titles[1:],2):
         swipe_page(hierarchy)
@@ -178,7 +184,7 @@ try:
         else:
             action = next((n for n in hierarchy.iter('node')
                            if n.get('package') in {'com.android.permissioncontroller','com.google.android.permissioncontroller'}
-                           and n.get('text','').casefold() in {'deny',"don't allow"}
+                           and n.get('text','').casefold() in {'deny',"don't allow",'запретить','не разрешать'}
                            and n.get('clickable') == 'true'),None)
             if action is not None: result['phone_permission_denials'] += 1
         if action is None: raise RuntimeError('Unexpected overlay blocks phone entry; inspect screenshot')

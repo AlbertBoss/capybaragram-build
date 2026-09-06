@@ -35,7 +35,9 @@ jobs:
           test -c /dev/kvm
           sudo chmod 666 /dev/kvm
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;36.0.0' 'platform-tools' 'emulator' 'system-images;android-30;google_apis;x86_64'
-      - name: Install reviewed client and check first-run UI
+      - name: Install reviewed client and check Russian first-run UI
+        env:
+          CAPY_TEST_LOCALE: ru-RU
         run: python3 ci/android_client_smoke.py
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
