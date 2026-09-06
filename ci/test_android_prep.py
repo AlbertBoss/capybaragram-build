@@ -42,6 +42,19 @@ class Tests(unittest.TestCase):
     perms=[e for e in root.findall('uses-permission') if e.get('{'+prep.ANDROID+'}name')=='android.permission.INTERNET']
     self.assertEqual(len(perms),1);self.assertEqual(perms[0].get('{'+prep.TOOLS+'}node'),'remove')
   vars=(self.root/prep.PATHS[3]).read_text();self.assertIn('APP_ID = 0;',vars);self.assertIn('APP_HASH = "";',vars)
+ def test_online_restores_downloaded_translations(self):
+  import re
+  import prepare_android_online as online
+  self.runprep()
+  def flag(text,name):
+   return re.search(r'public static boolean '+name+r'\s*=\s*(true|false);',text).group(1)
+  offline=(self.root/prep.PATHS[3]).read_text()
+  self.assertEqual(flag(offline,'USE_CLOUD_STRINGS'),'false')
+  _,changed=online.changes(self.root,prep,{'CAPY_API_ID':'123456','CAPY_API_HASH':'0123456789abcdef0123456789abcdef'})
+  online_vars=changed[prep.PATHS[3]].decode()
+  self.assertEqual(flag(online_vars,'USE_CLOUD_STRINGS'),'true')
+  self.assertEqual(flag(online_vars,'CHECK_UPDATES'),'false')
+  self.assertEqual(flag(online_vars,'LOGS_ENABLED'),'false')
  def test_changed_last_file_refuses_before_writes(self):
   p=self.root/prep.PATHS[-1];p.write_bytes(p.read_bytes()+b'\n<!-- drift -->')
   with self.assertRaises(ValueError):self.runprep()

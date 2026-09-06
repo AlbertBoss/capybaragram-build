@@ -39,6 +39,10 @@ def changes(root, baseline, environ=None):
     text = originals[relative].decode('utf-8')
     text = baseline.replace_once(text, r'(?m)^(\s*public static int APP_ID\s*=)\s*0;', lambda m: m[1] + ' ' + api_id + ';')
     text = baseline.replace_once(text, r'(?m)^(\s*public static String APP_HASH\s*=)\s*"";', lambda m: m[1] + ' "' + api_hash + '";')
+    # Online clients must use the downloaded language packs, including strings
+    # that are not bundled in the small built-in Russian resource fallback.
+    text = baseline.replace_once(text, r'(?m)^(\s*public static boolean USE_CLOUD_STRINGS\s*=)\s*false;',
+                                 lambda m: m[1] + ' true;')
     transformed[relative] = text.encode('utf-8')
     for relative in ('TMessagesProj/config/debug/AndroidManifest.xml', 'TMessagesProj/config/debug/AndroidManifest_SDK23.xml'):
         doc = ET.fromstring(originals[relative])
