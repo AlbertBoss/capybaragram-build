@@ -38,6 +38,16 @@ def transform(name,text):
         capyFailed();
     }
 }).fail(capyFailed).send();'''.lstrip()
+    if name==FILES[0]:
+        callback=callback.replace('const MTPBool &result','const MTPBool &response').replace('mtpIsTrue(result)','mtpIsTrue(response)')
+        callback=callback.replace('        session->data().chatsFilters().reload();',
+            '        session->data().chatsFilters().reload();\n        if (next) {\n            next(result);\n        }')
+        text=once(text,'\tconst auto doneCallback = [=](const Data::ChatFilter &result) {',
+            '\tconst auto saveFilter = [=](\n\t\t\tconst Data::ChatFilter &result,\n\t\t\tFn<void(Data::ChatFilter)> next) {')
+        text=once(text,'\tconst auto saveAnd = [=](\n',
+            '\tconst auto doneCallback = [=](const Data::ChatFilter &data) {\n\t\tsaveFilter(data, {});\n\t};\n\tconst auto saveAnd = [=](\n')
+        text=once(text,'\t\tdoneCallback(data);\n\t\tnext(data);',
+            '\t\tsaveFilter(data, std::move(next));')
     return once(text,ending,replacement+native(callback))
 def plan(source,check=False):
     source=Path(source).resolve(strict=True)
