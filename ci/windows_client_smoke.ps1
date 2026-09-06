@@ -26,6 +26,7 @@ public static class CapyTestWindows {
     [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr window, out uint owner);
     [DllImport("user32.dll", CharSet=CharSet.Unicode)] static extern int GetWindowText(IntPtr window, StringBuilder text, int size);
     [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr window);
+    [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr window, int command);
     public static IntPtr[] ForProcess(uint process) {
         var result = new List<IntPtr>();
         EnumWindows((window, unused) => { uint owner; GetWindowThreadProcessId(window, out owner); if (owner == process) result.Add(window); return true; }, IntPtr.Zero);
@@ -63,6 +64,23 @@ try {
         $nodes = @(Observe '01-start')
         if (@($nodes | Where-Object { $_.Current.Name -ceq 'Start Messaging' }).Count -eq 1) { break }
     }
+    # The native transition hides its child controls until painting completes.
+    # Display only the identified app window on this disposable CI desktop so
+    # we can test actual interactive UI, rather than a permanently hidden tree.
+    $shown = $false
+    foreach ($handle in [CapyTestWindows]::ForProcess([uint32]$app.Id)) {
+        $element = [System.Windows.Automation.AutomationElement]::FromHandle($handle)
+        if (-not $element) { continue }
+        $startCondition = [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::NameProperty,'Start Messaging')
+        if ($element.FindFirst([System.Windows.Automation.TreeScope]::Descendants,$startCondition)) {
+            $null = [CapyTestWindows]::ShowWindow($handle,9)
+            $shown = [CapyTestWindows]::IsWindowVisible($handle)
+            break
+        }
+    }
+    if (-not $shown) { throw 'Identified test window could not be displayed on CI desktop.' }
+    Start-Sleep -Seconds 2
+    $nodes = @(Observe '01-visible-start')
     Invoke-Named $nodes 'Start Messaging'
     Start-Sleep -Seconds 5
     $nodes = @(Observe '02-after-start')
