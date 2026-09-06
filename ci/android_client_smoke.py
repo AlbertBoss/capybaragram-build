@@ -10,7 +10,7 @@ import time
 import xml.etree.ElementTree as ET
 
 PACKAGE = 'org.capybaragram.preview.beta'
-APK_SHA = 'e210b6033eb578d9cfbfce28b793c69861b466ff5de133b2aa51c26876134ec1'
+APK_SHA = '74b7bcaaae706ba11a4be10805f7db57f007cb72075f6e6e7f0753659e835248'
 CERT_SHA = '8254ebe4b00d6e4a95ee07dd27a30f8bd95b066b83c72affb39e4d25e7bff282'
 sdk = Path(os.environ['ANDROID_HOME'])
 scratch = Path(os.environ['RUNNER_TEMP'])/'capy-client-smoke'
@@ -68,7 +68,7 @@ log = (report/'emulator.log').open('w')
 process = subprocess.Popen([str(emulator),'-avd','capy-client','-no-window','-no-audio',
     '-no-boot-anim','-no-snapshot','-gpu','swiftshader_indirect','-memory','2048',
     '-cores','2','-port','5554','-accel','on'],stdout=log,stderr=subprocess.STDOUT,env=env)
-result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':33983323983,
+result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':34003659571,
           'real_account_login_tested':False,'notes_ui_tested':False,'visual_review':'PENDING',
           'install':'PENDING','launch':'PENDING','login_screen':'PENDING','cold_restart':'PENDING'}
 try:
@@ -87,11 +87,9 @@ try:
     result['native_bridge'] = device('shell','getprop','ro.dalvik.vm.native.bridge').strip()
     if 'arm64-v8a' not in result['abi_list']:
         raise RuntimeError('This emulator image does not advertise ARM64 compatibility')
-    # This exact preview has android:testOnly=true in its signed manifest.
-    # -t permits its installation only for testing; final delivery must remove
-    # that flag during a new signed build, not rewrite this reviewed APK.
-    result['test_only_apk'] = True
-    install = device('install','-t',str(apk),timeout=150)
+    # Ordinary installation is required: no test-only installation override.
+    result['test_only_apk'] = False
+    install = device('install',str(apk),timeout=150)
     (report/'install.txt').write_text(install)
     if 'Success' not in install: raise RuntimeError('APK installation did not succeed')
     result['install'] = 'PASS'
