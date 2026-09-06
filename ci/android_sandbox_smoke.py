@@ -46,20 +46,30 @@ def snapshot(name):
     # A failed uiautomator dump can leave an older file behind while returning 0.
     # Use a new path for every attempt, and never act on an old hierarchy.
     last_failure = None
-    for attempt in range(4):
+    ordinary_failures = 0
+    fresh = False
+    for attempt in range(12):
         remote = '/sdcard/capy-ui-' + str(time.monotonic_ns()) + '.xml'
         try:
             dumped = run([adb,'-s','emulator-5554','shell','uiautomator','dump',remote],capture_output=True,timeout=45)
             with (report/'hierarchy-dump.log').open('ab') as log:
                 log.write(dumped.stdout + dumped.stderr + b'\n')
+            # The observed code-screen countdown emits accessibility updates every
+            # second. Wait for it to settle; do not resend a code or reuse UI data.
+            if b'ERROR: could not get idle state.' in dumped.stdout + dumped.stderr:
+                time.sleep(2)
+                continue
             xml = device('shell','cat',remote)
             tree = ET.fromstring(xml)
             if tree.tag != 'hierarchy': raise RuntimeError('Unexpected UI hierarchy root')
+            fresh = True
             break
         except (subprocess.CalledProcessError,subprocess.TimeoutExpired,ET.ParseError) as failure:
             last_failure = failure
+            ordinary_failures += 1
+            if ordinary_failures >= 4: break
             time.sleep(2)
-    else:
+    if not fresh:
         png = run([adb,'-s','emulator-5554','exec-out','screencap','-p'],capture_output=True).stdout
         if png.startswith(b'\x89PNG\r\n\x1a\n'):
             (report/(name+'-without-ui.png')).write_bytes(png)
