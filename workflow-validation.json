@@ -49,7 +49,7 @@
     {
       "file": ".github\\workflows\\windows-client-smoke.yml",
       "yaml_and_workflow_constraints": "pass",
-      "sha256": "380fd2457cf1930c2791c4542a8dd19f19536d20025dbc4f6a7ce45a76ff06aa"
+      "sha256": "f5d3f6feaa629e28ecd2d47116677719261f66778d1d2ad76f7e51147d852c6d"
     },
     {
       "file": ".github\\workflows\\windows-folder-contracts.yml",

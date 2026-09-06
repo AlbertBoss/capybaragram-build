@@ -6,7 +6,7 @@ $out = Join-Path (Get-Location) 'ci/windows-client-results'
 New-Item -ItemType Directory -Path $out -ErrorAction Stop | Out-Null
 $inputRoot = Join-Path $env:RUNNER_TEMP 'windows-client-input'
 $exe = Join-Path $inputRoot 'CapybaraGram.exe'
-$expected = 'f19082ad7bf0bd2e8ce24a71fff138b85228b0ec968dded44cdb96383a41ddb2'
+$expected = 'a203a79dd1aa24699c034926adfaa29ed2857c07771626d5ce4e50767bf20711'
 if ((Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expected) { throw 'Unexpected native executable.' }
 $profile = Join-Path $env:RUNNER_TEMP 'Capy preauth empty profile'
 if (Test-Path -LiteralPath $profile) { throw 'Test profile already exists.' }
@@ -41,7 +41,7 @@ public static class CapyTestWindows {
 }
 '@
 
-$result = @{ source_run=34001919263; exe_sha256=$expected; login_tested=$false; phone_entered=$false; visual_review='NOT PERFORMED: accessibility observation only'; preauth='PENDING' }
+$result = @{ source_run=34006416580; exe_sha256=$expected; login_tested=$false; phone_entered=$false; visual_review='NOT PERFORMED'; screenshots=@(); preauth='PENDING' }
 $app = Start-Process -FilePath $exe -WorkingDirectory $inputRoot -WindowStyle Hidden -PassThru
 function Observe([string]$label) {
     $app.Refresh()
@@ -61,6 +61,24 @@ function Invoke-Named($nodes,[string]$name) {
     $pattern = $null
     if (-not $matches[0].TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern,[ref]$pattern)) { throw "Control has no native InvokePattern: $name" }
     ([System.Windows.Automation.InvokePattern]$pattern).Invoke()
+}
+function Capture-OwnWindow([string]$name) {
+    $null = [CapyTestWindows]::SetForegroundWindow($testWindow)
+    Start-Sleep -Seconds 2
+    if ([CapyTestWindows]::GetForegroundWindow() -ne $testWindow) { throw 'Own test window is not foreground for capture.' }
+    $rect = [CapyTestWindows+Rect]::new()
+    if (-not [CapyTestWindows]::GetWindowRect($testWindow,[ref]$rect)) { throw 'Test window bounds unavailable.' }
+    $width = $rect.Right - $rect.Left
+    $height = $rect.Bottom - $rect.Top
+    if ($width -le 0 -or $height -le 0 -or $width -gt 3840 -or $height -gt 2160) { throw 'Unexpected test window bounds.' }
+    $bitmap = [System.Drawing.Bitmap]::new($width,$height)
+    $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+    try {
+        $graphics.CopyFromScreen($rect.Left,$rect.Top,0,0,$bitmap.Size)
+        $bitmap.Save((Join-Path $out $name),[System.Drawing.Imaging.ImageFormat]::Png)
+        $result.screenshots += $name
+        $result.visual_review = 'PENDING: captured native windows require visual review'
+    } finally { $graphics.Dispose(); $bitmap.Dispose() }
 }
 try {
     $nodes = @()
@@ -88,6 +106,8 @@ try {
     if (-not $shown) { throw 'Identified test window could not be displayed on CI desktop.' }
     Start-Sleep -Seconds 2
     $nodes = @(Observe '01-visible-start')
+    if (@($nodes | Where-Object { $_.Current.Name -ceq 'Start Messaging' -and $_.Current.IsEnabled }).Count -ne 1) { throw 'Start screen not observed before capture.' }
+    Capture-OwnWindow 'onboarding-screen.png'
     Invoke-Named $nodes 'Start Messaging'
     Start-Sleep -Seconds 5
     $nodes = @(Observe '02-after-start')
@@ -101,23 +121,9 @@ try {
     $value = $null
     if (-not $phone[0].TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern,[ref]$value)) { throw 'Phone control has no readable native value.' }
     if (([System.Windows.Automation.ValuePattern]$value).Current.Value -ne '') { throw 'Phone input is not empty.' }
-    $result.preauth = 'PASS: native Start Messaging and phone navigation invoked; empty accessible phone input observed'
     # Capture only the observed empty phone screen, never a QR login token.
-    $null = [CapyTestWindows]::SetForegroundWindow($testWindow)
-    Start-Sleep -Seconds 2
-    if ([CapyTestWindows]::GetForegroundWindow() -ne $testWindow) { throw 'Own test window is not foreground for capture.' }
-    $rect = [CapyTestWindows+Rect]::new()
-    if (-not [CapyTestWindows]::GetWindowRect($testWindow,[ref]$rect)) { throw 'Test window bounds unavailable.' }
-    $width = $rect.Right - $rect.Left
-    $height = $rect.Bottom - $rect.Top
-    if ($width -le 0 -or $height -le 0 -or $width -gt 3840 -or $height -gt 2160) { throw 'Unexpected test window bounds.' }
-    $bitmap = [System.Drawing.Bitmap]::new($width,$height)
-    $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
-    try {
-        $graphics.CopyFromScreen($rect.Left,$rect.Top,0,0,$bitmap.Size)
-        $bitmap.Save((Join-Path $out 'phone-screen.png'),[System.Drawing.Imaging.ImageFormat]::Png)
-        $result.visual_review = 'PENDING: actual empty phone window captured on disposable CI desktop'
-    } finally { $graphics.Dispose(); $bitmap.Dispose() }
+    Capture-OwnWindow 'phone-screen.png'
+    $result.preauth = 'PASS: native Start Messaging and phone navigation invoked; empty accessible phone input observed'
     Write-Output 'CAPY_WINDOWS_PREAUTH_NAVIGATION=PASS'
 } finally {
     $result | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $out 'verification.json') -Encoding utf8
