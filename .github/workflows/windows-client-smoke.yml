@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: MIT
+name: Windows native pre-auth navigation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: capybaragram-windows-client
+  cancel-in-progress: false
+jobs:
+  client:
+    if: github.event.repository.private == false
+    runs-on: windows-2025
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          repository: AlbertBoss/capybaragram-build
+          run-id: 34001919263
+          name: capybaragram-windows-preview-x64
+          path: ${{ runner.temp }}/windows-client-input
+          github-token: ${{ github.token }}
+      - name: Check native phone navigation without entering an account
+        shell: pwsh
+        run: ./ci/windows_client_smoke.ps1
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capybaragram-windows-client-verification
+          path: ci/windows-client-results/
+          retention-days: 3
+          if-no-files-found: error
+          compression-level: 0

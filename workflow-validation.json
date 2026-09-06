@@ -47,6 +47,11 @@
       "sha256": "1950f29c24d855d9d8422be669b3b0ffdf7de7bd634fbbdb7fc69bef84e9ad45"
     },
     {
+      "file": ".github\\workflows\\windows-client-smoke.yml",
+      "yaml_and_workflow_constraints": "pass",
+      "sha256": "380fd2457cf1930c2791c4542a8dd19f19536d20025dbc4f6a7ce45a76ff06aa"
+    },
+    {
       "file": ".github\\workflows\\windows-installer.yml",
       "yaml_and_workflow_constraints": "pass",
       "sha256": "d857e3e78f81cf732085204b7f55dcc9e9ee0431038280e16283062d2355fafe"
