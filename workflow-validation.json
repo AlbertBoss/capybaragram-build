@@ -19,7 +19,7 @@
     {
       "file": ".github\\workflows\\android-client-smoke.yml",
       "yaml_and_workflow_constraints": "pass",
-      "sha256": "e7de4ce2212ebf72b3941d716230984598f042894581c7b13447cbb270184d8b"
+      "sha256": "21a82f990606a1562629c2b7aa59632e61fa98d395bb1ebaaab36188ba8af7f8"
     },
     {
       "file": ".github\\workflows\\android-preview.yml",
