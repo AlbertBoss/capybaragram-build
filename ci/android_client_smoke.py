@@ -10,7 +10,7 @@ import time
 import xml.etree.ElementTree as ET
 
 PACKAGE = 'org.capybaragram.preview.beta'
-APK_SHA = '74b7bcaaae706ba11a4be10805f7db57f007cb72075f6e6e7f0753659e835248'
+APK_SHA = 'bc368ad62725fc867e819bbe5655cf8133d7cf5027c0d6fd19aa6130df9d35d8'
 CERT_SHA = '8254ebe4b00d6e4a95ee07dd27a30f8bd95b066b83c72affb39e4d25e7bff282'
 sdk = Path(os.environ['ANDROID_HOME'])
 scratch = Path(os.environ['RUNNER_TEMP'])/'capy-client-smoke'
@@ -68,7 +68,7 @@ log = (report/'emulator.log').open('w')
 process = subprocess.Popen([str(emulator),'-avd','capy-client','-no-window','-no-audio',
     '-no-boot-anim','-no-snapshot','-gpu','swiftshader_indirect','-memory','2048',
     '-cores','2','-port','5554','-accel','on'],stdout=log,stderr=subprocess.STDOUT,env=env)
-result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':34003659571,
+result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':34005401918,
           'real_account_login_tested':False,'notes_ui_tested':False,'visual_review':'PENDING',
           'install':'PENDING','launch':'PENDING','login_screen':'PENDING','cold_restart':'PENDING'}
 try:
@@ -107,6 +107,52 @@ try:
     if not any(n.get('package') == PACKAGE for n in hierarchy.iter('node')):
         raise RuntimeError('Client UI is not foreground')
     result['launch'] = 'PASS'
+
+    def require_title(tree, title):
+        if not any(n.get('package') == PACKAGE and n.get('text') == title for n in tree.iter('node')):
+            raise RuntimeError('Expected visible intro page: '+title)
+
+    def change_theme(tree, current_description, next_description, snapshot_name):
+        node = next((n for n in tree.iter('node') if n.get('package') == PACKAGE
+                     and n.get('content-desc','').casefold() == current_description),None)
+        if node is None: raise RuntimeError('Observed theme toggle is missing')
+        tap(node)
+        time.sleep(5)
+        tree = snapshot(snapshot_name)
+        if not any(n.get('content-desc','').casefold() == next_description for n in tree.iter('node')):
+            raise RuntimeError('Theme toggle did not change state')
+        require_title(tree,'CapybaraGram')
+        return tree
+
+    def swipe_page(tree, forward=True):
+        pager = next((n for n in tree.iter('node') if n.get('package') == PACKAGE
+                      and n.get('class','').endswith('.ViewPager')),None)
+        if pager is None: raise RuntimeError('Observed intro pager is missing')
+        bounds = re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',pager.get('bounds',''))
+        if not bounds: raise RuntimeError('Intro pager has invalid bounds')
+        x1,y1,x2,y2 = map(int,bounds.groups())
+        left,right = x1+(x2-x1)//6,x2-(x2-x1)//6
+        y = y1+(y2-y1)//2
+        start,end = (right,left) if forward else (left,right)
+        device('shell','input','swipe',str(start),str(y),str(end),str(y),'350')
+        time.sleep(2)
+
+    require_title(hierarchy,'CapybaraGram')
+    hierarchy = change_theme(hierarchy,'switch to night theme','switch to day theme','01-theme-dark')
+    hierarchy = change_theme(hierarchy,'switch to day theme','switch to night theme','01-theme-light')
+    result['theme_switch'] = 'PASS (both directions; visual review pending)'
+    titles = ['CapybaraGram','Keep the context','Prepare your reply','Separate accounts','Familiar folders','Make it yours']
+    result['intro_pages'] = [titles[0]]
+    for index,title in enumerate(titles[1:],2):
+        swipe_page(hierarchy)
+        hierarchy = snapshot('01-page-'+str(index))
+        require_title(hierarchy,title)
+        result['intro_pages'].append(title)
+    for _ in range(5):
+        swipe_page(hierarchy,False)
+    hierarchy = snapshot('01-return-first')
+    require_title(hierarchy,'CapybaraGram')
+    result['intro_return'] = 'PASS'
     # Only tap a label observed in the actual hierarchy. Never enter a phone,
     # request a login code, grant contacts, or send a Telegram message.
     start = next((n for n in hierarchy.iter('node') if n.get('package') == PACKAGE
