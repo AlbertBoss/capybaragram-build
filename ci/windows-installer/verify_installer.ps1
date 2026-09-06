@@ -62,15 +62,37 @@ $exe = Join-Path $install 'CapybaraGram.exe'
 $app = Start-Process -FilePath $exe -WorkingDirectory $install -WindowStyle Hidden -PassThru
 $uiNames = @()
 $uiProof = 'PENDING: native process launch only'
+$uiFailure = $null
 try {
     Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
+    # MainWindowHandle is zero for a hidden process. Inspect windows belonging
+    # to the exact launched PID instead; never target another application.
+    Add-Type -TypeDefinition @'
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Text;
+public static class CapyTestWindows {
+    public delegate bool Visitor(IntPtr window, IntPtr data);
+    [DllImport("user32.dll")] static extern bool EnumWindows(Visitor visitor, IntPtr data);
+    [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr window, out uint owner);
+    [DllImport("user32.dll", CharSet=CharSet.Unicode)] static extern int GetWindowText(IntPtr window, StringBuilder text, int size);
+    [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr window);
+    public static IntPtr[] ForProcess(uint process) {
+        var result = new List<IntPtr>();
+        EnumWindows((window, unused) => { uint owner; GetWindowThreadProcessId(window, out owner); if (owner == process) result.Add(window); return true; }, IntPtr.Zero);
+        return result.ToArray();
+    }
+    public static string Title(IntPtr window) { var text = new StringBuilder(1024); GetWindowText(window, text, text.Capacity); return text.ToString(); }
+}
+'@
     $deadline = [DateTime]::UtcNow.AddSeconds(60)
     while ([DateTime]::UtcNow -lt $deadline) {
         Start-Sleep -Seconds 2
         $app.Refresh()
         if ($app.HasExited) { throw "Installed application exited before pre-auth check: $($app.ExitCode)." }
-        if ($app.MainWindowHandle -ne [IntPtr]::Zero) {
-            $element = [System.Windows.Automation.AutomationElement]::FromHandle($app.MainWindowHandle)
+        foreach ($handle in [CapyTestWindows]::ForProcess([uint32]$app.Id)) {
+            $element = [System.Windows.Automation.AutomationElement]::FromHandle($handle)
             if ($element) {
                 $nodes = $element.FindAll([System.Windows.Automation.TreeScope]::Descendants, [System.Windows.Automation.Condition]::TrueCondition)
                 $uiNames = @($nodes | ForEach-Object { $_.Current.Name } | Where-Object { $_ })
@@ -80,9 +102,19 @@ try {
                 }
             }
         }
+        if ($uiProof.StartsWith('PASS')) { break }
     }
+    [ordered]@{ process_id = $app.Id; session_id = $app.SessionId; user_interactive = [Environment]::UserInteractive
+        windows = @([CapyTestWindows]::ForProcess([uint32]$app.Id) | ForEach-Object {
+            @{ handle = $_.ToInt64(); title = [CapyTestWindows]::Title($_); visible = [CapyTestWindows]::IsWindowVisible($_) }
+        })
+        accessibility_names = $uiNames
+    } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $out 'preauth-diagnostics.json') -Encoding utf8
     $uiNames | Set-Content -LiteralPath (Join-Path $out 'preauth-accessibility.txt') -Encoding utf8
     if (-not $uiProof.StartsWith('PASS')) { throw 'Installed process did not expose the expected pre-auth UI within 60 seconds.' }
+} catch {
+    $uiFailure = $_.Exception.Message
+    $uiProof = 'FAILED: ' + $uiFailure
 } finally {
     $app.Refresh()
     if (-not $app.HasExited) {
@@ -112,4 +144,5 @@ foreach ($marker in $profileMarker,$extraFile) {
     real_login = $false; logged_in_features = $false; visual_review = 'PENDING'
     final_release = $false; platform = 'Disposable GitHub Windows Server 2025 runner'
 } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $out 'verification.json') -Encoding utf8
+if ($uiFailure) { throw $uiFailure }
 Write-Host 'PASS: exact native payload installed, reinstalled, launched to pre-auth and uninstalled; synthetic local data preserved.'
