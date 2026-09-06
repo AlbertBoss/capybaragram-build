@@ -31,7 +31,14 @@ if ($Phase -eq 'Preflight') {
         $vc = Join-Path $instance.installationPath 'VC\Tools\MSVC'
         $matches = @(Get-ChildItem -LiteralPath $vc -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -like "$toolset.*" })
         $dev = Join-Path $instance.installationPath 'Common7\Tools\VsDevCmd.bat'
-        if ($matches.Count -gt 0 -and (Test-Path -LiteralPath $dev)) { $selected = $dev; break }
+        if ($matches.Count -gt 0 -and (Test-Path -LiteralPath $dev)) {
+            $selected = $dev
+            if ($Profile -eq 'Candidate') {
+                $matchingToolset = $matches | Sort-Object Name -Descending | Select-Object -First 1
+                & (Join-Path $PSScriptRoot 'ensure_windows_atl.ps1') -InstallationPath $instance.installationPath -ToolsetPath $matchingToolset.FullName
+            }
+            break
+        }
     }
     if (-not $selected) { throw 'Required VC 14.44 toolset not installed; no automatic VS installation.' }
     foreach ($tail in @("Include\$sdk\um\windows.h", "Lib\$sdk\um\x64\kernel32.lib")) {

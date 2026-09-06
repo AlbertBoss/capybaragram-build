@@ -67,6 +67,11 @@
       "sha256": "8fc5ecd8f651193cf7267f7257c45288fb8e818fe60408ec1901076bcf9aec81"
     },
     {
+      "file": ".github\\workflows\\windows-release-toolchain.yml",
+      "yaml_and_workflow_constraints": "pass",
+      "sha256": "76940a035439613678a667176e6b10515053a8620e8e5ad86ec7bbbd26f2bee8"
+    },
+    {
       "file": ".github\\workflows\\windows-vault-runtime.yml",
       "yaml_and_workflow_constraints": "pass",
       "sha256": "308b1abd7cf3bc4a72024a966d51e6dbf9febbd52b6e548bfbbe793678fbdc2e"
