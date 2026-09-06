@@ -6,7 +6,7 @@ $out = Join-Path (Get-Location) 'ci/windows-client-results'
 New-Item -ItemType Directory -Path $out -ErrorAction Stop | Out-Null
 $inputRoot = Join-Path $env:RUNNER_TEMP 'windows-client-input'
 $exe = Join-Path $inputRoot 'CapybaraGram.exe'
-$expected = 'a203a79dd1aa24699c034926adfaa29ed2857c07771626d5ce4e50767bf20711'
+$expected = '24150fb9370a9473eef888e77ed4905df34866ffc7675d802a45f08f57e26a8a'
 if ((Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expected) { throw 'Unexpected native executable.' }
 $profile = Join-Path $env:RUNNER_TEMP 'Capy preauth empty profile'
 if (Test-Path -LiteralPath $profile) { throw 'Test profile already exists.' }
@@ -41,7 +41,8 @@ public static class CapyTestWindows {
 }
 '@
 
-$result = @{ source_run=34006416580; exe_sha256=$expected; login_tested=$false; phone_entered=$false; visual_review='NOT PERFORMED'; screenshots=@(); preauth='PENDING' }
+$result = @{ source_run=34031740962; exe_sha256=$expected; login_tested=$false; phone_entered=$false; visual_review='NOT PERFORMED'; screenshots=@(); preauth='PENDING' }
+$startupWatch = [Diagnostics.Stopwatch]::StartNew()
 $app = Start-Process -FilePath $exe -WorkingDirectory $inputRoot -WindowStyle Hidden -PassThru
 function Observe([string]$label) {
     $app.Refresh()
@@ -85,7 +86,14 @@ try {
     for ($attempt=0; $attempt -lt 20; $attempt++) {
         Start-Sleep -Seconds 2
         $nodes = @(Observe '01-start')
-        if (@($nodes | Where-Object { $_.Current.Name -ceq 'Start Messaging' }).Count -eq 1) { break }
+        if (@($nodes | Where-Object { $_.Current.Name -ceq 'Start Messaging' }).Count -eq 1) {
+            $startupWatch.Stop()
+            $app.Refresh()
+            $result.start_screen_observed_ms = $startupWatch.ElapsedMilliseconds
+            $result.start_working_set_bytes = $app.WorkingSet64
+            $result.timing_scope = 'Fresh profile on GitHub Windows runner; includes 2-second polling and accessibility observation. Not user-PC startup measurement.'
+            break
+        }
     }
     # The native transition hides its child controls until painting completes.
     # Display only the identified app window on this disposable CI desktop so
