@@ -40,14 +40,33 @@ def device(*args, timeout=60):
         raise
 
 def snapshot(name):
-    run([adb,'-s','emulator-5554','shell','uiautomator','dump','/sdcard/capy-ui.xml'],capture_output=True,timeout=45)
-    xml = device('shell','cat','/sdcard/capy-ui.xml')
+    # A failed uiautomator dump can leave an older file behind while returning 0.
+    # Use a new path for every attempt, and never act on an old hierarchy.
+    last_failure = None
+    for attempt in range(4):
+        remote = '/sdcard/capy-ui-' + str(time.monotonic_ns()) + '.xml'
+        try:
+            dumped = run([adb,'-s','emulator-5554','shell','uiautomator','dump',remote],capture_output=True,timeout=45)
+            with (report/'hierarchy-dump.log').open('ab') as log:
+                log.write(dumped.stdout + dumped.stderr + b'\n')
+            xml = device('shell','cat',remote)
+            tree = ET.fromstring(xml)
+            if tree.tag != 'hierarchy': raise RuntimeError('Unexpected UI hierarchy root')
+            break
+        except (subprocess.CalledProcessError,subprocess.TimeoutExpired,ET.ParseError) as failure:
+            last_failure = failure
+            time.sleep(2)
+    else:
+        png = run([adb,'-s','emulator-5554','exec-out','screencap','-p'],capture_output=True).stdout
+        if png.startswith(b'\x89PNG\r\n\x1a\n'):
+            (report/(name+'-without-ui.png')).write_bytes(png)
+        raise RuntimeError('No fresh UI hierarchy; no coordinates may be reused') from last_failure
     (report/(name+'.xml')).write_text(xml,encoding='utf-8')
     png = run([adb,'-s','emulator-5554','exec-out','screencap','-p'],capture_output=True).stdout
     if not png.startswith(b'\x89PNG\r\n\x1a\n'):
         raise RuntimeError('Screenshot was not a PNG')
     (report/(name+'.png')).write_bytes(png)
-    return ET.fromstring(xml)
+    return tree
 
 def tap(node):
     match = re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',node.get('bounds',''))

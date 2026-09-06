@@ -43,14 +43,33 @@ def device(*args, timeout=60):
         raise
 
 def snapshot(name):
-    run([adb,'-s','emulator-5554','shell','uiautomator','dump','/sdcard/capy-ui.xml'],capture_output=True,timeout=45)
-    xml = device('shell','cat','/sdcard/capy-ui.xml')
+    # A failed uiautomator dump can leave an older file behind while returning 0.
+    # Use a new path for every attempt, and never act on an old hierarchy.
+    last_failure = None
+    for attempt in range(4):
+        remote = '/sdcard/capy-ui-' + str(time.monotonic_ns()) + '.xml'
+        try:
+            dumped = run([adb,'-s','emulator-5554','shell','uiautomator','dump',remote],capture_output=True,timeout=45)
+            with (report/'hierarchy-dump.log').open('ab') as log:
+                log.write(dumped.stdout + dumped.stderr + b'\n')
+            xml = device('shell','cat',remote)
+            tree = ET.fromstring(xml)
+            if tree.tag != 'hierarchy': raise RuntimeError('Unexpected UI hierarchy root')
+            break
+        except (subprocess.CalledProcessError,subprocess.TimeoutExpired,ET.ParseError) as failure:
+            last_failure = failure
+            time.sleep(2)
+    else:
+        png = run([adb,'-s','emulator-5554','exec-out','screencap','-p'],capture_output=True).stdout
+        if png.startswith(b'\x89PNG\r\n\x1a\n'):
+            (report/(name+'-without-ui.png')).write_bytes(png)
+        raise RuntimeError('No fresh UI hierarchy; no coordinates may be reused') from last_failure
     (report/(name+'.xml')).write_text(xml,encoding='utf-8')
     png = run([adb,'-s','emulator-5554','exec-out','screencap','-p'],capture_output=True).stdout
     if not png.startswith(b'\x89PNG\r\n\x1a\n'):
         raise RuntimeError('Screenshot was not a PNG')
     (report/(name+'.png')).write_bytes(png)
-    return ET.fromstring(xml)
+    return tree
 
 def tap(node):
     match = re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',node.get('bounds',''))
@@ -242,11 +261,10 @@ try:
             time.sleep(4)
             hierarchy = snapshot('06-extra-permission-'+str(attempt+1))
             continue
-        code_fields = [n for n in own_nodes(hierarchy) if n.get('class','').endswith('EditText')
-                       and n.get('enabled') == 'true']
+        code_fields = [n for n in own_nodes(hierarchy) if n.get('class','').endswith('EditText')]
         # Never enter a code into the phone form, password, email or another flow.
-        is_code_screen = any(n.get('text') == 'Phone verification' for n in own_nodes(hierarchy))
-        if is_code_screen and code_fields: break
+        is_code_screen = any(n.get('text') == 'Enter code' for n in own_nodes(hierarchy))
+        if is_code_screen and len(code_fields) == 5: break
         time.sleep(5)
         hierarchy = snapshot('06-code-wait-'+str(attempt+1))
     if not is_code_screen or not code_fields:
@@ -254,8 +272,29 @@ try:
     result['test_code_request'] = 'native code input observed after optional phone permissions denied'
     if any(n.get('text') or n.get('password') == 'true' for n in code_fields):
         raise RuntimeError('Unexpected code input state')
-    tap(code_fields[0])
-    device('shell','input','text','22222')
+    # CodeFieldContainer deliberately exposes disabled EditTexts; the native
+    # custom keyboard writes to them. Use its observed ten-key grid, whose order
+    # is defined by CustomPhoneKeyboardView.java and verified in runtime captures.
+    def bounds(node):
+        match = re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',node.get('bounds',''))
+        if not match: raise RuntimeError('Keyboard control has invalid bounds')
+        return tuple(map(int,match.groups()))
+    for digit_index in range(5):
+        hierarchy = snapshot('07-code-digit-'+str(digit_index))
+        fields = [n for n in own_nodes(hierarchy) if n.get('class','').endswith('EditText')]
+        if len(fields) != 5 or ''.join(n.get('text','') for n in fields) != '2'*digit_index:
+            raise RuntimeError('Unexpected native test-code prefix; stop without resubmitting')
+        keys = [n for n in own_nodes(hierarchy) if n.get('class') == 'android.view.View'
+                and n.get('clickable') == 'true' and n.get('enabled') == 'true'
+                and not n.get('text') and not n.get('content-desc')]
+        keys.sort(key=lambda n:(bounds(n)[1],bounds(n)[0]))
+        if len(keys) != 10: raise RuntimeError('Observed numeric keyboard differs')
+        rows = {}
+        for key in keys: rows.setdefault(bounds(key)[1],[]).append(key)
+        if [len(row) for row in rows.values()] != [3,3,3,1]:
+            raise RuntimeError('Observed numeric keypad is not the source-defined 3/3/3/1 grid')
+        tap(keys[1])
+        time.sleep(1)
     time.sleep(12)
     hierarchy = snapshot('07-after-test-code')
     check_server_errors(hierarchy)
