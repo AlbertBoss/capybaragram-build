@@ -52,7 +52,24 @@ function Observe([string]$label) {
     foreach ($handle in [CapyTestWindows]::ForProcess([uint32]$app.Id)) {
         try {
             $element = [System.Windows.Automation.AutomationElement]::FromHandle($handle)
-            if ($element) { $nodes += @($element.FindAll([System.Windows.Automation.TreeScope]::Descendants,[System.Windows.Automation.Condition]::TrueCondition)) }
+            if ($element) {
+                $found = $element.FindAll([System.Windows.Automation.TreeScope]::Descendants,[System.Windows.Automation.Condition]::TrueCondition)
+                foreach ($node in $found) {
+                    if ($node -isnot [System.Windows.Automation.AutomationElement]) { throw 'Unexpected accessibility collection member.' }
+                    $current = $node.Current
+                    $controlType = $current.ControlType
+                    if ($controlType -isnot [System.Windows.Automation.ControlType]) {
+                        $result.uia_retry_count++
+                        continue
+                    }
+                    # Snapshot properties while this provider is available. Keep the
+                    # real element only for the later required Invoke/Value action.
+                    $nodes += [pscustomobject]@{
+                        Element = $node
+                        Current = [pscustomobject]@{ Name=$current.Name; ControlType=$controlType; IsEnabled=$current.IsEnabled }
+                    }
+                }
+            }
         } catch {
             $cause = $_.Exception
             while ($cause.InnerException) { $cause = $cause.InnerException }
@@ -73,7 +90,7 @@ function Invoke-Named($nodes,[string]$name) {
     $matches = @($nodes | Where-Object { $_.Current.Name -ceq $name -and $_.Current.IsEnabled })
     if ($matches.Count -ne 1) { throw "Expected exactly one enabled control: $name" }
     $pattern = $null
-    if (-not $matches[0].TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern,[ref]$pattern)) { throw "Control has no native InvokePattern: $name" }
+    if (-not $matches[0].Element.TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern,[ref]$pattern)) { throw "Control has no native InvokePattern: $name" }
     ([System.Windows.Automation.InvokePattern]$pattern).Invoke()
 }
 function Capture-OwnWindow([string]$name) {
@@ -140,7 +157,7 @@ try {
     $phone = @($nodes | Where-Object { $_.Current.Name -ceq 'Phone number' -and $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Edit })
     if ($phone.Count -ne 1) { throw 'Native phone input was not observed.' }
     $value = $null
-    if (-not $phone[0].TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern,[ref]$value)) { throw 'Phone control has no readable native value.' }
+    if (-not $phone[0].Element.TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern,[ref]$value)) { throw 'Phone control has no readable native value.' }
     if (([System.Windows.Automation.ValuePattern]$value).Current.Value -ne '') { throw 'Phone input is not empty.' }
     # Capture only the observed empty phone screen, never a QR login token.
     Capture-OwnWindow 'phone-screen.png'
