@@ -9,9 +9,9 @@ import re
 import struct
 import subprocess
 
-SOURCE_RUN = 34001919263
-SOURCE_HEAD = '01599aa1f2c88b2865dff3488427065e5dcfbd06'
-EXE_SHA256 = 'f19082ad7bf0bd2e8ce24a71fff138b85228b0ec968dded44cdb96383a41ddb2'
+SOURCE_RUN = 34031740962
+SOURCE_HEAD = '4ee5059a997be3dcf7bc913d9758babedf3287b2'
+EXE_SHA256 = '24150fb9370a9473eef888e77ed4905df34866ffc7675d802a45f08f57e26a8a'
 
 def main():
     if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_OS') != 'Windows':
@@ -35,7 +35,7 @@ def main():
         if stream.read(6) != b'PE\0\0\x64\x86':
             raise ValueError('Expected native x64 executable.')
     info = (stage/'BUILD-INFO.txt').read_text(encoding='utf-8-sig')
-    if not re.search(rf'(?m)^Run: {SOURCE_RUN}\s*$', info) or 'ONLINE PREVIEW' not in info:
+    if not re.search(rf'(?m)^Run: {SOURCE_RUN}\s*$', info) or 'RELEASE CANDIDATE, not approved for final delivery. Build configuration: Release.' not in info:
         raise ValueError('Native build provenance differs.')
     for filename in ['LICENSE', 'LEGAL']:
         if (stage/filename).stat().st_size < 20:
@@ -74,7 +74,7 @@ def main():
     (out/'SHA256SUMS.txt').write_text(setup_hash+' *'+setup.name+'\n', encoding='ascii')
     (out/'BUILD-INFO.json').write_text(json.dumps(dict(source_run=SOURCE_RUN, source_head=SOURCE_HEAD,
         native_sha256=digest, setup_sha256=setup_hash, final_release=False,
-        purpose='Installer verification using known Debug preview; not the optimized Release candidate.',
+        purpose='Installer verification using the exact optimized Release candidate; real account session upgrade acceptance remains pending.',
         github_run=os.environ['GITHUB_RUN_ID']), indent=2)+'\n', encoding='utf-8')
     print('Verified exact native x64 artifact and compiled preview installer.')
 
