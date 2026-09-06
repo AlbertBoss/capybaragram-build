@@ -123,13 +123,18 @@ try:
             raise RuntimeError('Expected visible intro page: '+title)
 
     def change_theme(tree, current_description, next_description, snapshot_name):
+        # Remote strings can arrive between the initial capture and the first tap.
+        descriptions = {
+            'switch to night theme': {'switch to night theme','переключить на ночную тему'},
+            'switch to day theme': {'switch to day theme','переключить на дневную тему'},
+        }
         node = next((n for n in tree.iter('node') if n.get('package') == PACKAGE
-                     and n.get('content-desc','').casefold() == current_description),None)
+                     and n.get('content-desc','').casefold() in descriptions[current_description]),None)
         if node is None: raise RuntimeError('Observed theme toggle is missing')
         tap(node)
         time.sleep(5)
         tree = snapshot(snapshot_name)
-        if not any(n.get('content-desc','').casefold() == next_description for n in tree.iter('node')):
+        if not any(n.get('content-desc','').casefold() in descriptions[next_description] for n in tree.iter('node')):
             raise RuntimeError('Theme toggle did not change state')
         require_title(tree,'CapybaraGram')
         return tree
