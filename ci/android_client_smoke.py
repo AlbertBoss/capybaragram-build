@@ -145,6 +145,20 @@ try:
     tap(drawer_button)
     time.sleep(3)
     drawer = snapshot('00-launcher')
+    if not any(n.get('text') == 'CapybaraGram' for n in drawer.iter('node')):
+        # Some Pixel Launcher versions expose a tiny app-list control whose
+        # center tap does nothing. Swipe above the observed dock/search region.
+        dock = next((n for n in drawer.iter('node')
+                     if n.get('resource-id') == 'com.google.android.apps.nexuslauncher:id/hotseat'), None)
+        if dock is not None:
+            bounds = re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]', dock.get('bounds',''))
+            if bounds:
+                left, top, right, bottom = map(int, bounds.groups())
+                if right > left and top > 80:
+                    x = (left + right) // 2
+                    device('shell','input','swipe',str(x),str(top-20),str(x),str(top//4),'250')
+                    time.sleep(3)
+                    drawer = snapshot('00-launcher-after-workspace-swipe')
     launcher_icon = next((n for n in drawer.iter('node') if n.get('text') == 'CapybaraGram'
                           and n.get('package') != PACKAGE),None)
     if launcher_icon is None: raise RuntimeError('CapybaraGram launcher icon is not visible in app drawer')
