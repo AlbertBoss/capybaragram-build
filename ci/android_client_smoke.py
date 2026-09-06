@@ -161,8 +161,12 @@ try:
                     drawer = snapshot('00-launcher-after-workspace-swipe')
     launcher_icon = next((n for n in drawer.iter('node') if n.get('text') == 'CapybaraGram'
                           and n.get('package') != PACKAGE),None)
-    if launcher_icon is None: raise RuntimeError('CapybaraGram launcher icon is not visible in app drawer')
-    result['launcher_entry'] = 'PASS (label present; icon visual review pending)'
+    result['launcher_entry'] = ('PASS (label present; icon visual review pending)' if launcher_icon is not None
+                                else 'FAIL: launcher did not expose CapybaraGram; startup checks continue for diagnosis')
+    if launcher_icon is None:
+        for name,args in [('launcher-input.txt',('shell','dumpsys','input')),
+                          ('launcher-window.txt',('shell','dumpsys','window'))]:
+            (report/name).write_text(device(*args),encoding='utf-8')
     component = device('shell','cmd','package','resolve-activity','--brief',PACKAGE).strip().splitlines()[-1]
     if not component.startswith(PACKAGE+'/'): raise RuntimeError('No package launcher activity')
     launch = device('shell','am','start','-W','-n',component)
@@ -279,6 +283,8 @@ try:
     (report/'crash-buffer.txt').write_text(crash,encoding='utf-8')
     if PACKAGE in crash: raise RuntimeError('Client appeared in the crash buffer')
     result['cold_restart'] = 'PASS'
+    if not result['launcher_entry'].startswith('PASS'):
+        raise RuntimeError('Startup checks finished, but launcher icon acceptance failed; see launcher diagnostics')
     print('CAPY_ANDROID_CLIENT_SMOKE=PASS (fresh install, onboarding, phone entry, cold restart)',flush=True)
 finally:
     (report/'verification.json').write_text(json.dumps(result,indent=2)+'\n')
