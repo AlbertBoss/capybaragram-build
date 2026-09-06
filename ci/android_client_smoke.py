@@ -159,6 +159,19 @@ try:
                     device('shell','input','swipe',str(x),str(top-20),str(x),str(top//4),'250')
                     time.sleep(3)
                     drawer = snapshot('00-launcher-after-workspace-swipe')
+    if not any(n.get('text') == 'CapybaraGram' for n in drawer.iter('node')):
+        still_home = any(n.get('package') == 'com.google.android.apps.nexuslauncher'
+                         and n.get('content-desc') in {'Список приложений', 'Apps list', 'All apps'}
+                         for n in drawer.iter('node'))
+        if still_home:
+            # The captured failure remained on the Pixel home screen after both
+            # tap and swipe. Use Android's documented All Apps keyboard action,
+            # then require a NEW hierarchy and the actual installed icon below.
+            # https://developer.android.com/reference/android/view/KeyEvent#KEYCODE_ALL_APPS
+            device('shell','input','keyevent','KEYCODE_ALL_APPS')
+            time.sleep(3)
+            drawer = snapshot('00-launcher-after-all-apps-key')
+            result['launcher_open_fallback'] = 'Android KEYCODE_ALL_APPS from observed Pixel home screen'
     launcher_icon = next((n for n in drawer.iter('node') if n.get('text') == 'CapybaraGram'
                           and n.get('package') != PACKAGE),None)
     result['launcher_entry'] = ('PASS (label present; icon visual review pending)' if launcher_icon is not None
