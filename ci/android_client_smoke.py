@@ -47,6 +47,13 @@ def snapshot(name):
     (report/(name+'.png')).write_bytes(png)
     return ET.fromstring(xml)
 
+def tap(node):
+    match = re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',node.get('bounds',''))
+    if not match: raise RuntimeError('Observed action has no valid bounds')
+    x1,y1,x2,y2 = map(int,match.groups())
+    if x2 <= x1 or y2 <= y1: raise RuntimeError('Observed action is not visible')
+    device('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2))
+
 apks = list((Path(os.environ['RUNNER_TEMP'])/'client-input').rglob('*.apk'))
 if len(apks) != 1 or hashlib.sha256(apks[0].read_bytes()).hexdigest() != APK_SHA:
     raise RuntimeError('Artifact is not the exact reviewed Android notes APK')
@@ -107,13 +114,33 @@ try:
     start = next((n for n in hierarchy.iter('node') if n.get('package') == PACKAGE
                   and n.get('text','').strip().casefold() in {'start messaging','начать общение'}),None)
     if start is None: raise RuntimeError('Expected onboarding action was not exposed')
-    match = re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',start.get('bounds',''))
-    if not match: raise RuntimeError('Onboarding action has no valid bounds')
-    x1,y1,x2,y2 = map(int,match.groups())
-    if x2 <= x1 or y2 <= y1: raise RuntimeError('Onboarding action is not visible')
-    device('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2))
+    tap(start)
     time.sleep(5)
     hierarchy = snapshot('02-login')
+    result['phone_permission_denials'] = 0
+    for attempt in range(4):
+        fields = [n for n in hierarchy.iter('node') if n.get('package') == PACKAGE
+                  and n.get('class','').endswith('EditText') and n.get('enabled') == 'true']
+        if fields: break
+        # Source LoginActivity.fillNumber and the captured first-run UI show a
+        # rationale before Android's phone permission. Continue only that exact
+        # rationale; always deny the system permission. No auto-filled SIM number.
+        rationale = any(n.get('text') == 'Please allow Telegram to receive calls so that we can automatically confirm your phone number.'
+                        and n.get('package') == PACKAGE for n in hierarchy.iter('node'))
+        action = None
+        if rationale:
+            action = next((n for n in hierarchy.iter('node') if n.get('package') == PACKAGE
+                           and n.get('text') == 'Continue' and n.get('clickable') == 'true'),None)
+        else:
+            action = next((n for n in hierarchy.iter('node')
+                           if n.get('package') in {'com.android.permissioncontroller','com.google.android.permissioncontroller'}
+                           and n.get('text','').casefold() in {'deny',"don't allow"}
+                           and n.get('clickable') == 'true'),None)
+            if action is not None: result['phone_permission_denials'] += 1
+        if action is None: raise RuntimeError('Unexpected overlay blocks phone entry; inspect screenshot')
+        tap(action)
+        time.sleep(3)
+        hierarchy = snapshot('02-login-permission-'+str(attempt+1))
     fields = [n for n in hierarchy.iter('node') if n.get('package') == PACKAGE
               and n.get('class','').endswith('EditText') and n.get('enabled') == 'true']
     if not fields: raise RuntimeError('Phone entry fields were not exposed; inspect screenshot')
