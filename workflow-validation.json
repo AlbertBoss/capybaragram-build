@@ -19,7 +19,7 @@
     {
       "file": ".github\\workflows\\android-preview.yml",
       "yaml_and_workflow_constraints": "pass",
-      "sha256": "10e7a79ccced8e7bbd6ab9453ec1c896fa751e49b9ad37121d18bd14ffdcec88"
+      "sha256": "1f987c34f2ff3d2e231d84b6be433a084a7e154fecf589f993a8a1d562b23f2c"
     },
     {
       "file": ".github\\workflows\\android-vault-runtime.yml",

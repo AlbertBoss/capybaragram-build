@@ -114,7 +114,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          bash ./gradlew :TMessagesProj_App:assembleAfatDebug --no-daemon --max-workers=2 -PAPP_PACKAGE=org.capybaragram.preview -Pandroid.injected.build.abi=arm64-v8a
+          bash ./gradlew :TMessagesProj_App:assembleAfatDebug --no-daemon --max-workers=2 -PAPP_PACKAGE=org.capybaragram.preview -Pandroid.injected.build.abi=arm64-v8a -Pandroid.injected.testOnly=false
       - name: Verify manifest, signing and native ABI
         shell: bash
         run: |

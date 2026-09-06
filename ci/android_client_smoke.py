@@ -30,7 +30,12 @@ def run(args, timeout=90, **kwargs):
     return subprocess.run(list(map(str,args)), check=True, timeout=timeout, env=env, **kwargs)
 
 def device(*args, timeout=60):
-    return run([adb,'-s','emulator-5554',*args],timeout=timeout,capture_output=True,text=True).stdout
+    try:
+        return run([adb,'-s','emulator-5554',*args],timeout=timeout,capture_output=True,text=True).stdout
+    except subprocess.CalledProcessError as failure:
+        (report/'adb-failure.txt').write_text(
+            'operation='+str(args[0])+'\n'+(failure.stdout or '')+(failure.stderr or ''),encoding='utf-8')
+        raise
 
 def snapshot(name):
     run([adb,'-s','emulator-5554','shell','uiautomator','dump','/sdcard/capy-ui.xml'],capture_output=True,timeout=45)
@@ -75,7 +80,11 @@ try:
     result['native_bridge'] = device('shell','getprop','ro.dalvik.vm.native.bridge').strip()
     if 'arm64-v8a' not in result['abi_list']:
         raise RuntimeError('This emulator image does not advertise ARM64 compatibility')
-    install = device('install',str(apk),timeout=150)
+    # This exact preview has android:testOnly=true in its signed manifest.
+    # -t permits its installation only for testing; final delivery must remove
+    # that flag during a new signed build, not rewrite this reviewed APK.
+    result['test_only_apk'] = True
+    install = device('install','-t',str(apk),timeout=150)
     (report/'install.txt').write_text(install)
     if 'Success' not in install: raise RuntimeError('APK installation did not succeed')
     result['install'] = 'PASS'

@@ -58,6 +58,16 @@ def locate_apk(source, package='org.capybaragram.buildtest.beta'):
         raise RuntimeError('Expected exactly one afatDebug APK output manifest.')
     return matches[0].resolve(strict=True)
 
+def require_normal_install(manifest):
+    values = re.findall(r'\bandroid:testOnly(?:\([^)]*\))?\s*=\s*([^\r\n]+)', manifest)
+    if not values:
+        return
+    if len(values) != 1:
+        raise RuntimeError('Ambiguous testOnly attributes in signed APK manifest.')
+    value = values[0].strip().lower().replace(' ', '')
+    if value != 'false' and not re.fullmatch(r'\(type0x12\)0x0+',value):
+        raise RuntimeError('Preview APK is test-only and cannot be installed normally.')
+
 def collect(source, output, profile='offline', certificate_sha256=None):
     if profile not in PROFILES:
         raise RuntimeError('Unknown APK profile.')
@@ -76,6 +86,8 @@ def collect(source, output, profile='offline', certificate_sha256=None):
     if not re.search(r"^package: name='" + re.escape(package) + r"' ", badging, re.M):
         raise RuntimeError('Unexpected application ID; refusing to package.')
     permissions = checked([tools / 'aapt', 'dump', 'permissions', apk])
+    if online:
+        require_normal_install(checked([tools / 'aapt','dump','xmltree',apk,'AndroidManifest.xml']))
     if ('android.permission.INTERNET' in permissions) != online:
         raise RuntimeError('INTERNET permission does not match the requested APK profile.')
     signature = checked([tools / 'apksigner', 'verify', '--verbose', '--print-certs', apk])
@@ -112,7 +124,7 @@ def collect(source, output, profile='offline', certificate_sha256=None):
         'Certificate SHA256: ' + certificate_sha256 + '\n'
         'Modifications: ci/prepare_android_baseline.py, ci/prepare_android_online.py, ci/accounts/android_accounts_patch.py, ci/notes/prepare_android_notes.py.\n'
         'Local notes and template UI included; full client login, UI and session lifecycle acceptance remains required.\n'
-        'Verified: package ID, INTERNET permission, pinned APK signer and ARM64 ELF library headers.\n'
+        'Verified: package ID, INTERNET permission, testOnly absent/false, pinned APK signer and ARM64 ELF library headers.\n'
     ) if online else (
         'OFFLINE BUILD TEST, not a working Telegram client or release.\n'
         'No INTERNET permission, API_ID=0, ephemeral debug signature.\n'
