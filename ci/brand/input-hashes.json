@@ -1,0 +1,10 @@
+{
+  "source_sha": "62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c",
+  "pre": "b9f43ac533db9ece8ed121332ac433c4669463ff89e31b8aacbd8c033f11bf63",
+  "post": "c2773d2a4cb3eccac55fe7f607a1acb5217335de5bdbbcbe9d0752e426368446",
+  "added": {
+    "TMessagesProj/src/main/res/drawable/capy_intro.xml": "5b8f7893ef5803930186909500b3593b7ff80067cddd7fb32aa662db7bb0f275",
+    "TMessagesProj/src/main/res/values/capy_brand.xml": "82671dd0c3884c93494e38da12c81829ab089b755be87750e1763c05fa34f5e3",
+    "TMessagesProj/src/main/res/values-ru/capy_brand.xml": "a0e6f08381854e1c01434feb273a3eb32e550a9ddfb0955a911431c92dc588e3"
+  }
+}

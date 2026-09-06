@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: MIT -->
+<resources>
+    <string name="CapyIntroTitle1">CapybaraGram</string>
+    <string name="CapyIntroMessage1">An unofficial Telegram client.\nChat at your own pace.</string>
+    <string name="CapyIntroTitle2">Keep the context</string>
+    <string name="CapyIntroMessage2">Save a personal note in a chat.\nIt stays on this device.</string>
+    <string name="CapyIntroTitle3">Prepare your reply</string>
+    <string name="CapyIntroMessage3">Preview a template and add it to your draft. You decide when to send.</string>
+    <string name="CapyIntroTitle4">Separate accounts</string>
+    <string name="CapyIntroMessage4">Switch between your accounts.\nKeep work and personal chats apart.</string>
+    <string name="CapyIntroTitle5">Familiar folders</string>
+    <string name="CapyIntroMessage5">Use your Telegram chat folders.\nTelegram account limits still apply.</string>
+    <string name="CapyIntroTitle6">Make it yours</string>
+    <string name="CapyIntroMessage6">Choose a theme and notifications\nthat suit your day.</string>
+</resources>

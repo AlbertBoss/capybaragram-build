@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: MIT. Original CapybaraGram artwork. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp" android:height="150dp"
+    android:viewportWidth="200" android:viewportHeight="150">
+    <path android:fillColor="#F2E9D9" android:pathData="M100,4 C142,4 175,34 175,74 C175,114 144,143 101,143 C58,143 25,115 25,75 C25,35 59,4 100,4 Z"/>
+    <path android:fillColor="#D0DFCC" android:pathData="M26,108 C58,98 133,97 174,109 C171,131 140,146 100,146 C62,146 32,133 26,108 Z"/>
+    <path android:fillColor="#647D60" android:pathData="M39,109 C31,100 31,84 37,73 C46,86 49,99 44,109 Z M159,108 C155,97 161,84 173,78 C174,93 169,105 164,110 Z"/>
+    <path android:fillColor="#956B49" android:pathData="M55,101 C52,75 59,55 78,47 C92,41 115,42 128,49 L146,58 C153,62 156,71 156,80 L156,99 C156,112 145,121 130,121 L77,121 C65,121 57,114 55,101 Z"/>
+    <path android:fillColor="#956B49" android:pathData="M71,57 C62,52 60,40 66,33 C72,25 84,29 89,39 L91,47 Z"/>
+    <path android:fillColor="#C69A70" android:pathData="M72,46 C67,43 67,38 70,36 C75,33 80,37 81,43 Z"/>
+    <path android:fillColor="#B98D64" android:pathData="M100,74 C111,68 144,68 153,75 C160,80 162,99 154,107 C144,117 114,116 104,109 C96,102 94,83 100,74 Z"/>
+    <path android:fillColor="#342D25" android:pathData="M108,63 C110,60 114,60 116,63 C117,66 115,69 112,69 C109,69 107,66 108,63 Z M145,82 C147,81 150,82 150,85 C150,87 147,88 145,86 Z"/>
+    <path android:fillColor="#00000000" android:strokeColor="#5F4534" android:strokeWidth="2.4" android:strokeLineCap="round" android:pathData="M137,100 C144,103 151,101 154,97"/>
+    <path android:fillColor="#D0DFCC" android:pathData="M47,117 C77,113 137,112 164,118 L164,127 L47,127 Z"/>
+    <path android:fillColor="#00000000" android:strokeColor="#7C9778" android:strokeWidth="2" android:strokeLineCap="round" android:pathData="M55,124 L78,124 M124,127 L148,127 M86,133 L109,133"/>
+</vector>

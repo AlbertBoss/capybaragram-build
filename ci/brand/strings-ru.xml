@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: MIT -->
+<resources>
+    <string name="CapyIntroTitle1">CapybaraGram</string>
+    <string name="CapyIntroMessage1">Неофициальный клиент Telegram.\nОбщение в своём ритме.</string>
+    <string name="CapyIntroTitle2">Всё под рукой</string>
+    <string name="CapyIntroMessage2">Сохраните личную заметку в чате.\nОна останется на этом устройстве.</string>
+    <string name="CapyIntroTitle3">Ответ без спешки</string>
+    <string name="CapyIntroMessage3">Выберите шаблон и добавьте в черновик. Когда отправить — решаете вы.</string>
+    <string name="CapyIntroTitle4">Каждому своё</string>
+    <string name="CapyIntroMessage4">Переключайтесь между аккаунтами.\nРабочие и личные чаты — отдельно.</string>
+    <string name="CapyIntroTitle5">Знакомые папки</string>
+    <string name="CapyIntroMessage5">Пользуйтесь своими папками Telegram.\nЛимиты аккаунта сохраняются.</string>
+    <string name="CapyIntroTitle6">Как вам удобно</string>
+    <string name="CapyIntroMessage6">Выберите тему и уведомления\nпод свой распорядок дня.</string>
+</resources>
