@@ -30,6 +30,7 @@ jobs:
             Telegram/SourceFiles/data/data_chat_filters.h
             Telegram/SourceFiles/boxes/filters/edit_filter_box.cpp
             Telegram/SourceFiles/api/api_chat_filters.cpp
+            Telegram/SourceFiles/settings/sections/settings_folders.cpp
       - name: Compile actual native methods and inject ordered responses
         shell: bash
         run: |
@@ -40,6 +41,9 @@ jobs:
           python3 control/ci/folders/test_windows_save_share.py desktop 2>&1 | tee reports/native-save-share-test.txt
           python3 control/ci/folders/prepare_windows_mutations.py desktop
           python3 control/ci/folders/prepare_windows_mutations.py desktop --check
+          python3 control/ci/folders/test_windows_bulk.py desktop 2>&1 | tee reports/native-bulk-test.txt
+          python3 control/ci/folders/prepare_windows_bulk.py desktop
+          python3 control/ci/folders/prepare_windows_bulk.py desktop --check
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:

@@ -88,6 +88,10 @@ if ($Phase -eq 'Build') {
         if ($LASTEXITCODE -ne 0) { throw 'Desktop folder mutation response preparation failed.' }
         & python (Join-Path $PSScriptRoot 'folders/prepare_windows_mutations.py') $src --check
         if ($LASTEXITCODE -ne 0) { throw 'Desktop folder mutation response verification failed.' }
+        & python (Join-Path $PSScriptRoot 'folders/prepare_windows_bulk.py') $src
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop bulk folder response preparation failed.' }
+        & python (Join-Path $PSScriptRoot 'folders/prepare_windows_bulk.py') $src --check
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop bulk folder response verification failed.' }
         & python (Join-Path $PSScriptRoot 'windows-brand/prepare_windows_brand.py') $src
         if ($LASTEXITCODE -ne 0) { throw 'Desktop brand preparation failed.' }
         & python (Join-Path $PSScriptRoot 'windows-brand/prepare_windows_brand.py') $src --check
