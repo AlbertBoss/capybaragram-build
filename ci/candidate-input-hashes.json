@@ -1,0 +1,14 @@
+{
+  "pre": {
+    "TMessagesProj_App/build.gradle": "0caf05b3048ae300f1399f0a955c016914a2598c98ae226f4f0d9ceb95df7329",
+    "gradle.properties": "2a5e05f7e340875a9c5ff95c31010476d897cf0bce3ee121ec4043622125997e",
+    "TMessagesProj/config/release/AndroidManifest.xml": "d4d363017be156c70c31cd1e0f589bb5aeb784d4362c188b52a33e30968ac45d",
+    "TMessagesProj/config/release/AndroidManifest_SDK23.xml": "e73e50700d8a5dc39b49b31c564b782020f16bd254a6abc3219f8aec6749a9c0"
+  },
+  "post": {
+    "TMessagesProj_App/build.gradle": "7936f8ba9dc4fbc1a34187c6e33b38144e25f76f8b225db2daf6dc9dde115579",
+    "gradle.properties": "2c6d9ea20f525d667ec77eb5e24f6726e5ead98a6a938f92687527c505a7f4bc",
+    "TMessagesProj/config/release/AndroidManifest.xml": "95e69fd92b32bd0a0cd8cd4871906112fcb30da30490ca854320925c3ab90d16",
+    "TMessagesProj/config/release/AndroidManifest_SDK23.xml": "bc441788839a29375a75c562067f71d827a7d56c5dc88942febefa9093e8955a"
+  }
+}

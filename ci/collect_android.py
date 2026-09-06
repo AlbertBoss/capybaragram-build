@@ -13,6 +13,7 @@ import zipfile
 PROFILES = {
     'offline': ('org.capybaragram.buildtest.beta', 'CapybaraGram-OFFLINE-BUILD-TEST.apk'),
     'preview': ('org.capybaragram.preview.beta', 'CapybaraGram-Preview-arm64.apk'),
+    'candidate': ('org.capybaragram', 'CapybaraGram-Android-arm64.apk'),
 }
 
 def checked(args):
@@ -21,7 +22,7 @@ def checked(args):
         raise RuntimeError(f"Artifact inspection failed: {Path(args[0]).name}")
     return p.stdout
 
-def locate_apk(source, package='org.capybaragram.buildtest.beta'):
+def locate_apk(source, package='org.capybaragram.buildtest.beta', variant='afatDebug'):
     """Use AGP's output manifest rather than assuming a variant directory layout."""
     # AGP can place IDE-targeted APKs under intermediates instead of outputs/apk.
     # The injected ABI option is an IDE build option; use the artifact type below.
@@ -39,7 +40,7 @@ def locate_apk(source, package='org.capybaragram.buildtest.beta'):
         data = json.loads(manifest.read_text(encoding='utf-8'))
         if data.get('artifactType', {}).get('type') != 'APK':
             continue
-        if data.get('variantName') != 'afatDebug':
+        if data.get('variantName') != variant:
             continue
         if data.get('applicationId') != package:
             raise RuntimeError('Unexpected application ID in output metadata.')
@@ -55,28 +56,35 @@ def locate_apk(source, package='org.capybaragram.buildtest.beta'):
         apk.resolve(strict=True).relative_to(root.resolve(strict=True))
         matches.append(apk)
     if len(matches) != 1:
-        raise RuntimeError('Expected exactly one afatDebug APK output manifest.')
+        raise RuntimeError('Expected exactly one '+variant+' APK output manifest.')
     return matches[0].resolve(strict=True)
 
 def require_normal_install(manifest):
-    values = re.findall(r'\bandroid:testOnly(?:\([^)]*\))?\s*=\s*([^\r\n]+)', manifest)
+    require_disabled_flag(manifest, 'testOnly')
+
+def require_disabled_flag(manifest, name):
+    if name not in {'testOnly','debuggable','allowBackup'}:
+        raise ValueError('Unexpected manifest flag')
+    values = re.findall(r'\bandroid:'+name+r'(?:\([^)]*\))?\s*=\s*([^\r\n]+)', manifest)
     if not values:
+        if name == 'allowBackup':
+            raise RuntimeError('APK must explicitly disable allowBackup.')
         return
     if len(values) != 1:
-        raise RuntimeError('Ambiguous testOnly attributes in signed APK manifest.')
+        raise RuntimeError('Ambiguous '+name+' attributes in signed APK manifest.')
     value = values[0].strip().lower().replace(' ', '')
     if value != 'false' and not re.fullmatch(r'\(type0x12\)0x0+',value):
-        raise RuntimeError('Preview APK is test-only and cannot be installed normally.')
+        raise RuntimeError('APK manifest must disable '+name+'.')
 
 def collect(source, output, profile='offline', certificate_sha256=None):
     if profile not in PROFILES:
         raise RuntimeError('Unknown APK profile.')
     package, filename = PROFILES[profile]
-    online = profile == 'preview'
+    online = profile != 'offline'
     if online and (not isinstance(certificate_sha256, str) or not re.fullmatch(r'[0-9a-f]{64}', certificate_sha256)):
         raise RuntimeError('Preview requires a pinned signing certificate SHA256.')
     source = source.resolve(strict=True)
-    apk = locate_apk(source, package)
+    apk = locate_apk(source, package, 'afatRelease' if profile == 'candidate' else 'afatDebug')
     apk.relative_to(source)
     sdk_env = os.environ.get('ANDROID_HOME') or os.environ.get('ANDROID_SDK_ROOT')
     if not sdk_env:
@@ -87,7 +95,11 @@ def collect(source, output, profile='offline', certificate_sha256=None):
         raise RuntimeError('Unexpected application ID; refusing to package.')
     permissions = checked([tools / 'aapt', 'dump', 'permissions', apk])
     if online:
-        require_normal_install(checked([tools / 'aapt','dump','xmltree',apk,'AndroidManifest.xml']))
+        manifest = checked([tools / 'aapt','dump','xmltree',apk,'AndroidManifest.xml'])
+        require_normal_install(manifest)
+        if profile == 'candidate':
+            require_disabled_flag(manifest,'debuggable')
+            require_disabled_flag(manifest,'allowBackup')
     if ('android.permission.INTERNET' in permissions) != online:
         raise RuntimeError('INTERNET permission does not match the requested APK profile.')
     signature = checked([tools / 'apksigner', 'verify', '--verbose', '--print-certs', apk])
@@ -122,7 +134,7 @@ def collect(source, output, profile='offline', certificate_sha256=None):
     description = (
         'ONLINE PREVIEW, not a release. Owner application credentials and persistent preview signature.\n'
         'Certificate SHA256: ' + certificate_sha256 + '\n'
-        'Modifications: ci/prepare_android_baseline.py, ci/prepare_android_online.py, ci/accounts/android_accounts_patch.py, ci/notes/prepare_android_notes.py.\n'
+        'Modifications: ci/prepare_android_baseline.py, ci/prepare_android_online.py, ci/accounts/android_accounts_patch.py, ci/notes/prepare_android_notes.py, ci/brand/prepare_android_brand.py.\n'
         'Local notes and template UI included; full client login, UI and session lifecycle acceptance remains required.\n'
         'Verified: package ID, INTERNET permission, testOnly absent/false, pinned APK signer and ARM64 ELF library headers.\n'
     ) if online else (
@@ -131,6 +143,9 @@ def collect(source, output, profile='offline', certificate_sha256=None):
         'Modifications: ci/prepare_android_baseline.py in the build repository.\n'
         'Verified: package ID, absence of INTERNET, APK signature verification and ARM64 ELF library headers.\n'
     )
+    if profile == 'candidate':
+        description = description.replace('ONLINE PREVIEW, not a release.','RELEASE CANDIDATE, not approved for final delivery.')
+        description += 'Candidate preparation: ci/prepare_android_candidate.py. afatRelease; debuggable and allowBackup absent/false verified.\n'
     (output / 'BUILD-INFO.txt').write_text(description +
         'Source: https://github.com/DrKLO/Telegram/tree/62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c\n'
         'Not verified: installation, UI launch, actual login, notifications, calls.\n', encoding='utf-8')
