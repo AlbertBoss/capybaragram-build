@@ -221,6 +221,8 @@ try:
     result['test_phone_confirmation'] = 'confirmed on selected Test Backend; code request not yet observed'
     time.sleep(12)
     hierarchy = snapshot('06-code-response')
+    code_fields = []
+    is_code_screen = False
     for attempt in range(10):
         check_server_errors(hierarchy)
         # The confirmed phone flow asks separately for call-log access. Deny it,
