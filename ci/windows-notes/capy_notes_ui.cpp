@@ -16,6 +16,7 @@
 #include "ui/widgets/labels.h"
 #include "window/window_session_controller.h"
 #include "styles/style_boxes.h"
+#include "styles/style_layers.h"
 #include "styles/style_menu_icons.h"
 #include "styles/style_widgets.h"
 
@@ -326,7 +327,7 @@ void AddNoteAction(not_null<Window::SessionController*> controller,
 	const auto type = peer->isUser() ? 1 : peer->isChat() ? 2 : 3;
 	const auto id = peer->isUser() ? peerToUser(peer->id).bare
 		: peer->isChat() ? peerToChat(peer->id).bare : peerToChannel(peer->id).bare;
-	const auto record = Vault::Store::Note(type, id, topic ? topic->rootId() : 0);
+	const auto record = Vault::Store::Note(type, id, topic ? topic->rootId().bare : 0);
 	const auto recipient = peer->name() + (topic ? u" / "_q + topic->title() : QString());
 	const auto session = &controller->session();
 	const auto weakSession = base::make_weak(session);
