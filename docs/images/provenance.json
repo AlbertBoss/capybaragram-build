@@ -22,5 +22,25 @@
     "file": "windows-phone.png",
     "sha256": "eb93b7b7bb6a5a283233e404c062ecd2254c3440dd57583c723af39a16796b91",
     "source_run": 34059187270
+  },
+  {
+    "file": "windows-demo-chat.png",
+    "sha256": "59966f934a0952e8b793d44584a702fcd1241540ad8a6c8115425883f45902a6",
+    "source_kind": "local native window capture via Alt+Print; unchanged pixels",
+    "exe_run": 34031740962,
+    "theme": "light, previous appearance",
+    "demo_data": true,
+    "privacy_review": "No real names, avatars, chats, phone numbers or login tokens visible.",
+    "scope": "Invented demo channel and folder; previous Windows light theme."
+  },
+  {
+    "file": "windows-demo-note.png",
+    "sha256": "64b5cec68270180e01092aa39f98af07f94b8984f0ebdcba35b3ca15c88cb2dd",
+    "source_kind": "local native window capture via Alt+Print; unchanged pixels",
+    "exe_run": 34031740962,
+    "theme": "light, previous appearance",
+    "demo_data": true,
+    "privacy_review": "No real names, avatars, chats, phone numbers or login tokens visible.",
+    "scope": "Local note editor with typed synthetic text; persistence not yet verified."
   }
 ]
