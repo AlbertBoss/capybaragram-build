@@ -1,70 +1,103 @@
-# CapybaraGram build experiments
+<p align="center"><img src="ci/windows-brand/capy-logo.png" width="88" alt="Логотип CapybaraGram"></p>
 
-This repository prepares initial Android and Windows builds from pinned Telegram sources. **It is not a CapybaraGram release or a working implementation of its planned features.** The complete offline Android workflow succeeded in [run 33969421213](https://github.com/AlbertBoss/capybaragram-build/actions/runs/33969421213): compilation, manifest/signature/ARM64 checks and artifact upload passed. Installation and runtime testing remain pending.
+<h1 align="center">CapybaraGram</h1>
 
-## Scope
+<p align="center"><strong>Неофициальный Telegram-клиент для Android и Windows</strong><br>Личные заметки, подготовленные ответы и управление несколькими аккаунтами.</p>
 
-- Android: offline ARM64 debug test, separate `org.capybaragram.buildtest.beta` application ID, no INTERNET permission, no usable Telegram API credentials, fresh debug signature. This verifies compilation and packaging before production configuration. It cannot exchange messages.
-- Windows: official x64 debug executable using upstream restricted test API credentials. `TDESKTOP_API_TEST` does not select test data centers or disable networking. Do not use real accounts. Auto-update and crash reports are disabled; the updater is not packaged.
+<p align="center"><a href="#что-уже-сделано">Возможности</a> · <a href="#как-выглядит-приложение">Скриншоты</a> · <a href="docs/ARCHITECTURE.md">Архитектура</a> · <a href="docs/VERIFICATION.md">Проверки</a> · <a href="docs/BUILDING.md">Сборка</a></p>
 
-All workflows run only when dispatched manually and only for public repositories. Standard `ubuntu-24.04` and `windows-2025` runners are used. No paid/larger runners, scheduled jobs, releases or shared caches are configured. Artifacts expire after one day. Standard public-runner execution is free under current GitHub rules; artifact storage remains quota-controlled. Do not enable paid overages.
+---
 
-Each platform has its own concurrency group. Android and Windows may run together; multiple builds of the same platform stay serialized without canceling an active build.
+**Статус: активная разработка, рабочие тестовые сборки.** Android APK и Windows Release EXE собраны; установка и стартовые сценарии проверены. Полная приёмка функций на реальных аккаунтах продолжается. Это ещё не стабильный публичный релиз.
 
-## Android online preview preparation
+## О проекте
 
-`android-preview.yml` prepares a separate `org.capybaragram.preview.beta` ARM64 debug app with owner API credentials and persistent signing. Its online CI run succeeded; installation and login remain unverified. It shares the Android concurrency group. Four repository Actions Secrets are required: `CAPY_API_ID`, `CAPY_API_HASH`, `CAPY_ANDROID_KEYSTORE_BASE64`, and `CAPY_ANDROID_KEYSTORE_PASSWORD`. The PKCS12 alias is `capybaragram-preview`; its public certificate SHA256 is pinned in the workflow. Missing inputs or a different signer stop the job.
+CapybaraGram развивает привычный Telegram в сторону личного рабочего пространства: сохранить контекст разговора в заметке, подготовить ответ из шаблона, разделить несколько аккаунтов и управлять подтверждениями прочтения.
 
-Credentials and signing passwords enter the relevant steps through the environment. Only the verified APK, checksums and notices are uploaded; do not upload source with embedded API credentials, build intermediates or signing material. GitHub Secrets does not make an application API ID/hash unextractable from a distributed APK. It is separate from a user's Telegram login/session.
+Основа — официальные открытые исходники Telegram. В этом репозитории находятся **собственные модули, изменения исходников, тесты и сборочные процессы**. Исходники Android и Windows загружаются из закреплённых upstream-версий при сборке. Это два нативных приложения, а не веб-оболочка и не полностью написанный с нуля мессенджер.
 
-Local checks cover preparation, synthetic APK acceptance/rejection, and actual JDK restoration/certificate verification of the persistent key. They do not prove a working Telegram client, support for 10 accounts, folder synchronization, notifications or other planned features.
+Проект ведёт [AlbertBoss](https://github.com/AlbertBoss). CapybaraGram не является официальным продуктом Telegram.
 
-## Verified builds and Windows preview preparation
+## Как выглядит приложение
 
-The [Android online preview run 33972555759 succeeded](https://github.com/AlbertBoss/capybaragram-build/actions/runs/33972555759), including APK package, INTERNET, signer and native ABI checks. The downloaded archive and APK checksums also passed locally; installation and login remain unverified. 
+Ниже — **реальные снимки тестовых сборок**, сделанные на чистых тестовых устройствах без входа в аккаунт. Они показывают текущие стартовые экраны, а не макеты или работу функций внутри чата. Дизайн продолжает развиваться.
 
-The [Windows baseline run 33964398564 succeeded](https://github.com/AlbertBoss/capybaragram-build/actions/runs/33964398564). Downloaded archive/EXE checksums and x64 PE headers passed locally. The actual launch remains unverified; baseline toolchain compatibility is now demonstrated.
+<table>
+<tr><th>Android · первый запуск</th><th>Windows · первый запуск</th></tr>
+<tr>
+<td align="center"><img src="docs/images/android-start.png" width="240" alt="Реальный экран первого запуска CapybaraGram на Android"></td>
+<td align="center"><img src="docs/images/windows-start.png" width="540" alt="Реальный экран первого запуска Windows Release CapybaraGram"></td>
+</tr>
+</table>
 
-`windows-preview.yml` uses the same toolchain with owner API credentials from an initial CMake cache outside the source/artifacts. Eight pinned source files separate the default profile (`APPDATA/CapybaraGram Preview`), portable folder (`CapybaraGramForcePortable`), IPC ID, notification activator, shortcuts and application identity. Automatic legacy Telegram data migration and automatic URL association registration are removed; manual URL association settings remain available. The collected executable is `CapybaraGram.exe`. The online Windows workflow has not yet passed a native build or runtime check. No paid code-signing certificate is configured.
+<details>
+<summary>Ещё два экрана: тёмная тема Android и вход по номеру на Windows</summary>
+<p>Текущее приложение. Поле номера пустое; настоящие аккаунты не использовались.</p>
+<p><img src="docs/images/android-dark.png" width="230" alt="Текущая тёмная тема стартового экрана Android"> <img src="docs/images/windows-phone.png" width="510" alt="Пустая форма входа по номеру на Windows"></p>
+</details>
 
-Ten source-contract tests cover identity separation, preservation of Windows system GUIDs and license headers, preparation/verification and rejection of changed inputs. They cannot prove runtime profile isolation. Before real account use, verify launch beside official Telegram, both profile paths, notifications, shortcuts, restart and manual link association behavior.
+[Происхождение скриншотов](docs/images/README.md).
 
-## Sources and tooling
+## Что уже сделано
 
-| Platform | Source revision | Build inputs |
-|---|---|---|
-| Android | [DrKLO/Telegram](https://github.com/DrKLO/Telegram/tree/62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c) | AGP 8.10.1, Gradle 8.11.1, JDK 17, SDK 36, build-tools 36.0.0, NDK 27.2.12479018, CMake 3.22.1 |
-| Windows | [telegramdesktop/tdesktop](https://github.com/telegramdesktop/tdesktop/tree/80158983dba09d3bf5d96701f21473d6c34bf5f5) | VC 14.44, Windows SDK 10.0.26100.0, Python 3.10, Qt6 via upstream preparation, Ninja Multi-Config |
+«Есть в сборке» означает наличие скомпилированного кода. Проверка на настоящих аккаунтах — отдельный этап.
 
-The Windows documentation mentions Visual Studio 2026. The current standard Windows runner lists VS2022 17.14; the workflow checks the actual VC toolset and uses the upstream-supported explicit Ninja generator. The baseline CI build demonstrated that compatibility. Dependency preparation invokes upstream scripts and can download substantial data; a source SHA does not pin all external downloads. Final application compilation is limited to two workers; upstream preparation contains its own parallel commands. Disk thresholds are preliminary safeguards, not proven resource requirements.
+| Возможность | Android | Windows | Подтверждение и границы |
+| --- | --- | --- | --- |
+| Личные заметки к чату или теме | Есть в сборке | Есть в сборке | Хранилища и жизненный цикл проверены; приёмка редакторов в клиенте продолжается |
+| Шаблоны: создание, просмотр, вставка в черновик | Есть в сборке | Есть в сборке | Код интерфейса и хранения собран; отправка остаётся отдельным действием пользователя |
+| 10 локальных слотов аккаунтов | Есть в сборке | Есть в сборке | Изменения скомпилированы; десять одновременно авторизованных аккаунтов ещё не проверены |
+| Обработка ответов и ошибок сервера при изменении папок | Есть в сборке | Есть в сборке | Контролируемые тесты; двусторонняя синхронизация с официальным клиентом требует живой проверки |
+| «Нечиталка»: подавление подтверждений прочтения | Первая реализация в APK | В плане | Тесты политики, адаптера и запросов; сетевое поведение на двух аккаунтах ещё не принято |
+| Установка и запуск | APK: проверены | EXE и установщик: проверены | Стартовые экраны, пустая форма входа; перезапуск Android, установка и замена Windows |
 
-Official Actions revisions are recorded in `action-pins.json`; the action metadata was read, but this is not a full audit of their bundled dependencies.
+Заметки и шаблоны **хранятся на конкретном устройстве**; их синхронизации пока нет. Серверные лимиты Telegram и доступ к Premium этим клиентом не отменяются.
 
-## Run and acceptance
+## Инженерная часть
 
-1. Publish this reviewed build-only directory to a public repository after owner approval. Do not upload the separate project research folder, local machine report, Telegram materials or model conversations.
-2. Dispatch one platform workflow. Keep paid usage disabled. Record the first actual resource or compilation failure and fix it before retrying; do not blindly rerun repeatedly.
-3. A green workflow must produce the expected executable/APK and checksums. Android collection rejects an unexpected package, INTERNET permission, signature failure or wrong ABI.
-4. Install and launch test artifacts in a disposable test environment, then record runtime dependencies and errors. These checks have not been performed.
-5. Replace temporary baseline configuration with reviewed production identifiers, owner API credentials, signing/update infrastructure, original graphics and the actual product changes. Verify real account login, message/media exchange, notifications, calls and updates on both platforms before any client release.
+- **Нативная интеграция:** Java и Android API; C++ и Qt на Windows. Функции подключаются к существующим чатам, аккаунтам и жизненному циклу приложения.
+- **Локальные данные:** SQLite, AES-GCM и Android Keystore на Android; DPAPI, реестр владельцев и фоновая работа с хранилищем на Windows.
+- **Изоляция запросов:** разрешение на явное прочтение связано с конкретным запросом и сессией. Выход делает старые разрешения недействительными.
+- **Контроль исходников:** преобразования проверяют исходные и итоговые хеши; неожиданные изменения основы останавливают подготовку.
+- **Проверка готовых файлов:** архитектура, подпись Android, параметры манифеста, установка и нативные экраны, помимо тестов модулей.
 
-Generated debug keys intentionally change between runs; bit-for-bit reproducibility is not claimed.
+Это результаты конкретных проверок, а не заявление об отсутствии всех уязвимостей. [Архитектура и ограничения](docs/ARCHITECTURE.md) · [Подтверждения](docs/VERIFICATION.md).
 
-## License
+## Сборки и проверки
 
-New orchestration scripts are MIT-licensed. Telegram source and derived binaries retain their upstream licenses (Android GPL-2.0, desktop GPL-3.0 and applicable exceptions/third-party notices). This repository's MIT license does not relicense Telegram. Distributing derived binaries requires the corresponding source and license obligations to be fulfilled, including local modifications.
+| Артефакт / сценарий | Проверенный запуск |
+| --- | --- |
+| Android ARM64 APK с первой реализацией «нечиталки» | [Сборка 34058353588](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34058353588) |
+| Android: установка, стартовые экраны и перезапуск | [Проверка 34060394953](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34060394953) |
+| Windows x64 Release EXE | [Сборка 34031740962](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34031740962) |
+| Windows: переход к пустой форме входа | [Проверка 34059187270](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34059187270) |
+| Windows: установщик, замена и сохранность тестовых файлов | [Проверка 34060238891](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34060238891) |
 
-## Evidence
+Стабильные релизы ещё не опубликованы. Артефакты Actions временные: ссылки показывают историю проверок, а не постоянный каталог скачивания. [Как собрать приложение](docs/BUILDING.md).
 
-- [Windows build instructions at the selected SHA](https://github.com/telegramdesktop/tdesktop/blob/80158983dba09d3bf5d96701f21473d6c34bf5f5/docs/building-win.md)
-- [Windows upstream workflow at the selected SHA](https://github.com/telegramdesktop/tdesktop/blob/80158983dba09d3bf5d96701f21473d6c34bf5f5/.github/workflows/win.yml)
-- [GitHub runner image inventory](https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-Readme.md)
-- [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
-- `workflow-validation.json`: local syntax/constraint validation only, not compilation.
+## Что дальше
 
+Приоритет — приёмка повседневных сценариев на обеих платформах: сообщения, медиа, аккаунты, заметки, шаблоны, папки, уведомления и сохранение входа при обновлении. Затем — единый интерфейс и расширение функций приватности, истории и голоса.
 
-## Native Windows notes and templates
+Полная «нечиталка» секретных чатов, архив удалённых и исчезающих сообщений, локальная транскрипция и улучшение подключения **ещё не готовы**. [План разработки](docs/ROADMAP.md).
 
-The next Windows preview applies `ci/windows-notes/windows_notes_patch.py` after the identity and ten-account patches. It adds local chat/topic notes and response-template creation, editing, deletion, paginated browsing, preview and explicit draft insertion. Selected draft text is preserved; the callback verifies the current chat context and refuses message-editing/disabled-input modes. Nothing sends automatically. English/Russian labels follow the active app language and use native themed widgets.
+## Документация и код
 
-The source-preparation tests check the entire composed patch, reject drift before mutation and refuse overwriting existing source. They are not a substitute for compiling or testing the client UI. Native Store/Registry/Worker checks passed at [run33989959575](https://github.com/AlbertBoss/capybaragram-build/actions/runs/33989959575), with9 exact source hashes. Full notes/template client build and live UI/account acceptance remain required. DPAPI uses the current Windows user; app passcode gating is not separate passcode-derived encryption. This remains a preview, not a finished release.
+- [Архитектура и карта собственных модулей](docs/ARCHITECTURE.md)
+- [Подтверждённые результаты и границы тестирования](docs/VERIFICATION.md)
+- [Подготовка и запуск сборки](docs/BUILDING.md)
+- [Следующие этапы](docs/ROADMAP.md)
+- [История изменений](https://github.com/AlbertBoss/capybaragram-build/commits/main/) · [Сообщить об ошибке](https://github.com/AlbertBoss/capybaragram-build/issues)
+
+## Основа и лицензии
+
+| Платформа | Закреплённые исходники |
+| --- | --- |
+| Android | [DrKLO/Telegram · 62b56a0](https://github.com/DrKLO/Telegram/tree/62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c) |
+| Windows | [telegramdesktop/tdesktop · 8015898](https://github.com/telegramdesktop/tdesktop/tree/80158983dba09d3bf5d96701f21473d6c34bf5f5) |
+
+Собственные сборочные скрипты распространяются по [MIT](LICENSE). Исходники Telegram, производные приложения и сторонние компоненты сохраняют исходные лицензии и уведомления; MIT этого репозитория не меняет лицензии Telegram. Соответствующие исходники и лицензии входят в требования к итоговой поставке.
+
+## English summary
+
+**CapybaraGram is an unofficial native Telegram client for Android and Windows, under active development.** This repository contains custom modules, source transformations, tests and build workflows against pinned Telegram sources. Current builds include local chat notes, reply templates and ten account slots; Android also includes an initial silent-read implementation. Native startup and installer checks have passed. Real-account feature acceptance, the final interface and a stable public release remain in progress.

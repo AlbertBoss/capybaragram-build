@@ -1,0 +1,22 @@
+[
+  {
+    "file": "android-start.png",
+    "sha256": "4adc7635246bd1e46e74bddf83cddff1531d9500c856753519c8d2a015655df6",
+    "source_run": 34059939947
+  },
+  {
+    "file": "android-dark.png",
+    "sha256": "5901ededac359fc3d7ad1b64486c97909246ab6487859b874fe90177b8ba909e",
+    "source_run": 34059939947
+  },
+  {
+    "file": "windows-start.png",
+    "sha256": "1795220f006b32600414ef6f444c88ec11ae8912b1f4d6ddd1ad5db86d777532",
+    "source_run": 34059187270
+  },
+  {
+    "file": "windows-phone.png",
+    "sha256": "eb93b7b7bb6a5a283233e404c062ecd2254c3440dd57583c723af39a16796b91",
+    "source_run": 34059187270
+  }
+]
