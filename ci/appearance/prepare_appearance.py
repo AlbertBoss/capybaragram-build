@@ -69,12 +69,39 @@ def transform(name, text):
 \tauto image = QImage(32, 32, QImage::Format_ARGB32_Premultiplied);
 \timage.fill(QColor(238, 233, 224));
 \treturn image;''')
+        text = replace(text, 'void ChatBackground::setPreparedAfterPaper(QImage image) {', '''void ChatBackground::setPreparedAfterPaper(QImage image) {
+\t// Old default profiles still carry Telegram's green gradient parameters.
+\t// Render our neutral default without changing a user's custom wallpaper.
+\tif (!nightMode() && _themeObject.pathAbsolute.isEmpty()
+\t\t&& (Data::IsDefaultWallPaper(_paper)
+\t\t\t|| Data::details::IsTestingDefaultWallPaper(_paper))) {
+\t\tconst auto neutral = ReadDefaultImage();
+\t\tsetPrepared(neutral, neutral, QImage());
+\t\treturn;
+\t}
+''')
         return replace(text, '''\tstyle::main_palette::reset(ColorizerForTheme(QString()));
 \tsaveAdjustableColors();''', '''\tstyle::main_palette::reset(ColorizerForTheme(QString()));
 \t// Only the default palette is changed. Imported themes keep their own colors.
 \tLoadTheme(readThemeContent(u":/gui/day-blue.tdesktop-theme"_q),
 \t\tstyle::colorizer(), std::nullopt);
 \tsaveAdjustableColors();''')
+    if name.endswith('/window_themes_embedded.cpp'):
+        begin = text.index('\treturn {', text.index('std::vector<EmbeddedScheme> EmbeddedThemes()'))
+        end = text.index('\n}\n',begin)
+        block = text[begin:end]
+        schemes = block.split('EmbeddedScheme{')
+        palettes = [('eee9e0','f3dfb8','fffdf9','f3dfb8','fffdf9','8c570d'),
+                    ('eee9e0','f3dfb8','fffdf9','f3dfb8','fffdf9','8c570d'),
+                    ('101315','33302a','222629','222629','33302a','efb454'),
+                    ('101315','33302a','222629','222629','33302a','efb454')]
+        import re
+        if len(schemes)!=5: raise ValueError('Embedded theme inventory changed')
+        for i, palette in enumerate(palettes,1):
+            values=iter(palette)
+            if len(re.findall(r'qColor\("[0-9a-f]+"\)',schemes[i]))!=6: raise ValueError('Embedded preview colors changed')
+            schemes[i]=re.sub(r'qColor\("[0-9a-f]+"\)',lambda _: 'qColor("'+next(values)+'")',schemes[i])
+        return text[:begin]+'EmbeddedScheme{'.join(schemes)+text[end:]
     if name.endswith('/history_view_top_bar_widget.h'):
         text = replace(text, '\tobject_ptr<Ui::IconButton> _menuToggle;',
                        '\tobject_ptr<Ui::IconButton> _menuToggle;\n\tobject_ptr<Ui::IconButton> _capyTools;')

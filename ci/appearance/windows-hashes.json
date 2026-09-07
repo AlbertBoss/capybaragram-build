@@ -3,7 +3,12 @@
   "files": {
     "Telegram/SourceFiles/window/themes/window_theme.cpp": {
       "pre": "9111f5e25e5725e3afe0bceb77593da198f613b6658fab254b527777fd63ddf4",
-      "post": "1f166f33088cb929300480ea4faf03bb6d041de54a67f16ff5cfa4443f31a58d",
+      "post": "f14733c84bf05272018b4261940b5ff3741c4542d9170610e8c81a8e9f75878b",
+      "text": true
+    },
+    "Telegram/SourceFiles/window/themes/window_themes_embedded.cpp": {
+      "pre": "c9c375f16ac394123506f82c10ce9616c96b06969b06681d20cceb3990e93ce3",
+      "post": "b2384bc345e0b01d9cfce460ea65f4e43bb857d0d8c14661588896462decdec2",
       "text": true
     },
     "Telegram/SourceFiles/intro/intro_step.cpp": {
