@@ -8,7 +8,7 @@
     },
     "TMessagesProj/src/main/java/org/telegram/ui/IntroActivity.java": {
       "pre": "c2773d2a4cb3eccac55fe7f607a1acb5217335de5bdbbcbe9d0752e426368446",
-      "post": "88f1da6cbbf0f50580b3e495800b0c1cf1348692d982d89435266c9a18ba5329",
+      "post": "f46da67d5a23aea602e1d30db6a080becda32e876e60a871713f40c2b003f445",
       "text": true
     },
     "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": {
@@ -18,12 +18,12 @@
     },
     "TMessagesProj/src/main/assets/capy-light.attheme": {
       "pre": null,
-      "post": "2637d828d739233616c8703f60dfd2276c676f2f3cd5b6176c3f80cef72c78d4",
+      "post": "fa9b017d6daf2e1b76ced936d3d6babb33a5ba5d011c0b666e46002b3483d0de",
       "asset": "capy-light.attheme"
     },
     "TMessagesProj/src/main/assets/capy-dark.attheme": {
       "pre": null,
-      "post": "65233e48481ad5c7a32b18638c08141bcecb8e6fc5e8fba8cf00a86009b15910",
+      "post": "3b815a64a48dd16c5c070a71128eb241cfe53e557b891f33fd4823b7bca21e3b",
       "asset": "capy-dark.attheme"
     }
   }

@@ -45,6 +45,8 @@ def transform(name, text):
         return replace(text, '        if (applyingTheme == null) {\n            applyingTheme = defaultTheme;',
                        '        if (applyingTheme == null) {\n            applyingTheme = capyLight;')
     if name.endswith('/IntroActivity.java'):
+        text = replace(text, "paint.setColor(ThemeColors.TELEGRAM_COLOR); // It's logo color, it should not be colored by the theme",
+                       'paint.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText)); // Capybara accent')
         text = replace(text, 'String dayThemeName = "Blue";', 'String dayThemeName = "Capybara Light";')
         text = replace(text, 'String nightThemeName = "Night";', 'String nightThemeName = "Capybara Dark";')
         text = replace(text, 'new int[]{0xff365c45, 0xff41694e}',
