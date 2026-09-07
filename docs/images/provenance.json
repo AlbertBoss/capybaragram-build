@@ -1,13 +1,17 @@
 [
   {
     "file": "android-start.png",
-    "sha256": "4adc7635246bd1e46e74bddf83cddff1531d9500c856753519c8d2a015655df6",
-    "source_run": 34059939947
+    "sha256": "bb2df9f92655c6beb17e2f429e76790381fd4f81587ed252b9b3d531f9e52773",
+    "source_run": 34156405310,
+    "apk_run": 34154803384,
+    "source_file": "01-onboarding.png"
   },
   {
     "file": "android-dark.png",
-    "sha256": "5901ededac359fc3d7ad1b64486c97909246ab6487859b874fe90177b8ba909e",
-    "source_run": 34059939947
+    "sha256": "fef315bdd67f32d0216a4e76b7ccd78ef78b5b753fcb2588ff983529704368f7",
+    "source_run": 34156405310,
+    "apk_run": 34154803384,
+    "source_file": "01-theme-dark.png"
   },
   {
     "file": "windows-start.png",
