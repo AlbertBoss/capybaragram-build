@@ -2,6 +2,8 @@
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows') { throw 'Disposable Windows CI only.' }
+$themeMode = $env:CAPY_TEST_COLOR_MODE
+if ($themeMode -notin @('light','dark')) { throw 'Explicit test color mode required.' }
 $out = Join-Path (Get-Location) 'ci/windows-client-results'
 New-Item -ItemType Directory -Path $out -ErrorAction Stop | Out-Null
 $inputRoot = Join-Path $env:RUNNER_TEMP 'windows-client-input'
@@ -41,7 +43,7 @@ public static class CapyTestWindows {
 }
 '@
 
-$result = @{ source_run=34031740962; exe_sha256=$expected; login_tested=$false; phone_entered=$false; visual_review='NOT PERFORMED'; screenshots=@(); preauth='PENDING' }
+$result = @{ color_mode=$themeMode; background_checks=@(); source_run=34031740962; exe_sha256=$expected; login_tested=$false; phone_entered=$false; visual_review='NOT PERFORMED'; screenshots=@(); preauth='PENDING' }
 $startupWatch = [Diagnostics.Stopwatch]::StartNew()
 $result.uia_retry_count = 0
 $app = Start-Process -FilePath $exe -WorkingDirectory $inputRoot -WindowStyle Hidden -PassThru
@@ -106,6 +108,19 @@ function Capture-OwnWindow([string]$name) {
     $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
     try {
         $graphics.CopyFromScreen($rect.Left,$rect.Top,0,0,$bitmap.Size)
+        if ($name -eq 'phone-screen.png') {
+            # Blank margin of the exact app window, away from the input form.
+            # Verify the actual pixels, not just a registry setting or theme label.
+            $samples = @(0.45,0.60,0.75 | ForEach-Object {
+                $pixel = $bitmap.GetPixel([int]($width * 0.08),[int]($height * $_))
+                [math]::Round(0.2126*$pixel.R + 0.7152*$pixel.G + 0.0722*$pixel.B,2)
+            })
+            $matches = @($samples | Where-Object { if ($themeMode -eq 'dark') { $_ -lt 100 } else { $_ -gt 180 } })
+            $result.background_checks += @{ screen=$name; mode=$themeMode; luminance=$samples; passed=($matches.Count -eq 3) }
+            # Keep the failure image too, so a regression can be reviewed.
+            $bitmap.Save((Join-Path $out $name),[System.Drawing.Imaging.ImageFormat]::Png)
+            if ($matches.Count -ne 3) { throw "Phone background does not match requested $themeMode theme." }
+        }
         $bitmap.Save((Join-Path $out $name),[System.Drawing.Imaging.ImageFormat]::Png)
         $result.screenshots += $name
         $result.visual_review = 'PENDING: captured native windows require visual review'

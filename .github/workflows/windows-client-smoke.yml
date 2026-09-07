@@ -11,6 +11,10 @@ concurrency:
 jobs:
   client:
     if: github.event.repository.private == false
+    strategy:
+      fail-fast: false
+      matrix:
+        color-mode: [light, dark]
     runs-on: windows-2025
     timeout-minutes: 10
     steps:
@@ -26,11 +30,29 @@ jobs:
           github-token: ${{ github.token }}
       - name: Check native phone navigation without entering an account
         shell: pwsh
-        run: ./ci/windows_client_smoke.ps1
+        env:
+          CAPY_TEST_COLOR_MODE: ${{ matrix.color-mode }}
+        run: |
+          if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows') { throw 'Disposable CI only.' }
+          $themeKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize'
+          $previous = Get-ItemProperty -LiteralPath $themeKey -Name AppsUseLightTheme -ErrorAction SilentlyContinue
+          $hadValue = $null -ne $previous
+          try {
+            New-Item -Path $themeKey -Force | Out-Null
+            $light = if ($env:CAPY_TEST_COLOR_MODE -eq 'light') { 1 } else { 0 }
+            New-ItemProperty -LiteralPath $themeKey -Name AppsUseLightTheme -Value $light -PropertyType DWord -Force | Out-Null
+            ./ci/windows_client_smoke.ps1
+          } finally {
+            if ($hadValue) {
+              Set-ItemProperty -LiteralPath $themeKey -Name AppsUseLightTheme -Value $previous.AppsUseLightTheme
+            } else {
+              Remove-ItemProperty -LiteralPath $themeKey -Name AppsUseLightTheme -ErrorAction SilentlyContinue
+            }
+          }
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: capybaragram-windows-client-verification
+          name: capybaragram-windows-client-verification-${{ matrix.color-mode }}
           path: ci/windows-client-results/
           retention-days: 3
           if-no-files-found: error
