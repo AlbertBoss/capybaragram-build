@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 LOCALE = os.environ.get('CAPY_TEST_LOCALE','en-US')
 if LOCALE not in {'en-US','ru-RU'}: raise ValueError('Unsupported test locale')
 PACKAGE = 'org.capybaragram'
-APK_SHA = 'a917a855b0f0b6193e1f63492f5842f6ad351c84f6df55bcdbdb849ae87108b7'
+APK_SHA = 'f1bec0132f47e9276bf99ab775507794390df13197e0714d4ad96baa22bfeef2'
 CERT_SHA = '8254ebe4b00d6e4a95ee07dd27a30f8bd95b066b83c72affb39e4d25e7bff282'
 sdk = Path(os.environ['ANDROID_HOME'])
 scratch = Path(os.environ['RUNNER_TEMP'])/'capy-client-smoke'
@@ -87,7 +87,7 @@ def tap(node):
 
 apks = list((Path(os.environ['RUNNER_TEMP'])/'client-input').rglob('*.apk'))
 if len(apks) != 1 or hashlib.sha256(apks[0].read_bytes()).hexdigest() != APK_SHA:
-    raise RuntimeError('Artifact is not the exact reviewed Android read-mode candidate APK')
+    raise RuntimeError('Artifact is not the exact reviewed Android appearance candidate APK')
 apk = apks[0]
 certificate = run([sdk/'build-tools/36.0.0/apksigner','verify','--print-certs',apk],capture_output=True,text=True).stdout
 if f'Signer #1 certificate SHA-256 digest: {CERT_SHA}' not in certificate:
@@ -103,7 +103,7 @@ log = (report/'emulator.log').open('w')
 process = subprocess.Popen([str(emulator),'-avd','capy-client','-no-window','-no-audio',
     '-no-boot-anim','-no-snapshot','-gpu','swiftshader_indirect','-memory','2048',
     '-cores','2','-port','5554','-accel','on','-change-locale',LOCALE],stdout=log,stderr=subprocess.STDOUT,env=env)
-result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':34058353588,
+result = {'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'artifact_run':34152342678,
           'package':PACKAGE,'release_manifest_flags':'PASS (testOnly/debuggable/allowBackup disabled)',
           'real_account_login_tested':False,'notes_ui_tested':False,'read_mode_network_tested':False,'visual_review':'PENDING',
           'install':'PENDING','launch':'PENDING','login_screen':'PENDING','cold_restart':'PENDING'}
