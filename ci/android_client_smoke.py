@@ -172,10 +172,43 @@ try:
             time.sleep(3)
             drawer = snapshot('00-launcher-after-all-apps-key')
             result['launcher_open_fallback'] = 'Android KEYCODE_ALL_APPS from observed Pixel home screen'
+    if not any(n.get('text') == 'CapybaraGram' for n in drawer.iter('node')):
+        # The captured input/window diagnostics show a focused Pixel Launcher
+        # ignoring tap, swipe and All Apps. Recover that disposable launcher
+        # once (no data clearing), then still require the real visible app icon.
+        launcher = 'com.google.android.apps.nexuslauncher'
+        resolved_home = device('shell','cmd','package','resolve-activity','--brief',
+                               '-a','android.intent.action.MAIN','-c','android.intent.category.HOME').strip().splitlines()[-1]
+        if resolved_home.startswith(launcher+'/'):
+            device('shell','am','force-stop',launcher)
+            device('shell','input','keyevent','KEYCODE_HOME')
+            time.sleep(10)
+            drawer = snapshot('00-home-recovered')
+            app_list = next((n for n in drawer.iter('node') if n.get('package') == launcher
+                             and n.get('content-desc') in {'Список приложений','Apps list','All apps'}
+                             and n.get('clickable') == 'true' and n.get('enabled') == 'true'),None)
+            if app_list is not None:
+                bounds = re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',app_list.get('bounds',''))
+                if not bounds: raise RuntimeError('Recovered launcher control has invalid bounds')
+                left,top,right,bottom = map(int,bounds.groups())
+                if right <= left or bottom <= top or top < 100:
+                    raise RuntimeError('Recovered launcher control is not usable')
+                x,y = (left+right)//2,(top+bottom)//2
+                device('shell','input','swipe',str(x),str(y),str(x),str(top//4),'600')
+                time.sleep(5)
+                drawer = snapshot('00-launcher-recovered')
+                result['launcher_recovery'] = 'Restarted only disposable Pixel Launcher once; swiped from freshly observed app-list control'
     launcher_icon = next((n for n in drawer.iter('node') if n.get('text') == 'CapybaraGram'
                           and n.get('package') != PACKAGE),None)
     result['launcher_entry'] = ('PASS (label present; icon visual review pending)' if launcher_icon is not None
                                 else 'FAIL: launcher did not expose CapybaraGram; startup checks continue for diagnosis')
+    if launcher_icon is not None:
+        tap(launcher_icon)
+        time.sleep(20)
+        launched_from_icon = snapshot('00-launcher-icon-opened')
+        if not any(n.get('package') == PACKAGE for n in launched_from_icon.iter('node')):
+            raise RuntimeError('Visible launcher icon did not open CapybaraGram')
+        result['launcher_entry'] = 'PASS (visible CapybaraGram icon tapped; app UI opened)'
     if launcher_icon is None:
         for name,args in [('launcher-input.txt',('shell','dumpsys','input')),
                           ('launcher-window.txt',('shell','dumpsys','window'))]:
