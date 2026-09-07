@@ -137,6 +137,12 @@ jobs:
           mkdir -p "$RUNNER_TEMP/capy-read-policy"
           javac --release 8 -Xlint:all -Werror -d "$RUNNER_TEMP/capy-read-policy" control/ci/read-mode/ReadReceiptPolicy.java control/ci/read-mode/ReadReceiptPolicyTest.java
           java -cp "$RUNNER_TEMP/capy-read-policy" org.capybaragram.readmode.ReadReceiptPolicyTest
+      - name: Prepare native CapybaraGram light and dark appearance
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 control/ci/appearance/prepare_appearance.py android android
+          python3 control/ci/appearance/prepare_appearance.py android android --check
       - name: Build one ARM64 release candidate
         env:
           CAPY_ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/capybaragram-preview.p12

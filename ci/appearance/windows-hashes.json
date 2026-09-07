@@ -1,0 +1,40 @@
+{
+  "source": "80158983dba09d3bf5d96701f21473d6c34bf5f5",
+  "files": {
+    "Telegram/SourceFiles/window/themes/window_theme.cpp": {
+      "pre": "9111f5e25e5725e3afe0bceb77593da198f613b6658fab254b527777fd63ddf4",
+      "post": "1f166f33088cb929300480ea4faf03bb6d041de54a67f16ff5cfa4443f31a58d",
+      "text": true
+    },
+    "Telegram/SourceFiles/intro/intro_step.cpp": {
+      "pre": "0be6d49d3b4ae26b64cdb3abda589e3434566b69551a38aa2b84ad9e3e32383e",
+      "post": "c2e236627ee4ec24305d951f81beb3a2225a6bd2cb5347ebacfc9b87fddac84a",
+      "text": true
+    },
+    "Telegram/SourceFiles/history/view/history_view_top_bar_widget.cpp": {
+      "pre": "fa54f54bad0df52b9d8fd4e1554a6233094e59aa705c523f2207ce3223c27705",
+      "post": "e3e192adaf155584e5c516a909ac69af9b884a97b319452e79b98125d4669f08",
+      "text": true
+    },
+    "Telegram/SourceFiles/history/view/history_view_top_bar_widget.h": {
+      "pre": "933d37880fcdf7cfaa96d77ec0412b65e1bd957b1f03f00ace79e4bdd3341513",
+      "post": "47c8d9ac2cfbcdcc33ec290a0fc54e4d3f71fa038fcba9b2e25cedda73796fb3",
+      "text": true
+    },
+    "Telegram/Resources/day-blue.tdesktop-theme": {
+      "pre": "cef14bea54261604211dee578ddb03f3588517687d1f2be55d63de3ee4eea224",
+      "post": "97a1fe5bbfc3bb225416e7a1e26c3627e64da3bc61a812f21c30f70f50c4b7e1",
+      "asset": "capy-light.tdesktop-theme"
+    },
+    "Telegram/Resources/night.tdesktop-theme": {
+      "pre": "364fcd7288453377e16db9c733fd98699b161248bc62cc62f78d58d909951d3a",
+      "post": "d2c6df16e953404b7bdd785128cca62ec04a09999afb090c64d16c3a8b89057e",
+      "asset": "capy-dark.tdesktop-theme"
+    },
+    "Telegram/Resources/night-green.tdesktop-theme": {
+      "pre": "ed9d02e0d20c0144d833ff10374ea8ccaa20fbda6e9746192f71692afda82e32",
+      "post": "d2c6df16e953404b7bdd785128cca62ec04a09999afb090c64d16c3a8b89057e",
+      "asset": "capy-dark.tdesktop-theme"
+    }
+  }
+}

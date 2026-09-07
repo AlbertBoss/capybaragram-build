@@ -1,0 +1,30 @@
+{
+  "source": "62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c",
+  "files": {
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/Theme.java": {
+      "pre": "260a1e27778813efb76c4a7d60c64b26c5829e304a7f23c063686cc7cc41ae32",
+      "post": "e392b231d65c37321146a175906c960a26ca69779e96dbb546bf37c58e0ff168",
+      "text": true
+    },
+    "TMessagesProj/src/main/java/org/telegram/ui/IntroActivity.java": {
+      "pre": "c2773d2a4cb3eccac55fe7f607a1acb5217335de5bdbbcbe9d0752e426368446",
+      "post": "88f1da6cbbf0f50580b3e495800b0c1cf1348692d982d89435266c9a18ba5329",
+      "text": true
+    },
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": {
+      "pre": "225b05489508e22b45035082c86a76865567c16345ad6d5cc5a69ce63aa221ec",
+      "post": "f7d47f846665cf9ec7eed72b19d37288ebf95508f5783e9b96128e2340719967",
+      "text": true
+    },
+    "TMessagesProj/src/main/assets/capy-light.attheme": {
+      "pre": null,
+      "post": "2637d828d739233616c8703f60dfd2276c676f2f3cd5b6176c3f80cef72c78d4",
+      "asset": "capy-light.attheme"
+    },
+    "TMessagesProj/src/main/assets/capy-dark.attheme": {
+      "pre": null,
+      "post": "65233e48481ad5c7a32b18638c08141bcecb8e6fc5e8fba8cf00a86009b15910",
+      "asset": "capy-dark.attheme"
+    }
+  }
+}
