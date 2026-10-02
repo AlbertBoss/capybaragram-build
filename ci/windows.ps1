@@ -104,6 +104,12 @@ if ($Phase -eq 'Build') {
         & python (Join-Path $PSScriptRoot 'api_credentials.py') --windows-cache $env:CAPY_WINDOWS_API_CACHE
         if ($LASTEXITCODE -ne 0) { throw 'Owner API cache creation failed.' }
     }
+    & python (Join-Path $PSScriptRoot 'test_windows_dependencies.py') $src
+    if ($LASTEXITCODE -ne 0) { throw 'Pinned Windows build-tool recipe tests failed.' }
+    & python (Join-Path $PSScriptRoot 'prepare_windows_dependencies.py') $src
+    if ($LASTEXITCODE -ne 0) { throw 'Windows build-tool recipe preparation failed.' }
+    & python (Join-Path $PSScriptRoot 'prepare_windows_dependencies.py') $src --check
+    if ($LASTEXITCODE -ne 0) { throw 'Windows build-tool recipe verification failed.' }
     New-Item -ItemType Directory -Force -Path (Join-Path $root 'Libraries\win64'), (Join-Path $root 'ThirdParty') | Out-Null
     $batch = Join-Path $env:RUNNER_TEMP 'capy-windows-build.cmd'
     @'
