@@ -33,7 +33,10 @@ public static class CapyTestWindows {
     [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr window);
     [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
     [StructLayout(LayoutKind.Sequential)] public struct Rect { public int Left, Top, Right, Bottom; }
-    [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr window, out Rect rect);
+    [DllImport("dwmapi.dll")] static extern int DwmGetWindowAttribute(IntPtr window, int attribute, out Rect rect, int size);
+    public static bool VisibleFrameBounds(IntPtr window, out Rect rect) {
+        return DwmGetWindowAttribute(window, 9, out rect, Marshal.SizeOf(typeof(Rect))) == 0;
+    }
     public static IntPtr[] ForProcess(uint process) {
         var result = new List<IntPtr>();
         EnumWindows((window, unused) => { uint owner; GetWindowThreadProcessId(window, out owner); if (owner == process) result.Add(window); return true; }, IntPtr.Zero);
@@ -100,7 +103,7 @@ function Capture-OwnWindow([string]$name) {
     Start-Sleep -Seconds 2
     if ([CapyTestWindows]::GetForegroundWindow() -ne $testWindow) { throw 'Own test window is not foreground for capture.' }
     $rect = [CapyTestWindows+Rect]::new()
-    if (-not [CapyTestWindows]::GetWindowRect($testWindow,[ref]$rect)) { throw 'Test window bounds unavailable.' }
+    if (-not [CapyTestWindows]::VisibleFrameBounds($testWindow,[ref]$rect)) { throw 'Visible app frame bounds unavailable.' }
     $width = $rect.Right - $rect.Left
     $height = $rect.Bottom - $rect.Top
     if ($width -le 0 -or $height -le 0 -or $width -gt 3840 -or $height -gt 2160) { throw 'Unexpected test window bounds.' }
