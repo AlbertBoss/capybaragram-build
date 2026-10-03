@@ -1,0 +1,23 @@
+{
+  "source_sha": "62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c",
+  "pre": {
+    "TMessagesProj/src/main/java/org/telegram/messenger/MessagesStorage.java": "c8e6d712b08853b61b54659dad84bd47ccd2d56315d2c66df7b3a52d1716f0cb",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "f7d47f846665cf9ec7eed72b19d37288ebf95508f5783e9b96128e2340719967",
+    "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java": "3137df15d84755dd36928887a546fc8bf278f7133c5655536a795e945cff250a",
+    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "abc584e8e3097b307dc73a4a05f07914b5067c1587b641baf75bd2a7b9147968"
+  },
+  "post": {
+    "TMessagesProj/src/main/java/org/telegram/messenger/MessagesStorage.java": "ffd559d4b5ee567db3d97815ed12993ae998c8feaa0c8b399b9446e85ee46a09",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "5872751e27b5e479ac1879ba5467772c0ef4d291868880d48042ee24c1193966",
+    "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java": "dcdaf6648c8cbd1d539633350e75dfb0c3b3f70ed73e2bafbdfaa22feba33d56",
+    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "7a0f349bd02391a47e2a67239c36fdfe913a3611b7329badfff87a11390d5828"
+  },
+  "added": {
+    "TMessagesProj/src/main/java/org/capybaragram/archive/AndroidArchiveStore.java": "fa3d835645c95487ced48259a64bd355d8f37decd443af29abe8975ab2b2f9d0",
+    "TMessagesProj/src/main/java/org/capybaragram/archive/AndroidArchiveCoordinator.java": "a22c2f4591c00090dc2e523609095d375a47148c862b23f3d5c3cefff49a1535",
+    "TMessagesProj/src/main/java/org/capybaragram/archive/CapyMessageArchive.java": "eb97d2c984bb557c4c0fec6f9e1857013373d8d834475d265693488b006166ec",
+    "TMessagesProj/src/main/java/org/capybaragram/archive/CapyArchiveUi.java": "9e74e5eb957ec79d875753169ae85deafc075066b3e20938de37ffebb11a8723",
+    "TMessagesProj/src/main/res/values/capy_archive.xml": "72b3276be6ec6772c0ec541a0516727b894a3d796ba51ccce4d8e4d96f17d446",
+    "TMessagesProj/src/main/res/values-ru/capy_archive.xml": "b87155eda7ec8dfa7fe4ff34e109415120e04ed9b745ddd658ff5a265ae60e05"
+  }
+}

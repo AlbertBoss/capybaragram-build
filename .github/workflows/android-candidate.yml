@@ -145,6 +145,15 @@ jobs:
           set -euo pipefail
           python3 control/ci/appearance/prepare_appearance.py android android
           python3 control/ci/appearance/prepare_appearance.py android android --check
+      - name: Prepare encrypted local message archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 control/ci/archive/prepare_android_archive.py android
+          python3 control/ci/archive/prepare_android_archive.py android --check
+          mkdir -p "$RUNNER_TEMP/capy-archive-cipher"
+          javac --release 8 -Xlint:all -Werror -d "$RUNNER_TEMP/capy-archive-cipher" control/ci/vault/PayloadCipher.java control/ci/archive/ArchiveCipherTest.java
+          java -cp "$RUNNER_TEMP/capy-archive-cipher" org.capybaragram.archive.ArchiveCipherTest
       - name: Build one ARM64 release candidate
         env:
           CAPY_ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/capybaragram-preview.p12

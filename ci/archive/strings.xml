@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CapyArchive">CapybaraGram · Message archive</string>
+    <string name="CapyArchiveDescription">Save local encrypted snapshots before deletion, media expiry and message edits. Off by default; enabling applies to future events for this account. This version saves text and message data, but does not save original media files. Up to 2,000 snapshots per account, with older snapshots removed first. Disabling keeps existing snapshots. Nothing is sent to another server.</string>
+    <string name="CapyArchiveEnable">Enable archive</string>
+    <string name="CapyArchiveDisable">Disable archive</string>
+    <string name="CapyArchiveOpen">Open chat archive</string>
+    <string name="CapyArchiveLoading">Loading local snapshots…</string>
+    <string name="CapyArchiveEmpty">No saved snapshots for this chat. Messages deleted before enabling the archive cannot be recovered.</string>
+    <string name="CapyArchiveFailure">Could not open this archive. Existing data was preserved.</string>
+    <string name="CapyArchiveDeleted">Before deletion</string>
+    <string name="CapyArchiveExpired">Before media expiry</string>
+    <string name="CapyArchiveEdited">Before an edit</string>
+    <string name="CapyArchiveNoText">Message has no text</string>
+    <string name="CapyArchiveOriginalMissing">Original attachment has not been saved.</string>
+    <string name="CapyArchiveOlder">Older snapshots</string>
+    <string name="CapyArchiveClear">Clear archive</string>
+    <string name="CapyArchiveClearConfirm">Delete the entire local archive for this account, including other chats? Telegram messages and notes are unaffected.</string>
+</resources>

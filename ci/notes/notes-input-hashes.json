@@ -10,7 +10,7 @@
     "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "a71ac870134df96b5349b752c2e3e5627d1f47e356212676fba29e5b1109dfa8"
   },
   "added": {
-    "TMessagesProj/src/main/java/org/capybaragram/local/PayloadCipher.java": "a7587a2684dab7a93814b57f05047f491123ce535913252799da0288d912dd03",
+    "TMessagesProj/src/main/java/org/capybaragram/local/PayloadCipher.java": "c18e9419ea158f89f03bfcf8acf235224496c3e96668fa00519b03aaf2150128",
     "TMessagesProj/src/main/java/org/capybaragram/local/AndroidVaultKeys.java": "2cbd7136a0d2585701b4b43dcfca6046bde749214716acf0a74678face6033fc",
     "TMessagesProj/src/main/java/org/capybaragram/local/AndroidVaultStore.java": "0eefeaa12265014e80101a32895603a3d3fa904bb87d73e17db4809e8419dcc7",
     "TMessagesProj/src/main/java/org/capybaragram/local/VaultSchema.java": "c1865cefa1863650189f999ae8d97231e128344638b157527223637833f04b5b",

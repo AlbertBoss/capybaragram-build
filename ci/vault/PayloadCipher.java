@@ -92,6 +92,12 @@ public final class PayloadCipher {
             return new Context(generation, (byte) 2, (byte) 0, 0, 0, templateId);
         }
 
+        /** Separate purpose from notes/templates, including attachment-part identity. */
+        public static Context archive(UUID generation, long entryId, long part) {
+            if (entryId <= 0 || part < 0) throw invalid();
+            return new Context(generation, (byte) 3, (byte) 0, entryId, part, 0);
+        }
+
         // Fresh buffer on every call; big endian is ByteBuffer's defined default.
         byte[] aad() {
             return ByteBuffer.allocate(DOMAIN.length + 1 + 16 + 2 + 24)

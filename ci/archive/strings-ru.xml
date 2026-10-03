@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CapyArchive">CapybaraGram · Архив сообщений</string>
+    <string name="CapyArchiveDescription">Сохраняет локальные зашифрованные снимки перед удалением, исчезновением медиа и правками. По умолчанию выключен; включение действует на будущие события этого аккаунта. Эта версия сохраняет текст и данные сообщения, но пока не сохраняет оригиналы вложений. До 2000 снимков на аккаунт, старые удаляются первыми. Выключение оставляет прежние снимки. На сторонний сервер ничего не отправляется.</string>
+    <string name="CapyArchiveEnable">Включить архив</string>
+    <string name="CapyArchiveDisable">Выключить архив</string>
+    <string name="CapyArchiveOpen">Открыть архив чата</string>
+    <string name="CapyArchiveLoading">Загружаю локальные снимки…</string>
+    <string name="CapyArchiveEmpty">Сохранённых снимков этого чата нет. Сообщения, удалённые до включения архива, восстановить нельзя.</string>
+    <string name="CapyArchiveFailure">Не удалось открыть архив. Существующие данные сохранены.</string>
+    <string name="CapyArchiveDeleted">Перед удалением</string>
+    <string name="CapyArchiveExpired">Перед исчезновением медиа</string>
+    <string name="CapyArchiveEdited">Перед правкой</string>
+    <string name="CapyArchiveNoText">Сообщение без текста</string>
+    <string name="CapyArchiveOriginalMissing">Оригинал вложения не сохранён.</string>
+    <string name="CapyArchiveOlder">Более старые снимки</string>
+    <string name="CapyArchiveClear">Очистить архив</string>
+    <string name="CapyArchiveClearConfirm">Удалить весь локальный архив этого аккаунта, включая другие чаты? Сообщения Telegram и заметки сохранятся.</string>
+</resources>
