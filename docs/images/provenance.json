@@ -15,12 +15,54 @@
   },
   {
     "file": "windows-start.png",
-    "sha256": "1795220f006b32600414ef6f444c88ec11ae8912b1f4d6ddd1ad5db86d777532",
-    "source_run": 34059187270
+    "sha256": "d3d32f453407ab9fbb7b22270bf42f8ae45cee92b1cc32771a64e7d4a583220a",
+    "source_run": 37155302094,
+    "native_run": 37070585321,
+    "exe_sha256": "12c959b8e87fcefe0098acbf4d79442981ec9e76797b24aef90d95688ecb0b0a",
+    "source_file": "onboarding-screen.png",
+    "color_mode": "light",
+    "source_head": "350fc1952289d533b154ab4003a20334d80aa53b",
+    "empty_profile": true,
+    "visual_review": "PASS",
+    "image_processing": "None; exact captured pixels"
   },
   {
     "file": "windows-phone.png",
-    "sha256": "eb93b7b7bb6a5a283233e404c062ecd2254c3440dd57583c723af39a16796b91",
-    "source_run": 34059187270
+    "sha256": "31e8b5a972783365fc0f52ae4fa813c0e17775aa07017112fc7d30949179b883",
+    "source_run": 37155302094,
+    "native_run": 37070585321,
+    "exe_sha256": "12c959b8e87fcefe0098acbf4d79442981ec9e76797b24aef90d95688ecb0b0a",
+    "source_file": "phone-screen.png",
+    "color_mode": "light",
+    "source_head": "350fc1952289d533b154ab4003a20334d80aa53b",
+    "empty_profile": true,
+    "visual_review": "PASS",
+    "image_processing": "None; exact captured pixels"
+  },
+  {
+    "file": "windows-dark.png",
+    "sha256": "079db55eff53a1cf18f5b734a07096787c61de566662eb5f7ac1b17f0baf7587",
+    "source_run": 37155302094,
+    "native_run": 37070585321,
+    "exe_sha256": "12c959b8e87fcefe0098acbf4d79442981ec9e76797b24aef90d95688ecb0b0a",
+    "source_file": "onboarding-screen.png",
+    "color_mode": "dark",
+    "source_head": "350fc1952289d533b154ab4003a20334d80aa53b",
+    "empty_profile": true,
+    "visual_review": "PASS",
+    "image_processing": "None; exact captured pixels"
+  },
+  {
+    "file": "windows-phone-dark.png",
+    "sha256": "ebc7dba181be32f40825ac83b1199f7aa01a9d971ea94b6b3b5b5818e3699db4",
+    "source_run": 37155302094,
+    "native_run": 37070585321,
+    "exe_sha256": "12c959b8e87fcefe0098acbf4d79442981ec9e76797b24aef90d95688ecb0b0a",
+    "source_file": "phone-screen.png",
+    "color_mode": "dark",
+    "source_head": "350fc1952289d533b154ab4003a20334d80aa53b",
+    "empty_profile": true,
+    "visual_review": "PASS",
+    "image_processing": "None; exact captured pixels"
   }
 ]

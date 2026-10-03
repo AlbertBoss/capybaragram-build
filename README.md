@@ -22,24 +22,25 @@ CapybaraGram развивает привычный Telegram в сторону л
 
 Первый этап оформления реализован в исходниках: **Capybara Light / Capybara Dark**, тёплая светлая и графитовая тёмная палитры с янтарными акцентами. Подготовлены цвета основных экранов, фон и отдельный доступ к инструментам CapybaraGram из шапки чата. Это ещё не завершённая переработка интерфейса по концепту.
 
-**В работающем приложении проверены стартовые экраны Android:** запуск по значку, переключение тем и индикатор страниц. Внутренние экраны Android ещё требуют визуальной приёмки. **Новое оформление Windows пока не проверено в готовом EXE:** соответствующая сборка ещё выполняется. Опубликованные ниже Windows-снимки относятся к старому оформлению. [Как устроено оформление и что перенесено из концепта](docs/APPEARANCE.md).
+**В работающем приложении проверены стартовые экраны Android:** запуск по значку, переключение тем и индикатор страниц. Внутренние экраны Android ещё требуют визуальной приёмки. **Новое оформление Windows проверено на стартовом экране и пустой форме номера в обеих темах.** На тёмной форме фон остаётся графитовым. Внутренние экраны с тестовым аккаунтом ещё требуют отдельной визуальной приёмки. [Как устроено оформление и что перенесено из концепта](docs/APPEARANCE.md).
 
 ## Как выглядит приложение
 
-Ниже — **реальные снимки стартовых экранов тестовых сборок**, снятые без входа в аккаунт. Android показан с новой палитрой, Windows — в предыдущем оформлении. Эти снимки не подтверждают готовность нового интерфейса внутри чатов.
+Ниже — **реальные снимки стартовых экранов тестовых сборок**, снятые без входа в аккаунт. Обе платформы показаны с новой палитрой. Эти снимки не подтверждают готовность нового интерфейса внутри чатов.
 
 <table>
-<tr><th>Android · новое оформление</th><th>Windows · предыдущая сборка</th></tr>
+<tr><th>Android · новое оформление</th><th>Windows · новое оформление</th></tr>
 <tr>
 <td align="center"><img src="docs/images/android-start.png" width="240" alt="Реальный экран первого запуска CapybaraGram на Android"></td>
-<td align="center"><img src="docs/images/windows-start.png" width="540" alt="Реальный экран первого запуска Windows Release CapybaraGram"></td>
+<td align="center"><img src="docs/images/windows-start.png" width="540" alt="Реальный экран новой Windows Release сборки CapybaraGram"></td>
 </tr>
 </table>
 
 <details>
-<summary>Ещё два экрана: тёмная тема Android и вход по номеру на Windows</summary>
-<p>Новая тёмная тема Android и <strong>светлая</strong> форма входа предыдущей Windows-сборки. Тёмно-зелёная шапка на стартовом экране Windows — отдельное старое оформление, а не включённая тёмная тема. Поле номера пустое; настоящие аккаунты не использовались.</p>
-<p><img src="docs/images/android-dark.png" width="230" alt="Текущая тёмная тема стартового экрана Android"> <img src="docs/images/windows-phone.png" width="510" alt="Пустая форма входа по номеру на Windows"></p>
+<summary>Тёмные темы и формы входа Windows</summary>
+<p>Реальные светлая и тёмная темы новой Windows-сборки. Поля номера пустые; QR-коды и авторизованные аккаунты в этих проверках не использовались. Android также показан в тёмной теме.</p>
+<p><img src="docs/images/android-dark.png" width="230" alt="Тёмная тема стартового экрана Android"> <img src="docs/images/windows-dark.png" width="510" alt="Новая графитовая тема стартового экрана Windows"></p>
+<p><img src="docs/images/windows-phone.png" width="400" alt="Новая светлая форма номера Windows"> <img src="docs/images/windows-phone-dark.png" width="400" alt="Новая тёмная форма номера Windows с графитовым фоном"></p>
 </details>
 
 [Происхождение скриншотов](docs/images/README.md).
@@ -77,9 +78,9 @@ CapybaraGram развивает привычный Telegram в сторону л
 | --- | --- |
 | Android ARM64 APK с новым оформлением и первой реализацией «нечиталки» | [Сборка 34156952657](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34156952657) |
 | Android: установка, стартовые экраны и перезапуск | [Проверка 34159878677](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34159878677) |
-| Windows x64 Release EXE | [Сборка 34031740962](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34031740962) |
-| Windows: переход к пустой форме входа | [Проверка 34059187270](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34059187270) |
-| Windows: установщик, замена и сохранность тестовых файлов | [Проверка 34060238891](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34060238891) |
+| Windows x64 Release EXE | [Сборка 37070585321](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37070585321) |
+| Windows: светлая и тёмная темы, переход к пустой форме номера | [Проверка 37155302094](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37155302094) |
+| Windows: установщик, замена и сохранность тестовых файлов | [Проверка 37096165716](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37096165716) |
 
 Стабильные релизы ещё не опубликованы. Артефакты Actions временные: ссылки показывают историю проверок, а не постоянный каталог скачивания. [Как собрать приложение](docs/BUILDING.md).
 
