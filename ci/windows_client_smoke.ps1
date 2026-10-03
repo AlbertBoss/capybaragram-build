@@ -8,7 +8,7 @@ $out = Join-Path (Get-Location) 'ci/windows-client-results'
 New-Item -ItemType Directory -Path $out -ErrorAction Stop | Out-Null
 $inputRoot = Join-Path $env:RUNNER_TEMP 'windows-client-input'
 $exe = Join-Path $inputRoot 'CapybaraGram.exe'
-$expected = '24150fb9370a9473eef888e77ed4905df34866ffc7675d802a45f08f57e26a8a'
+$expected = '12c959b8e87fcefe0098acbf4d79442981ec9e76797b24aef90d95688ecb0b0a'
 if ((Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expected) { throw 'Unexpected native executable.' }
 $profile = Join-Path $env:RUNNER_TEMP 'Capy preauth empty profile'
 if (Test-Path -LiteralPath $profile) { throw 'Test profile already exists.' }
@@ -43,7 +43,7 @@ public static class CapyTestWindows {
 }
 '@
 
-$result = @{ color_mode=$themeMode; background_checks=@(); source_run=34031740962; exe_sha256=$expected; login_tested=$false; phone_entered=$false; visual_review='NOT PERFORMED'; screenshots=@(); preauth='PENDING' }
+$result = @{ color_mode=$themeMode; background_checks=@(); source_run=37070585321; exe_sha256=$expected; login_tested=$false; phone_entered=$false; visual_review='NOT PERFORMED'; screenshots=@(); preauth='PENDING' }
 $startupWatch = [Diagnostics.Stopwatch]::StartNew()
 $result.uia_retry_count = 0
 $app = Start-Process -FilePath $exe -WorkingDirectory $inputRoot -WindowStyle Hidden -PassThru

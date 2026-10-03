@@ -12,8 +12,8 @@
 [Setup]
 AppId=CapybaraGram.Desktop
 AppName=CapybaraGram
-AppVersion=0.1.0-preview.1
-AppVerName=CapybaraGram 0.1.0 Preview
+AppVersion=0.1.0-preview.2
+AppVerName=CapybaraGram 0.1.0 Preview 2
 AppPublisher=CapybaraGram contributors
 AppPublisherURL=https://github.com/AlbertBoss/capybaragram-build
 DefaultDirName={localappdata}\Programs\CapybaraGram
@@ -29,7 +29,7 @@ SetupIconFile=..\windows-brand\capy-icon.ico
 UninstallDisplayIcon={app}\CapybaraGram.exe
 LicenseFile={#InputDir}\LICENSE
 InfoBeforeFile={#InputDir}\INSTALL-NOTES.txt
-VersionInfoVersion=0.1.0.1
+VersionInfoVersion=0.1.0.2
 WizardStyle=modern
 Compression=lzma2/fast
 SolidCompression=yes

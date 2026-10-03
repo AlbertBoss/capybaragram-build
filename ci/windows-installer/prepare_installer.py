@@ -9,9 +9,9 @@ import re
 import struct
 import subprocess
 
-SOURCE_RUN = 34031740962
-SOURCE_HEAD = '4ee5059a997be3dcf7bc913d9758babedf3287b2'
-EXE_SHA256 = '24150fb9370a9473eef888e77ed4905df34866ffc7675d802a45f08f57e26a8a'
+SOURCE_RUN = 37070585321
+SOURCE_HEAD = '923f17ab5a2ae76bfd01c230bb146d11e559e404'
+EXE_SHA256 = '12c959b8e87fcefe0098acbf4d79442981ec9e76797b24aef90d95688ecb0b0a'
 
 def main():
     if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_OS') != 'Windows':
@@ -73,6 +73,7 @@ def main():
     setup_hash = hashlib.sha256(setup.read_bytes()).hexdigest()
     (out/'SHA256SUMS.txt').write_text(setup_hash+' *'+setup.name+'\n', encoding='ascii')
     (out/'BUILD-INFO.json').write_text(json.dumps(dict(source_run=SOURCE_RUN, source_head=SOURCE_HEAD,
+        installer_version='0.1.0-preview.2',
         native_sha256=digest, setup_sha256=setup_hash, final_release=False,
         purpose='Installer verification using the exact optimized Release candidate; real account session upgrade acceptance remains pending.',
         github_run=os.environ['GITHUB_RUN_ID']), indent=2)+'\n', encoding='utf-8')

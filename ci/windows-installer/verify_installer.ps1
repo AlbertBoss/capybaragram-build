@@ -44,6 +44,7 @@ function Assert-Payload {
         if (-not (Test-Path -LiteralPath (Join-Path $install $name))) { throw "Installed notice missing: $name" }
     }
     $entry = Get-ItemProperty -LiteralPath $registry
+    if ($entry.DisplayVersion -ne $build.installer_version) { throw 'Installed version differs from this preview release.' }
     if ([IO.Path]::GetFullPath($entry.InstallLocation).TrimEnd('\') -ne $install) { throw 'Uninstall registration points elsewhere.' }
     $link = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
     if ($link.TargetPath -ne $exe -or $link.WorkingDirectory -ne $install) { throw 'Start menu shortcut points elsewhere.' }
@@ -172,6 +173,7 @@ foreach ($marker in ($dataMarkers + @($extraFile))) {
 [ordered]@{
     installation = 'PASS'; repeated_installation = 'PASS'; installed_exe_hash = 'PASS'
     user_start_menu_shortcut = 'PASS'; shortcut_notification_identity = 'PASS'; uninstall = 'PASS'
+    installed_release_version = $build.installer_version
     appdata_and_unowned_file_preservation = 'PASS'; native_preauth = $uiProof
     changed_executable_replacement = 'PASS'; nested_profile_marker_preservation = 'PASS'; uia_retry_count = $uiaRetries
     account_session_preservation = 'NOT TESTED: synthetic files only; no real authorization supplied'
