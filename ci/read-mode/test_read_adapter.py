@@ -3,14 +3,20 @@ import hashlib,json,subprocess,tempfile,zipfile
 from pathlib import Path
 ci=Path(__file__).resolve().parent
 stage=Path(tempfile.mkdtemp(prefix='capy-read-adapter-')).resolve()
-types=['TL_messages_readHistory','TL_channels_readHistory','TL_messages_readDiscussion','TL_messages_readEncryptedHistory','TL_messages_readMessageContents','TL_channels_readMessageContents','TL_messages_readSavedHistory','TL_messages_readMentions']
+types=['TL_messages_readHistory','TL_channels_readHistory','TL_messages_readDiscussion','TL_messages_readEncryptedHistory','TL_messages_readMessageContents','TL_channels_readMessageContents','TL_messages_readSavedHistory','TL_messages_readMentions','TL_messages_readReactions','TL_messages_readPollVotes']
 actual=(Path(sys.argv[1])/'TMessagesProj/src/main/java/org/telegram/tgnet/TLRPC.java').read_text(encoding='utf-8')
 for name in types: assert 'class '+name+' ' in actual, name
+story_types=['TL_stories_readStories','TL_stories_incrementStoryViews']
+actual_stories=(Path(sys.argv[1])/'TMessagesProj/src/main/java/org/telegram/tgnet/tl/TL_stories.java').read_text(encoding='utf-8')
+for name in story_types: assert 'class '+name+' ' in actual_stories, name
 host=(Path(sys.argv[1])/'TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java').read_text(encoding='utf-8')
 assert 'public volatile long clientUserId;' in host
 fixtures={
  'org/telegram/tgnet/TLObject.java':'package org.telegram.tgnet; public class TLObject {}',
- 'org/telegram/tgnet/TLRPC.java':'package org.telegram.tgnet; public class TLRPC { '+''.join('public static class '+n+' extends TLObject {}' for n in types)+'}',
+ 'org/telegram/tgnet/TLRPC.java':'package org.telegram.tgnet; public class TLRPC { '+''.join('public static class '+n+' extends TLObject {}' for n in types)+'''public static class DecryptedMessage extends TLObject { public Object action; }
+public static class TL_decryptedMessageActionReadMessages {}
+public static class TL_decryptedMessageActionSetMessageTTL {} }''',
+ 'org/telegram/tgnet/tl/TL_stories.java':'package org.telegram.tgnet.tl; public class TL_stories { '+''.join('public static class '+n+' extends org.telegram.tgnet.TLObject {}' for n in story_types)+'}',
  'org/telegram/messenger/UserConfig.java':'''package org.telegram.messenger;
 public class UserConfig {
  public static final int MAX_ACCOUNT_COUNT=10;
@@ -54,16 +60,33 @@ public class AdapterProbe {
   check(!CapyReadReceipts.consume(0,b,permit),"other request in same account");
   check(CapyReadReceipts.consume(0,a,permit),"exact request retained");
   check(!CapyReadReceipts.consume(0,a,permit),"replay");
+  TLRPC.DecryptedMessage secret=new TLRPC.DecryptedMessage();
+  secret.action=new TLRPC.TL_decryptedMessageActionReadMessages();
+  check(!CapyReadReceipts.consume(0,secret,CapyReadReceipts.captureSecretRead(0,secret)),"encrypted service read suppressed");
+  secret.action=new TLRPC.TL_decryptedMessageActionSetMessageTTL();
+  check(CapyReadReceipts.captureSecretRead(0,secret)==null,"ordinary secret service is not a read");
+  check(CapyReadReceipts.captureSecretRead(0,null)==null,"null secret request");
+  check(CapyReadReceipts.isReadReceipt(new TLRPC.TL_messages_readReactions()),"reaction read classified");
+  check(CapyReadReceipts.isReadReceipt(new TLRPC.TL_messages_readPollVotes()),"poll read classified");
+  check(CapyReadReceipts.isReadReceipt(new org.telegram.tgnet.tl.TL_stories.TL_stories_readStories()),"story read classified");
+  check(CapyReadReceipts.isReadReceipt(new org.telegram.tgnet.tl.TL_stories.TL_stories_incrementStoryViews()),"story view classified");
+  secret.action=new TLRPC.TL_decryptedMessageActionReadMessages();
+  CapyReadReceipts.setSilent(0,1001,false);
+  CapyReadReceipts.CapturedRead secretTicket=CapyReadReceipts.captureSecretRead(0,secret);
+  CapyReadReceipts.setSilent(0,1001,true);
+  check(!CapyReadReceipts.consume(0,secret,secretTicket),"queued encrypted read suppressed after enable");
   permit=CapyReadReceipts.capture(0,a,false);
   CapyReadReceipts.setSilent(0,1001,false);
   check(!CapyReadReceipts.consume(0,a,permit),"silent request not flushed");
   permit=CapyReadReceipts.capture(0,a,true);
+  secretTicket=CapyReadReceipts.captureSecretRead(0,secret);
   CapyReadReceipts.SessionIdentity identity=CapyReadReceipts.captureSession(0);
   check(CapyReadReceipts.isCurrent(identity),"live callback identity");
   CapyReadReceipts.beforeLogout(0);
   check(!CapyReadReceipts.isCurrent(identity),"callback retired before logout");
   check(CapyReadReceipts.captureSession(0)==null,"retired UI cannot open");
   check(!CapyReadReceipts.consume(0,a,permit),"logout");
+  check(!CapyReadReceipts.consume(0,secret,secretTicket),"queued encrypted read retired on logout");
   check(!CapyReadReceipts.setSilent(0,1001,false),"retired session cannot change mode");
   CapyReadReceipts.ownerChanged(0,0,1001);
   check(!CapyReadReceipts.isCurrent(identity),"same owner relogin invalidates old UI callback");

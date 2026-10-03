@@ -15,7 +15,7 @@
   },
   "added": {
     "TMessagesProj/src/main/java/org/capybaragram/readmode/ReadReceiptPolicy.java": "ca7b241673aa9c48b114b12cfb41cf0a8bccd46653f8d8a5c7c1d935acd91ac0",
-    "TMessagesProj/src/main/java/org/capybaragram/readmode/CapyReadReceipts.java": "13992dd8063b2cbf7d797856c349b16eff3eb5b5385788e9ddc67ba959c79fc6",
+    "TMessagesProj/src/main/java/org/capybaragram/readmode/CapyReadReceipts.java": "2980d84ed0ea7081ff84e63a6d8af650e8ae015ea942b5862e53d05cc7444b12",
     "TMessagesProj/src/main/java/org/capybaragram/readmode/CapyReadModeUi.java": "31b780b33c772207e4e9e0af0760020cabf732f6af04f957ca7ce2905005d660",
     "TMessagesProj/src/main/java/org/capybaragram/readmode/CapyReadRequest.java": "063a8180de3d1a0f1e6485a5feb45cdbff247557a0f2747c92f13e7d12357f66",
     "TMessagesProj/src/main/res/values/capy_read_mode.xml": "e7603b54d34ae8e557a6ac1f78957fa0bced558e23e27a20d354be8bcd131496",

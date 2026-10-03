@@ -4,6 +4,7 @@ package org.capybaragram.readmode;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_stories;
 
 /** Android host adapter. Captures travel with requests; no global allowance is consumed. */
 public final class CapyReadReceipts {
@@ -96,6 +97,12 @@ public final class CapyReadReceipts {
         return isReadReceipt(request) ? new CapturedRead(account, request, session(account), explicit) : null;
     }
 
+    /** Secret service reads are classified BEFORE encryption hides their action. */
+    public static synchronized CapturedRead captureSecretRead(int account, TLRPC.DecryptedMessage request) {
+        return request != null && request.action instanceof TLRPC.TL_decryptedMessageActionReadMessages
+                ? new CapturedRead(account, request, session(account), false) : null;
+    }
+
     public static synchronized boolean consume(int account, TLObject request, CapturedRead captured) {
         if (captured == null || captured.account != account || captured.request != request) return false;
         Session value = session(account);
@@ -110,6 +117,10 @@ public final class CapyReadReceipts {
             || request instanceof TLRPC.TL_messages_readMessageContents
             || request instanceof TLRPC.TL_channels_readMessageContents
             || request instanceof TLRPC.TL_messages_readSavedHistory
-            || request instanceof TLRPC.TL_messages_readMentions;
+            || request instanceof TLRPC.TL_messages_readMentions
+            || request instanceof TLRPC.TL_messages_readReactions
+            || request instanceof TLRPC.TL_messages_readPollVotes
+            || request instanceof TL_stories.TL_stories_readStories
+            || request instanceof TL_stories.TL_stories_incrementStoryViews;
     }
 }

@@ -1,5 +1,22 @@
 # Android silent-read integration — compiled candidate, acceptance pending
 
+## Source additions on 4 October 2026
+
+The current source adds reaction/poll read methods, story reads and story-view
+increments. `prepare_android_secret_reads.py` classifies decrypted secret service
+read actions before encryption and captures the exact request/account session
+before the stage queue. Suppression does not allocate a secret sequence number or
+update key-use counters. A queued suppressed service message is retired as a
+local send error rather than kept for automatic replay; cleanup is owner-bound.
+Other encrypted messages, key exchange and TTL/screenshot service actions proceed.
+
+The actual bridge and policy passed 60 fixture adapter checks with the installed
+JDK, including queued secret reads and the additional TL methods. New native APK
+compilation and live secret-chat acceptance are pending. The older compiled APK
+does not contain these additions. Local TTL retention remains a separate task.
+
+## Earlier compiled implementation
+
 Included in the signed ARM64 candidate [34058353588](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34058353588). APK signature, release flags and production class definitions were checked. This is not yet an accepted real-account feature or a complete secret-chat silent-read implementation. [Project verification status](../../docs/VERIFICATION.md).
 
 `ReadReceiptPolicy.java` owns mode and one-use permissions per account session. Requests captured while silent remain suppressed after disabling the mode. A queued request captured before enabling the mode is also suppressed if it reaches the gate while silent. Reset invalidates old-session tickets.
