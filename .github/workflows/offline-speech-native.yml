@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: MIT
+name: Offline speech native engine checks
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-offline-speech-checks
+  cancel-in-progress: false
+jobs:
+  cpu:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Compile pinned engine and recognise actual audio
+        run: python ci/transcription/run_engine_checks.py cpu
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capy-speech-${{ matrix.os }}-results
+          path: ci/transcription/test-results/
+          retention-days: 1
+          if-no-files-found: error
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install pinned Android NDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;27.2.12479018"
+      - name: Cross-compile actual Android ARM64 JNI
+        run: python3 ci/transcription/run_engine_checks.py android
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capy-speech-android-results
+          path: ci/transcription/test-results/
+          retention-days: 1
+          if-no-files-found: error

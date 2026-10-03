@@ -1,0 +1,16 @@
+{
+  "repository": "ggml-org/whisper.cpp",
+  "tag": "v1.9.4",
+  "commit": "927cfce34f31707e17f2bff35c349632fb9e2c3a",
+  "zip_sha256": "69cf2f4505458b10b88d05e094482b1827a52504d2da285dfa6b5783f261f2d1",
+  "git_blobs_verified": 1959,
+  "upstream_code_executed": false,
+  "model": {
+    "repository": "ggerganov/whisper.cpp",
+    "revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+    "file": "ggml-tiny.bin",
+    "bytes": 77691713,
+    "sha256": "be07e048e1e599ad46341c8d2a135645097a538221678b7acdd1b1919c6e1b21"
+  },
+  "model_downloaded": false
+}
