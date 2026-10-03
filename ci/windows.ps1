@@ -100,6 +100,10 @@ if ($Phase -eq 'Build') {
         if ($LASTEXITCODE -ne 0) { throw 'Desktop appearance preparation failed.' }
         & python (Join-Path $PSScriptRoot 'appearance/prepare_appearance.py') windows $src --check
         if ($LASTEXITCODE -ne 0) { throw 'Desktop appearance verification failed.' }
+        & python (Join-Path $PSScriptRoot 'windows-read-mode/prepare_windows_read_mode.py') $src
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop silent-read preparation failed.' }
+        & python (Join-Path $PSScriptRoot 'windows-read-mode/prepare_windows_read_mode.py') $src --check
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop silent-read verification failed.' }
         $env:CAPY_WINDOWS_API_CACHE = Join-Path $env:RUNNER_TEMP 'capy-windows-owner-api.cmake'
         & python (Join-Path $PSScriptRoot 'api_credentials.py') --windows-cache $env:CAPY_WINDOWS_API_CACHE
         if ($LASTEXITCODE -ne 0) { throw 'Owner API cache creation failed.' }
@@ -170,6 +174,11 @@ if /i not "%CAPY_WINDOWS_PROFILE%"=="Baseline" (
     "%GITHUB_WORKSPACE%\TBuild\tdesktop\out\capy-tests\%CAPY_WINDOWS_CONFIGURATION%\capy-auth-test.exe" > "%RUNNER_TEMP%\capy-auth-runtime-result.txt"
     if errorlevel 1 exit /b 1
     type "%RUNNER_TEMP%\capy-auth-runtime-result.txt"
+    cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target capy-read-policy-test --config %CAPY_WINDOWS_CONFIGURATION% --parallel 2
+    if errorlevel 1 exit /b 1
+    "%GITHUB_WORKSPACE%\TBuild\tdesktop\out\capy-tests\%CAPY_WINDOWS_CONFIGURATION%\capy-read-policy-test.exe" > "%RUNNER_TEMP%\capy-read-policy-runtime-result.txt"
+    if errorlevel 1 exit /b 1
+    type "%RUNNER_TEMP%\capy-read-policy-runtime-result.txt"
 )
 cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target Telegram --config %CAPY_WINDOWS_CONFIGURATION% --parallel 2
 if errorlevel 1 exit /b 1
@@ -194,6 +203,11 @@ if ($Profile -ne 'Baseline') {
         throw 'Missing successful native authorization serialization check.'
     }
     Copy-Item -LiteralPath $authResult -Destination (Join-Path $stage 'AUTHORIZATION-TEST.txt')
+    $readResult = Join-Path $env:RUNNER_TEMP 'capy-read-policy-runtime-result.txt'
+    if (-not (Test-Path -LiteralPath $readResult) -or (Get-Content -LiteralPath $readResult -Raw) -notmatch '^CAPY_READ_POLICY=PASS checks=[0-9]+\s*$') {
+        throw 'Missing successful native read-mode policy check.'
+    }
+    Copy-Item -LiteralPath $readResult -Destination (Join-Path $stage 'READ-POLICY-TEST.txt')
 }
 $artifactName = if ($Profile -ne 'Baseline') { 'CapybaraGram.exe' } else { 'Telegram.exe' }
 Copy-Item -LiteralPath $exe -Destination (Join-Path $stage $artifactName)
@@ -206,6 +220,7 @@ $buildLabel Build configuration: $configuration.
 Own Telegram application credentials; unsigned Windows executable.
 Source: telegramdesktop/tdesktop @ $($env:TDESKTOP_SHA)
 Changes: identity, accounts and windows-notes patches; profile: APPDATA/CapybaraGram Preview.
+Per-account silent-reading gate and explicit read confirmation. Full client compile does not prove live peer acceptance; that test is pending.
 Ten local account slots without Premium; multi-account UI, login and notification isolation require runtime verification.
 Native local chat/topic notes and response templates with preview/draft insertion. These features still require client runtime acceptance.
 Own IPC, toast activator and shortcuts. No automatic legacy data migration or URL association changes.

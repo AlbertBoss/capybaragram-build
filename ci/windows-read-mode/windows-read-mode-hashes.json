@@ -1,0 +1,37 @@
+{
+  "source_sha": "80158983dba09d3bf5d96701f21473d6c34bf5f5",
+  "pre": {
+    "Telegram/CMakeLists.txt": "6490f16ccd6f0a0bfdeeb3648fb06101c9d99ba19781e3fb434ad857d85a9504",
+    "Telegram/SourceFiles/mtproto/mtp_instance.h": "c7566af9c73e3715a4f2c0172af6cff4e7eeeff1379394714ec34bd65a7fcd3b",
+    "Telegram/SourceFiles/mtproto/mtp_instance.cpp": "fc2d993742a88502a9c07bfd5bfb9207dfb66f3fed92b347546b539262798aca",
+    "Telegram/SourceFiles/main/main_session_settings.h": "f75b3ea5db0ccf48cba72cb26b5a53a4b790e27e8dd56eb1d0992147f420ab8f",
+    "Telegram/SourceFiles/main/main_session_settings.cpp": "49adb16fa7ea68f34a66c366ee534e41e4b5bddafc029c965459e5095f11b8fe",
+    "Telegram/SourceFiles/main/main_session.cpp": "0b2b85caccbd54ad4a3b53501051a43c015bbfe45a684ee16bb6f4851ec75429",
+    "Telegram/SourceFiles/main/main_account.cpp": "a740853f342b641a53414c8c27a6bf0a1b0c0b199af919a9e71882d918f4e727",
+    "Telegram/SourceFiles/window/window_peer_menu.cpp": "8b57cc2fc1b6800eeb3c156339e40da8874dbb4f7427b0a9544a53573541d568",
+    "Telegram/SourceFiles/history/view/history_view_top_bar_widget.cpp": "e3e192adaf155584e5c516a909ac69af9b884a97b319452e79b98125d4669f08",
+    "Telegram/SourceFiles/data/data_histories.cpp": "8af3c37a200ff402038baba647ed56a22d2c5ce721aae00c3ab1f7c9528764b7",
+    "Telegram/SourceFiles/data/data_replies_list.cpp": "f03824a205eb46cd262f5080cfa7d4a16c4053bb11a615fac351e2fcad1d43c4",
+    "Telegram/SourceFiles/data/data_saved_sublist.cpp": "9e955b8b5dba5df506c5486a12de3dce0afed3b3fd4d503071214b49e2d7efa0"
+  },
+  "post": {
+    "Telegram/CMakeLists.txt": "6323950e9892561a7ead65d52ba3ac53a463e531da178764c9b51491f55cf42b",
+    "Telegram/SourceFiles/mtproto/mtp_instance.h": "2608ce45d025302d048f6c7f7a129f4ef132085da503550f6ee81b0d170e06f3",
+    "Telegram/SourceFiles/mtproto/mtp_instance.cpp": "9ba65923cec87db83594636a616767fd0d075922d121859709dbf29f3f6b4eb4",
+    "Telegram/SourceFiles/main/main_session_settings.h": "a8a5f95f606294980b6d40b10a1d14c8ee02ae472974248effa431865818d4e3",
+    "Telegram/SourceFiles/main/main_session_settings.cpp": "e28db603e3648ac34d472605a7cfa3b57f37895215501f31d32697f6938f6d69",
+    "Telegram/SourceFiles/main/main_session.cpp": "7495f37e152d5d7438736e3fd2b95efff3ba5917b02165ecd493acc9691a3681",
+    "Telegram/SourceFiles/main/main_account.cpp": "21a7b6df83feea58b1274181bcf44d713509b09187e072b5d02854af743a15db",
+    "Telegram/SourceFiles/window/window_peer_menu.cpp": "a60c0609bf53417456fb0087addef282918a9f12f7c13b18bf51dd25ba0c4d40",
+    "Telegram/SourceFiles/history/view/history_view_top_bar_widget.cpp": "ed440843815efbc935714c71d25d7fa7058689ee6eee851dfe4c1beb6c652213",
+    "Telegram/SourceFiles/data/data_histories.cpp": "99488f5ffa0cf429debc1cadb9c0d60e262e582b11956862a8f6c9150d9b8917",
+    "Telegram/SourceFiles/data/data_replies_list.cpp": "ef4caf1744d6e0517d6fbc2ee3e1da7cada936efb5be5bb2af9e722fb5a566c7",
+    "Telegram/SourceFiles/data/data_saved_sublist.cpp": "3902310c3d84445321f0c8b17b34f300929a3cda92b5d06e6236118ceb773511"
+  },
+  "added": {
+    "Telegram/SourceFiles/capybara/read_receipt_policy.h": "a8a9a90447652b746f0dc2787089ff250a38330f0e95d2c79b8fc7670ba8d5e3",
+    "Telegram/SourceFiles/capybara/read_receipt_policy_test.cpp": "bb33bbd175a1e76931ba4da37fb485250dcb93f85b07d26dd755796cc111b893",
+    "Telegram/SourceFiles/capybara/capy_read_mode_ui.h": "c956c9d75b12383e36ceeba57539fc99608fbe9f2539746bc45a6980b2231c3b",
+    "Telegram/SourceFiles/capybara/capy_read_mode_ui.cpp": "9c9c7aa949d455dfd43c378014688a2cb8af03c4273ec61c668c21604a9f6153"
+  }
+}
