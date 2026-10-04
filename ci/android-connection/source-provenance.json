@@ -127,7 +127,7 @@
     "CMakeLists.txt": "24d4bd51393ec60a95d4cc1d29bb88c5c294abb3921d00f57487c9cd33ab6727",
     "NativeTunnel.java": "4d2dfdd1d7e80d55fb575c4c1a2d382f05e7e014e49701ac9ea799d5225724bb",
     "prepare_android_core.py": "685ad4ffc118f72a4437c24946312bde90016a83150a757e8d6215d23f57be11",
-    "README.md": "80d737c5fd27de5a6546a9967b8d5614adc03650b27b01cafb1a21fe554b6e4c",
+    "README.md": "ac9019a4ed16a74b3124f1238e01723a48e6257d9258e2b27d70ea7b6eda5024",
     "run_android_checks.py": "1beac4d5e29be437efeabe3c0412bfc6d219f52e6eca82c75ba4a2e15bd80ef0",
     "tls_regressions.rs": "2739990b76c6b267b51686adb9ee66f0800891f68d02160cf0980d3caf1a7a99",
     "AndroidConnectionDeviceInstrumentation.java": "c3fb9a7e5761fbd8c3d60f03412c847af17c652b97d44660949789d54c41d563",
@@ -154,6 +154,18 @@
       "x86_64"
     ],
     "android_jni_runtime_tested": false,
+    "client_integrated": false,
+    "live_telegram_tested": false
+  },
+  "android_jni_device_proof": {
+    "run": 37193035153,
+    "head": "40fea0b40309a96a1dd44f59001404664428d600",
+    "artifact_sha256": "a265f988ffc09b78b84c9156eb95de41a9c92bf9d1c23db9247c79633fdfefbd",
+    "source_files_verified": 15,
+    "runtime": "Android 11 API 30 x86_64 emulator",
+    "assertions": 427,
+    "jni_sha256": "51fa2075f5d4f2998a8b3f132fe2b051c9546da34d469abb09a1cb6085bb7824",
+    "production_arm64_execution": false,
     "client_integrated": false,
     "live_telegram_tested": false
   }

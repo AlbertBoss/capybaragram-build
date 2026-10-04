@@ -65,4 +65,17 @@ actual JNI execution in an isolated API 30 emulator, including boundary rejectio
 independent listeners, repeated shutdown and stale handles. It uses only synthetic
 loopback traffic and a disposable test signer. It does not test Telegram login,
 real providers, VPN transitions or production ARM64 execution. Client integration
-and actual device runtime remain pending.
+remains pending. Actual API 30 JNI execution subsequently passed as recorded below.
+
+## Confirmed API 30 JNI execution, 2026-10-04
+
+[37193035153](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37193035153)
+passed actual JNI execution on an isolated Android 11 x86_64 emulator. Its checks
+cover invalid/null array bounds, ABI readiness, two independent listeners/tokens,
+SOCKS rejection by connection closure, independent/idempotent shutdown, stale
+handles, wiping failed status output and repeated start/stop without handle reuse.
+The 427 assertions include repeated hexadecimal byte validation, not 427 separate
+user scenarios. The native 90 Rust tests and 632 C++ ABI assertions also passed.
+The artifact, all 15 package hashes and the executed JNI binary identity were
+independently verified. No owner keys or accounts were used. No live Telegram
+connection, production ARM64 execution or VPN transition is claimed.
