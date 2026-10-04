@@ -32,6 +32,6 @@
     "Telegram/SourceFiles/capybara/read_receipt_policy.h": "a8a9a90447652b746f0dc2787089ff250a38330f0e95d2c79b8fc7670ba8d5e3",
     "Telegram/SourceFiles/capybara/read_receipt_policy_test.cpp": "bb33bbd175a1e76931ba4da37fb485250dcb93f85b07d26dd755796cc111b893",
     "Telegram/SourceFiles/capybara/capy_read_mode_ui.h": "c956c9d75b12383e36ceeba57539fc99608fbe9f2539746bc45a6980b2231c3b",
-    "Telegram/SourceFiles/capybara/capy_read_mode_ui.cpp": "9c9c7aa949d455dfd43c378014688a2cb8af03c4273ec61c668c21604a9f6153"
+    "Telegram/SourceFiles/capybara/capy_read_mode_ui.cpp": "1ca8d4bbe18ae71e8fa1ae76b0c83b3fcf4bd106baa60fb7d5d1603abf82639c"
   }
 }

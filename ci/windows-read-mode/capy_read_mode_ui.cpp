@@ -23,6 +23,7 @@
 #include "ui/widgets/labels.h"
 #include "window/window_session_controller.h"
 #include "styles/style_boxes.h"
+#include "styles/style_layers.h"
 #include "styles/style_widgets.h"
 
 #include <QPointer>
@@ -156,7 +157,7 @@ void AddReadModeAction(not_null<Window::SessionController*> controller,
 		const auto history = peer->owner().historyLoaded(peer);
 		const auto current = history ? history->threadFor(root, sublist) : nullptr;
 		if (current) ShowReadMode(weak.get(), current);
-	});
+	}, nullptr);
 }
 
 } // namespace Capy
