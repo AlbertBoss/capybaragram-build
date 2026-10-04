@@ -22,7 +22,8 @@ ADDED.update({PREFIX + 'capybara/offline_voice/' + p: SHARED / p for p in (
     'CMakeLists.txt', 'offline_engine.cpp', 'offline_engine.h', 'UPSTREAM-LICENSE.txt')})
 
 def digest(data):
-    return hashlib.sha256(data).hexdigest()
+    # Git converts checked-out text to CRLF on Windows; pins bind normalized text.
+    return hashlib.sha256(data.replace(b"\r\n", b"\n")).hexdigest()
 
 def replace(text, before, after):
     if text.count(before) != 1:
@@ -94,11 +95,11 @@ def plan(root, check=False):
             if digest(data) != manifest['post'][name]: raise ValueError('Wrong patch result')
             output[name] = data
     for name, source in ADDED.items():
-        data = source.read_bytes()
+        data = source.read_bytes().replace(b"\r\n", b"\n")
         if digest(data) != manifest['added'][name]: raise ValueError('Payload changed: ' + name)
         target = root / name
         if check:
-            if target.read_bytes() != data: raise ValueError('Installed payload changed')
+            if target.read_bytes().replace(b"\r\n", b"\n") != data: raise ValueError('Installed payload changed')
         elif target.exists() or target.is_symlink():
             raise ValueError('Refusing overwrite')
         else: output[name] = data
