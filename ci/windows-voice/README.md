@@ -45,3 +45,5 @@ SHA-256 архива; upstream-файлы не редактируются. Ли�
 [FFmpeg: custom IO и io_open](https://ffmpeg.org/doxygen/trunk/structAVFormatContext.html).
 
 [Запуск 37169057966](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37169057966) прошёл на Windows и Linux: по 21 проверке, фактическое распознавание, Opus/AAC, отмена, отсутствующая модель и путь к модели с кириллицей. Хеши артефактов и исходников сверены; для Windows подтверждено только ожидаемое преобразование LF в CRLF из `text=auto`. Полный клиент и его окно этим запуском не проверялись.
+
+Full-client preparation run 37171270131 exposed Git CRLF conversion in the payload digest. The failure was reproduced with CRLF hosts and payloads; normalized preparation and installed-source verification now pass without changing the content pins. Full candidate 37171862699 is in progress. Standalone 21-check runtime success is distinct from full-client compilation and live account acceptance.
