@@ -70,6 +70,17 @@ http.write_text(playlist('http://127.0.0.1:' + str(server.server_port) + '/segme
 local.write_text(playlist(segment.as_uri()), encoding='utf-8')
 flags = shlex.split(subprocess.run(['pkg-config', '--cflags', '--libs', 'Qt6Core', 'libavformat', 'libavcodec', 'libavutil'],
     capture_output=True, text=True, check=True, timeout=30).stdout)
+# Package headers belong to external Qt/FFmpeg, not our warning-clean scaffold.
+# Keep -Werror on project code; GCC 16 diagnoses Qt 6's QChar SFINAE declaration.
+# GCC recommends -isystem for vendor-supplied headers.
+vendor_flags = []
+for flag in flags:
+    if flag.startswith('-I'):
+        assert len(flag) > 2, 'Expected pkg-config combined include path'
+        vendor_flags += ['-isystem', flag[2:]]
+    else:
+        vendor_flags.append(flag)
+flags = vendor_flags
 exe = root / 'player-policy-probe.exe'
 try:
     subprocess.run(['g++', '-std=c++20', '-Wall', '-Wextra', '-Werror', '-I' + str(root),
