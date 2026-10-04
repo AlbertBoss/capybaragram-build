@@ -171,3 +171,21 @@ Android-вариант в `ci/android-connection` использует отде�
 чужой несообщающий клиент не обнаруживается. [Описание](SCREENSHOT-EVENTS.md).
 
 Технические контракты и порядок расширения модулей: [руководство разработчика](DEVELOPER-GUIDE.md).
+# Recording-language controls (source update, 2026-10-04)
+
+Android and Windows transcription source now expose automatic detection,
+Russian and English. The immutable language choice reaches the current worker
+and survives the explicit missing-model/download step. Windows disables the
+controls while the job runs. No choice is stored across windows or accounts.
+Both preparation/check passes used exact pinned host hashes; localized resource
+keys are identical. Existing account-generation checks, cancel/close gates,
+local-only audio processing and read-acknowledgement exclusions are retained.
+Whisper, decoder, model and JNI source/bytes did not change.
+
+This is source preparation evidence, not client compilation or runtime proof.
+It is absent from APK 37208052043 and Windows build 37218130339, which was
+dispatched before this update. Compilation and actual controls remain pending.
+The separate ten-case model comparison 37227986292 still measures the unchanged
+release ARM64 JNI with two verified models, both explicitly Russian; it does not
+exercise these UI controls or change the production model.
+

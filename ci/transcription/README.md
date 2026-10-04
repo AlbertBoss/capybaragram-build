@@ -1,5 +1,14 @@
 # Offline voice transcription — development module
 
+The current source update offers an explicit recording-language choice: auto,
+Russian or English. Android starts from the selected menu item; the same choice
+is retained if a model download is needed. Windows offers radio controls and
+freezes them during the current job. A new window starts with auto; the choice is
+not stored as an account preference. The tiny model and engine are unchanged.
+Exact source preparation passed, but compilation and live UI acceptance for
+this language-control update are pending. It is not in Android APK 37208052043
+or the already running Windows build 37218130339.
+
 The Android candidate pipeline now includes native voice menus and the engine;
 APK run 37164244121 compiled successfully; its signature, 20 integration class definitions and 16 KiB-aligned ARM64 JNI were checked. The Windows client UI is pending.
 The module contains an actual

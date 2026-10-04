@@ -3,6 +3,10 @@
     <string name="CapySpeech">CapybaraGram · Offline transcript</string>
     <string name="CapySpeechDescription">Recognise a downloaded voice message on this device. No Premium or audio upload. The result may contain errors. Up to three minutes; cancellation is available.</string>
     <string name="CapySpeechStart">Recognise</string>
+    <string name="CapySpeechChooseLanguage">Choose the recording language to start.</string>
+    <string name="CapySpeechLanguageAuto">Detect language automatically</string>
+    <string name="CapySpeechLanguageRussian">Русский</string>
+    <string name="CapySpeechLanguageEnglish">English</string>
     <string name="CapySpeechWorking">Recognising on this device</string>
     <string name="CapySpeechDownloading">Downloading the speech model</string>
     <string name="CapySpeechModel">Download the multilingual speech model (78 MB) once. Later recognition works offline. Mobile data charges from your carrier may apply.</string>

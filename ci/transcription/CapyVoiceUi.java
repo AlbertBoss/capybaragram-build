@@ -53,14 +53,21 @@ public final class CapyVoiceUi {
         AndroidVaultCoordinator c=CapyVault.get();AndroidVaultCoordinator.Token token=c.capture(account);
         if(!available(fragment,location,c,token))return;
         AlertDialog.Builder b=new AlertDialog.Builder(fragment.getParentActivity());
-        b.setTitle(text(R.string.CapySpeech));b.setMessage(text(R.string.CapySpeechDescription));
+        b.setTitle(text(R.string.CapySpeech));
+        b.setMessage(text(R.string.CapySpeechDescription)+"\n\n"+text(R.string.CapySpeechChooseLanguage));
         b.setNegativeButton(text(R.string.Cancel),null);
-        b.setPositiveButton(text(R.string.CapySpeechStart),(d,w)->start(fragment,account,message,location,c,token,false));
+        b.setItems(new CharSequence[]{text(R.string.CapySpeechLanguageAuto),
+                text(R.string.CapySpeechLanguageRussian),text(R.string.CapySpeechLanguageEnglish)},(d,w)->{
+            final String language;
+            switch(w){case 0:language="auto";break;case 1:language="ru";break;case 2:language="en";break;default:return;}
+            start(fragment,account,message,location,c,token,language,false);
+        });
         display(fragment,b.create(),null);
     }
     private static void start(BaseFragment fragment,int account,MessageObject message,Current location,
-            AndroidVaultCoordinator c,AndroidVaultCoordinator.Token token,boolean download){
-        if(!available(fragment,location,c,token))return;
+            AndroidVaultCoordinator c,AndroidVaultCoordinator.Token token,String language,boolean download){
+        if(!("auto".equals(language)||"ru".equals(language)||"en".equals(language))
+                ||!available(fragment,location,c,token))return;
         Job job=new Job();AlertDialog.Builder b=new AlertDialog.Builder(fragment.getParentActivity());
         b.setTitle(text(R.string.CapySpeech));b.setMessage(text(R.string.CapySpeechWorking));
         b.setNegativeButton(text(R.string.Cancel),(d,w)->job.cancel());
@@ -87,7 +94,7 @@ public final class CapyVoiceUi {
                     if(job.cancelled()||!c.isCurrent(token))return;
                     OfflineSpeech speech=new OfflineSpeech();job.speech=speech;
                     if(job.cancelled())speech.cancel();
-                    result=speech.run(model,pcm,"auto");
+                    result=speech.run(model,pcm,language);
                 }
             } catch(Exception|LinkageError|OutOfMemoryError failure){failed=true;}
             finally {if(pcm!=null)Arrays.fill(pcm,0f);}
@@ -98,7 +105,7 @@ public final class CapyVoiceUi {
                 done.setTitle(text(R.string.CapySpeech));done.setNegativeButton(text(R.string.Close),null);
                 if(missing){
                     done.setMessage(text(R.string.CapySpeechModel));
-                    done.setPositiveButton(text(R.string.CapySpeechDownload),(d,w)->start(fragment,account,message,location,c,token,true));
+                    done.setPositiveButton(text(R.string.CapySpeechDownload),(d,w)->start(fragment,account,message,location,c,token,language,true));
                 } else {
                     done.setMessage(error?text(R.string.CapySpeechFailure):transcript==null||transcript.isEmpty()?text(R.string.CapySpeechEmpty):transcript);
                     if(!error&&transcript!=null&&!transcript.isEmpty())done.setPositiveButton(text(R.string.Copy),(d,w)->{

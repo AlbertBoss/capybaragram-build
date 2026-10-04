@@ -14,6 +14,7 @@
 #include "ui/layers/generic_box.h"
 #include "ui/layers/show.h"
 #include "ui/widgets/buttons.h"
+#include "ui/widgets/checkbox.h"
 #include "ui/widgets/fields/input_field.h"
 #include "ui/widgets/labels.h"
 #include "ui/widgets/popup_menu.h"
@@ -27,16 +28,20 @@
 #include <QPointer>
 #include <QTimer>
 #include <algorithm>
+#include <array>
 
 namespace Capy {
 namespace {
 QString Text(const QString &en, const QString &ru) {
     return Lang::Id().startsWith(u"ru"_q) ? ru : en;
 }
+enum class SpeechLanguage { Auto, Russian, English };
 struct State {
     bool closed = false;
     bool pending = false;
     bool downloadAllowed = false;
+    std::string language = "auto";
+    std::array<QPointer<Ui::Radiobutton>, 3> languages;
     std::shared_ptr<Voice::Job> job;
     QPointer<Ui::RoundButton> start;
     QPointer<Ui::RoundButton> copy;
@@ -75,6 +80,28 @@ void AddVoiceAction(not_null<Ui::PopupMenu*> menu,
                 Text(u"Without Premium. Audio is processed on this computer. The first use requires a 78 MB model download. Up to 3 minutes and 32 MiB per message. Recognition may contain mistakes."_q,
                     u"Без Premium. Голос обрабатывается на этом компьютере. Для первого запуска нужна загрузка модели 78 МБ. До 3 минут и 32 МиБ на сообщение. В тексте возможны ошибки."_q),
                 st::aboutLabel), st::boxPadding);
+            const auto state = box->lifetime().make_state<State>();
+            box->addRow(object_ptr<Ui::FlatLabel>(box,
+                Text(u"Recording language"_q, u"Язык записи"_q),
+                st::aboutLabel), st::boxPadding);
+            const auto languageGroup = std::make_shared<Ui::RadioenumGroup<SpeechLanguage>>(SpeechLanguage::Auto);
+            const auto addLanguage = [=](SpeechLanguage value, const QString &label) {
+                const auto radio = box->addRow(object_ptr<Ui::Radioenum<SpeechLanguage>>(
+                    box, languageGroup, value, label, st::defaultBoxCheckbox), st::boxPadding);
+                state->languages[static_cast<int>(value)] = radio;
+            };
+            addLanguage(SpeechLanguage::Auto,
+                Text(u"Detect automatically"_q, u"Определить автоматически"_q));
+            addLanguage(SpeechLanguage::Russian, u"Русский"_q);
+            addLanguage(SpeechLanguage::English, u"English"_q);
+            languageGroup->setChangedCallback([=](SpeechLanguage value) {
+                if (state->closed || state->pending || !valid()) return;
+                switch (value) {
+                case SpeechLanguage::Auto: state->language = "auto"; break;
+                case SpeechLanguage::Russian: state->language = "ru"; break;
+                case SpeechLanguage::English: state->language = "en"; break;
+                }
+            });
             const auto status = box->addRow(object_ptr<Ui::FlatLabel>(box,
                 Text(u"Download the voice message in the chat first, then start."_q,
                     u"Сначала загрузите голосовое сообщение в чате, затем запустите расшифровку."_q), st::aboutLabel), st::boxPadding);
@@ -84,7 +111,6 @@ void AddVoiceAction(not_null<Ui::PopupMenu*> menu,
             output->setMaxLength(64000);
             output->setMinHeight(st::boxWideWidth / 3);
             output->setDisabled(true);
-            const auto state = box->lifetime().make_state<State>();
             const auto weakBox = QPointer<Ui::GenericBox>(box.get());
             const auto clear = [=] {
                 state->closed = true;
@@ -126,6 +152,7 @@ void AddVoiceAction(not_null<Ui::PopupMenu*> menu,
                 Voice::Worker::Input input;
                 input.expectedBytes = doc->size;
                 input.allowModelDownload = state->downloadAllowed;
+                input.language = state->language;
                 const auto media = doc->activeMediaView();
                 const auto bytes = media ? media->bytes() : QByteArray();
                 if (!bytes.isEmpty()) {
@@ -148,6 +175,7 @@ void AddVoiceAction(not_null<Ui::PopupMenu*> menu,
                         std::fill(result.text.begin(), result.text.end(), '\0'); return;
                     }
                     state->pending = false; state->job.reset(); state->start->setDisabled(false);
+                    for (const auto &radio : state->languages) if (radio) radio->setDisabled(false);
                     if (result.code == Voice::Worker::Result::Code::ModelRequired) {
                         state->downloadAllowed = true;
                         state->start->setText(rpl::single(Text(u"Download 78 MB and start"_q,
@@ -171,6 +199,7 @@ void AddVoiceAction(not_null<Ui::PopupMenu*> menu,
                         u"Уже обрабатывается другая запись. Закройте её окно расшифровки и повторите."_q)); return;
                 }
                 state->job = job; state->pending = true; state->start->setDisabled(true);
+                for (const auto &radio : state->languages) if (radio) radio->setDisabled(true);
             });
             box->addButton(tr::lng_cancel(), close);
             const auto timer = new QTimer(box.get());
