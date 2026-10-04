@@ -38,6 +38,11 @@ jobs:
       - name: Check toolchain and resources
         shell: pwsh
         run: ./control/ci/windows.ps1 -Phase Preflight -Profile Candidate
+      - name: Check DNS import library and signed child exit codes
+        shell: pwsh
+        run: |
+          python ./control/ci/windows_dns_link_probe.py
+          if ($LASTEXITCODE -ne 0) { throw 'DNS/exit-code preflight failed before the full build.' }
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: telegramdesktop/tdesktop

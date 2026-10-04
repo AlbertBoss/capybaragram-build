@@ -123,7 +123,7 @@ if ($Phase -eq 'Build') {
             $connectionBatch = Join-Path $env:RUNNER_TEMP 'capy-windows-connection.cmd'
             $connectionScript = Join-Path $PSScriptRoot 'windows-connection-native/build_windows_library.py'
             @('@echo off', 'call "%CAPY_VSDEVCMD%" -no_logo -arch=x64 -host_arch=x64 -winsdk=10.0.26100.0 -vcvars_ver=14.44',
-              'if errorlevel 1 exit /b 1', ('python "' + $connectionScript + '" --probe'),
+              'if errorlevel 1 (exit /b 1) else if not errorlevel 0 (exit /b 1)', ('python "' + $connectionScript + '" --probe'),
               'exit /b %errorlevel%') | Set-Content -LiteralPath $connectionBatch -Encoding ascii
             & $connectionBatch
             if ($LASTEXITCODE -ne 0) { throw 'Connection production library compile or ABI runtime failed.' }
@@ -195,28 +195,29 @@ exit /b 0
     @'
 @echo off
 call "%CAPY_VSDEVCMD%" -no_logo -arch=x64 -host_arch=x64 -winsdk=10.0.26100.0 -vcvars_ver=14.44
-if errorlevel 1 exit /b 1
+if errorlevel 1 (exit /b 1) else if not errorlevel 0 (exit /b 1)
 if /i not "%VSCMD_ARG_TGT_ARCH%"=="x64" exit /b 102
 set "Platform=%VSCMD_ARG_TGT_ARCH%"
 if /i not "%CAPY_WINDOWS_PROFILE%"=="Baseline" (
     cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target capy-auth-test --config %CAPY_WINDOWS_CONFIGURATION% --parallel 2
-    if errorlevel 1 exit /b 1
+    if errorlevel 1 (exit /b 1) else if not errorlevel 0 (exit /b 1)
     "%GITHUB_WORKSPACE%\TBuild\tdesktop\out\capy-tests\%CAPY_WINDOWS_CONFIGURATION%\capy-auth-test.exe" > "%RUNNER_TEMP%\capy-auth-runtime-result.txt"
-    if errorlevel 1 exit /b 1
+    if errorlevel 1 (exit /b 1) else if not errorlevel 0 (exit /b 1)
     type "%RUNNER_TEMP%\capy-auth-runtime-result.txt"
     cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target capy-read-policy-test --config %CAPY_WINDOWS_CONFIGURATION% --parallel 2
-    if errorlevel 1 exit /b 1
+    if errorlevel 1 (exit /b 1) else if not errorlevel 0 (exit /b 1)
     "%GITHUB_WORKSPACE%\TBuild\tdesktop\out\capy-tests\%CAPY_WINDOWS_CONFIGURATION%\capy-read-policy-test.exe" > "%RUNNER_TEMP%\capy-read-policy-runtime-result.txt"
-    if errorlevel 1 exit /b 1
+    if errorlevel 1 (exit /b 1) else if not errorlevel 0 (exit /b 1)
     type "%RUNNER_TEMP%\capy-read-policy-runtime-result.txt"
     cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target capy-archive-settings-test --config %CAPY_WINDOWS_CONFIGURATION% --parallel 2
-    if errorlevel 1 exit /b 1
+    if errorlevel 1 (exit /b 1) else if not errorlevel 0 (exit /b 1)
     "%GITHUB_WORKSPACE%\TBuild\tdesktop\out\capy-tests\%CAPY_WINDOWS_CONFIGURATION%\capy-archive-settings-test.exe" > "%RUNNER_TEMP%\capy-archive-settings-runtime-result.txt"
-    if errorlevel 1 exit /b 1
+    if errorlevel 1 (exit /b 1) else if not errorlevel 0 (exit /b 1)
     type "%RUNNER_TEMP%\capy-archive-settings-runtime-result.txt"
 )
 cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target Telegram --config %CAPY_WINDOWS_CONFIGURATION% --parallel 2
-if errorlevel 1 exit /b 1
+if errorlevel 1 (exit /b 1) else if not errorlevel 0 (exit /b 1)
+rem Ninja can return -1; IF ERRORLEVEL 1 alone does not reject negative codes.
 exit /b 0
 '@ | Set-Content -LiteralPath $batch -Encoding ascii
     & $batch

@@ -11,7 +11,7 @@
     "Telegram/SourceFiles/intro/intro_widget.cpp": "27cc802613ad5c7d855f0b72a3cbb0f102ca0d693334be271d552b3d01af6b7d"
   },
   "post": {
-    "Telegram/CMakeLists.txt": "fb788d16c0109c9adadc5a69fe179453cbe6a4cb367884dac64bdf17cf932319",
+    "Telegram/CMakeLists.txt": "4c836955aed701c93dfa8e8b26b80b876229374589e250cf9b136d7d7820aefd",
     "Telegram/SourceFiles/core/application.h": "d80885c2c2202c72d316169fed3514c9745ab016f029689f4379ce63313e1c86",
     "Telegram/SourceFiles/core/application.cpp": "065ef0ab9f11b4762b2472f9d088091573140cdf07c6f2672ccad82c055045b2",
     "Telegram/SourceFiles/mtproto/session.cpp": "32bf8df5b7b308bb5186fcfcc6ba023e5dc71185c2a70d59767cc739fc7f2cf0",

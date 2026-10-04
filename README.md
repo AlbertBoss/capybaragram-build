@@ -57,11 +57,11 @@ CapybaraGram развивает привычный Telegram в сторону л
 | Шаблоны: создание, просмотр, вставка в черновик | Есть в сборке | Есть в сборке | Код интерфейса и хранения собран; отправка остаётся отдельным действием пользователя |
 | 10 локальных слотов аккаунтов | Есть в сборке | Есть в сборке | Изменения скомпилированы; десять одновременно авторизованных аккаунтов ещё не проверены |
 | Обработка ответов и ошибок сервера при изменении папок | Есть в сборке | Есть в сборке | Контролируемые тесты; двусторонняя синхронизация с официальным клиентом требует живой проверки |
-| «Нечиталка»: подавление подтверждений прочтения | Есть в APK 37201227437 | Нативный код добавлен; новая сборка ожидается | Политика и запросы проверены; сетевое поведение на двух аккаунтах ещё не принято |
-| Архив полученных сообщений, правок и скачанных медиа | Есть в APK 37201227437 | Нативный код добавлен; новая сборка ожидается | Шифрование, очередь и оригиналы проверены отдельно; живые сценарии и секретные чаты Windows не приняты |
-| Локальная расшифровка голоса без Premium | Есть в APK 37201227437 | Нативный код добавлен; новая сборка ожидается | Движок распознавал тестовое аудио; русский язык, ARM64 и реальные голосовые требуют приёмки |
-| Встроенное экспериментальное подключение | Есть в APK 37201227437, включая экран входа | Ошибка предыдущей сборки исправлена; новый EXE с кнопкой входа ещё ожидается | Библиотеки проверены; вход, доступность у провайдеров и VPN-переходы не приняты |
-| Добровольные события моих скриншотов | Есть в APK 37201227437 для Android 14+ | Собственного расширения нет | Выключены по умолчанию; полная сборка проверена, аппаратный снимок и служебное событие ещё не приняты; точная область неизвестна |
+| «Нечиталка»: подавление подтверждений прочтения | Есть в APK 37208052043 | Нативный код добавлен; новая сборка ожидается | Политика и запросы проверены; сетевое поведение на двух аккаунтах ещё не принято |
+| Архив полученных сообщений, правок и скачанных медиа | Есть в APK 37208052043 | Нативный код добавлен; новая сборка ожидается | Шифрование, очередь и оригиналы проверены отдельно; живые сценарии и секретные чаты Windows не приняты |
+| Локальная расшифровка голоса без Premium | Есть в APK 37208052043 | Нативный код добавлен; новая сборка ожидается | Движок распознавал тестовое аудио; русский язык, ARM64 и реальные голосовые требуют приёмки |
+| Встроенное экспериментальное подключение | Есть в APK 37208052043, включая экран входа | Ошибка предыдущей сборки исправлена; новый EXE с кнопкой входа ещё ожидается | Библиотеки проверены; вход, доступность у провайдеров и VPN-переходы не приняты |
+| Добровольные события моих скриншотов | Есть в APK 37208052043 для Android 14+ | Собственного расширения нет | Выключены по умолчанию; полная сборка проверена, аппаратный снимок и служебное событие ещё не приняты; точная область неизвестна |
 | Установка и запуск | APK: проверены | EXE и установщик: проверены | Стартовые экраны, пустая форма входа; перезапуск Android, установка и замена Windows |
 
 Заметки и шаблоны **хранятся на конкретном устройстве**; их синхронизации пока нет. Серверные лимиты Telegram и доступ к Premium этим клиентом не отменяются.
@@ -80,7 +80,7 @@ CapybaraGram развивает привычный Telegram в сторону л
 
 | Артефакт / сценарий | Проверенный запуск |
 | --- | --- |
-| Android ARM64 APK с нечиталкой, архивом, локальным голосом и встроенным подключением | [Сборка 37201227437](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37201227437): подпись и состав проверены, запуск этой APK ещё не принят |
+| Android ARM64 APK с нечиталкой, архивом, локальным голосом и встроенным подключением | [Сборка 37208052043](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37208052043): подпись и состав проверены; установка и сценарии до входа прошли в [37210805548](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37210805548), все 12 снимков просмотрены |
 | Android: установка, стартовые экраны и перезапуск | [Проверка 34159878677](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34159878677) |
 | Windows x64 Release EXE | [Сборка 37070585321](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37070585321) |
 | Windows: светлая и тёмная темы, переход к пустой форме номера | [Проверка 37155302094](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37155302094) |
@@ -90,7 +90,7 @@ CapybaraGram развивает привычный Telegram в сторону л
 
 ## Что дальше
 
-Текущие приоритеты — нечиталка, архив полученного содержимого и локальный голос/подключение/наблюдаемые события на обеих платформах. Новые Android-модули скомпилированы; функциональная приёмка на живых аккаунтах остаётся. Предыдущая Windows-сборка завершилась ошибкой компиляции; причина исправлена, новая попытка ожидается. Повседневные сообщения, аккаунты, папки, сохранение входа, основной интерфейс и финальная поставка также остаются в объёме проекта.
+Текущие приоритеты — нечиталка, архив полученного содержимого и локальный голос/подключение/наблюдаемые события на обеих платформах. Новые Android-модули скомпилированы; функциональная приёмка на живых аккаунтах остаётся. Windows-кандидат 37201211653 скомпилировал C++-модули, но не получил EXE из-за отсутствующей библиотеки DNS на этапе линковки. Подключение dnsapi и обработка отрицательных кодов возврата исправлены; полная повторная сборка требуется. Повседневные сообщения, аккаунты, папки, сохранение входа, основной интерфейс и финальная поставка также остаются в объёме проекта.
 
 Полная «нечиталка» секретных чатов, архив удалённых и исчезающих сообщений, локальная транскрипция и улучшение подключения **ещё не готовы**. [План разработки](docs/ROADMAP.md).
 
@@ -118,7 +118,7 @@ CapybaraGram развивает привычный Telegram в сторону л
 
 ## English summary
 
-**CapybaraGram is an unofficial native Telegram client for Android and Windows, under active development.** This repository contains custom modules, source transformations, tests and build workflows against pinned Telegram sources. Current builds include local chat notes, reply templates and ten account slots. The latest Android APK also compiles silent reading, the received-content archive, offline voice and experimental connection controls. Cooperative Android screenshot reporting is included in the latest compiled APK, with hardware and live service-event acceptance still pending. Earlier native startup and installer checks passed; they do not prove the latest APK runtime. Real-account feature acceptance, the final interface and a stable public release remain in progress.
+**CapybaraGram is an unofficial native Telegram client for Android and Windows, under active development.** This repository contains custom modules, source transformations, tests and build workflows against pinned Telegram sources. Current builds include local chat notes, reply templates and ten account slots. The latest Android APK also compiles silent reading, the received-content archive, offline voice and experimental connection controls. Cooperative Android screenshot reporting is included in the latest compiled APK, with hardware and live service-event acceptance still pending. The exact latest APK passed accountless installation, themes, phone UI, native local-route start/disable and restart in run 37210805548; all twelve screenshots were reviewed. This does not prove live peer features or physical-device behavior. Real-account feature acceptance, the final interface and a stable public release remain in progress.
 
 [Руководство разработчика: модули, данные и правила расширения](docs/DEVELOPER-GUIDE.md).
 [Комплект исходников текущих кандидатов и зависимости сетевого модуля](docs/SOURCE-PACKAGE.md).

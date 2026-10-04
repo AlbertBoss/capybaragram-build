@@ -65,7 +65,8 @@ def transform(name, text):
         PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
     target_link_libraries(capy_windows_connection PUBLIC capy_connection_rust
         ws2_32 crypt32 secur32 ncrypt bcrypt userenv advapi32 ntdll)
-    target_link_libraries(Telegram PRIVATE crypt32 bcrypt capy_windows_voice capy_windows_connection)''')
+    # Static QtNetwork DNS lookup requires the Windows DNS import library.
+    target_link_libraries(Telegram PRIVATE dnsapi crypt32 bcrypt capy_windows_voice capy_windows_connection)''')
     if name == PREFIX + 'core/application.h':
         text = replace(text, '#include "base/timer.h"',
             '#include "base/timer.h"\n#include <mutex>\n#include <optional>')
