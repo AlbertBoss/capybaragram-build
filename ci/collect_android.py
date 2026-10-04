@@ -123,6 +123,13 @@ def collect(source, output, profile='offline', certificate_sha256=None):
             expected_notice = (Path(__file__).resolve().parent / 'transcription/UPSTREAM-LICENSE.txt').read_bytes().replace(b'\r\n', b'\n')
             if archive.read('assets/capy_whisper_license.txt') != expected_notice:
                 raise RuntimeError('Offline speech copyright notice is missing or altered.')
+        if profile == 'candidate':
+            if 'lib/arm64-v8a/libcapy_connection_jni.so' not in libraries:
+                raise RuntimeError('Candidate built-in connection JNI is absent.')
+            notice = 'assets/capy_connection_notices.txt'
+            expected_notice = source / 'TMessagesProj/src/main/assets/capy_connection_notices.txt'
+            if notice not in names or not expected_notice.is_file() or archive.read(notice) != expected_notice.read_bytes():
+                raise RuntimeError('Connection dependency notices are absent or altered.')
         for name in libraries:
             with archive.open(name) as library:
                 header = library.read(20)
@@ -160,6 +167,13 @@ def collect(source, output, profile='offline', certificate_sha256=None):
         notice = (Path(__file__).resolve().parent / 'transcription/UPSTREAM-LICENSE.txt').read_bytes().replace(b'\r\n', b'\n')
         with (output / 'LICENSE').open('ab') as notices:
             notices.write(b'\n\nThird-party offline speech engine: whisper.cpp / ggml\n\n' + notice)
+    if 'lib/arm64-v8a/libcapy_connection_jni.so' in libraries:
+        notice=(source/'TMessagesProj/src/main/assets/capy_connection_notices.txt').read_bytes()
+        (output/'CONNECTION-NOTICES.txt').write_bytes(notice)
+        description+='Built-in connection JNI and exact bundled dependency notices verified. Main-client route/VPN transitions remain untested.\n'
+        (output/'BUILD-INFO.txt').write_text(description+
+            'Source: https://github.com/DrKLO/Telegram/tree/62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c\n'
+            'Not verified: installation, UI launch, actual login, notifications, calls.\n',encoding='utf-8')
     print('PASS: ' + profile + ' APK structure, signature and package; runtime not tested.')
 
 if __name__ == '__main__':

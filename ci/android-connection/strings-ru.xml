@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CapyConnection">CapybaraGram · Подключение</string>
+    <string name="CapyConnectionLogin">Подключение</string>
+    <string name="CapyConnectionEnable">Включить встроенный маршрут</string>
+    <string name="CapyConnectionDisable">Обычное подключение</string>
+    <string name="CapyConnectionProxySettings">Настройки прокси</string>
+    <string name="CapyConnectionStarting">Запускаем встроенный маршрут… Откройте это окно снова, чтобы проверить состояние.</string>
+    <string name="CapyConnectionLocalReady">Встроенный маршрут запущен. Доступность Telegram проверьте по индикатору подключения в приложении.</string>
+    <string name="CapyConnectionDisabled">Обычное подключение: напрямую, через ваш VPN или настроенный прокси.</string>
+    <string name="CapyConnectionFailed">Встроенный маршрут не запустился. Обычное подключение восстановлено. Можно попробовать ещё раз.</string>
+    <string name="CapyConnectionChanged">Настройки подключения изменились. Откройте это окно снова.</string>
+    <string name="CapyConnectionDescription">Встроенный маршрут использует WebSocket Telegram и может помочь, когда прямое подключение недоступно. Отдельное приложение прокси не требуется, но доступность зависит от вашей сети. Это способ подключения, а не VPN или средство анонимности.\n\nРежим действует для всех аккаунтов этого приложения до выключения, выбора обычного прокси или перезапуска приложения. Сохранённые настройки прокси остаются на месте.</string>
+</resources>

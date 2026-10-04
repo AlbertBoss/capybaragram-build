@@ -127,7 +127,7 @@
     "CMakeLists.txt": "24d4bd51393ec60a95d4cc1d29bb88c5c294abb3921d00f57487c9cd33ab6727",
     "NativeTunnel.java": "4d2dfdd1d7e80d55fb575c4c1a2d382f05e7e014e49701ac9ea799d5225724bb",
     "prepare_android_core.py": "685ad4ffc118f72a4437c24946312bde90016a83150a757e8d6215d23f57be11",
-    "README.md": "ac9019a4ed16a74b3124f1238e01723a48e6257d9258e2b27d70ea7b6eda5024",
+    "README.md": "7dcbec7ccd6a7a98792e960b8e2b777f36b813016e38b763667bd70f92bc0e42",
     "run_android_checks.py": "1beac4d5e29be437efeabe3c0412bfc6d219f52e6eca82c75ba4a2e15bd80ef0",
     "tls_regressions.rs": "2739990b76c6b267b51686adb9ee66f0800891f68d02160cf0980d3caf1a7a99",
     "AndroidConnectionDeviceInstrumentation.java": "c3fb9a7e5761fbd8c3d60f03412c847af17c652b97d44660949789d54c41d563",
@@ -168,5 +168,35 @@
     "production_arm64_execution": false,
     "client_integrated": false,
     "live_telegram_tested": false
+  },
+  "native_client_integration": {
+    "files_sha256": {
+      "ConnectionController.java": "cb1dc60ce6740db64ca651430b9f171ed0d91ff22a9e5bddeef100a14aa43eb7",
+      "ConnectionControllerTest.java": "429ab61f25d915124d756c39218cc865e02e646b62ebdc54b7b3d0d04aed9268",
+      "MemoryRoute.java": "0f6cdf0e8befb32310d618c3a5e2fad797644197390d33cd3a110a4cc9ee23e3",
+      "MemoryRouteTest.java": "20bc0aed50a45c2cf4821ad342d9fd0986526dcd71999df8199143037cd451c8",
+      "CapyConnectionService.java": "df320b131a4eab1f80d606ef70781edcef4b2831bc844ea6846757fec8e23ad3",
+      "CapyConnectionUi.java": "e7387bbb1a54bd2eb02136422798963fc669d050a18355c47836721821ff9cdd",
+      "strings.xml": "3928346b996a501b770a96c46a9061bd5d0971bdea3a6130da4777e12ba0b402",
+      "strings-ru.xml": "a1e60eac227ef6df2f5c2f9ecd294f0c3d301d6d42889f251aee41d15519307d",
+      "prepare_android_connection.py": "f3245a3d5c535d236246ab5e8f3d23e676276c4c8ba0026cf769107903d8f4cd",
+      "native-host-hashes.json": "8183b4fb16d19da23f8e48adad09ccdf398189154ad6b73c97d3f87c18face7e",
+      "build_android_library.py": "7821c2c6f98a5596d49c4f65c5db96077eb3603fdfc16ac121a3f343fcfd1541",
+      "connection_notices.py": "637a6cac3de186bfb4f4201d70dc2918cab852b89f2e00ac396f278a8df618db"
+    },
+    "controller_assertions": 27,
+    "route_assertions": 24,
+    "guarded_preparation_checks": 10,
+    "local_java_runtime": {
+      "ConnectionControllerTest": "CAPY_ANDROID_CONNECTION_CONTROLLER=PASS 27 assertions; 2000 requests coalesced",
+      "MemoryRouteTest": "CAPY_ANDROID_MEMORY_ROUTE=PASS 24 assertions"
+    },
+    "local_java_engine_is_synthetic": true,
+    "prepared_hosts": 5,
+    "added_payloads": 7,
+    "full_application_compiled": false,
+    "live_telegram_tested": false,
+    "vpn_transition_tested": false,
+    "documentation": "docs/ANDROID-CONNECTION.md"
   }
 }

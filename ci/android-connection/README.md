@@ -79,3 +79,17 @@ user scenarios. The native 90 Rust tests and 632 C++ ABI assertions also passed.
 The artifact, all 15 package hashes and the executed JNI binary identity were
 independently verified. No owner keys or accounts were used. No live Telegram
 connection, production ARM64 execution or VPN transition is claimed.
+
+## Native client integration prepared, 2026-10-04
+
+The package now includes the native login/chat controls, a bounded Java controller
+and a memory-only native proxy coordinator. The first full application build is
+pending. These Java changes preserve the frozen Rust/JNI source and native proofs
+above; those earlier runs do not prove this new client integration.
+
+The controller has 27 locally executed assertions (including 2,000 coalesced
+requests), the route coordinator has 24 and guarded source preparation has ten.
+All controller/route tests use synthetic engine/native targets, not an authenticated
+Telegram client. See [the integration notes](../../docs/ANDROID-CONNECTION.md)
+for the lock ordering, manual-proxy revocation, initialization race, controls and
+remaining acceptance and licensing gates.

@@ -161,6 +161,19 @@ jobs:
           python3 control/ci/transcription/prepare_android_voice.py android
           python3 control/ci/transcription/prepare_android_voice.py android --check
           python3 control/ci/transcription/run_engine_checks.py android --install-to android
+      - name: Prepare bounded native connection controls and frozen ARM64 transport
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 control/ci/android-connection/prepare_android_connection.py android
+          python3 control/ci/android-connection/prepare_android_connection.py android --check
+          mkdir -p "$RUNNER_TEMP/capy-connection-java"
+          javac --release 8 -encoding UTF-8 -Xlint:all -Werror -d "$RUNNER_TEMP/capy-connection-java" control/ci/android-connection/ConnectionController.java control/ci/android-connection/ConnectionControllerTest.java control/ci/android-connection/MemoryRoute.java control/ci/android-connection/MemoryRouteTest.java
+          java -cp "$RUNNER_TEMP/capy-connection-java" org.capybaragram.connection.ConnectionControllerTest
+          java -cp "$RUNNER_TEMP/capy-connection-java" org.capybaragram.connection.MemoryRouteTest
+          rustup toolchain install 1.88.0 --profile minimal
+          rustup target add aarch64-linux-android --toolchain 1.88.0
+          python3 control/ci/android-connection/build_android_library.py android
       - name: Build one ARM64 release candidate
         env:
           CAPY_ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/capybaragram-preview.p12
