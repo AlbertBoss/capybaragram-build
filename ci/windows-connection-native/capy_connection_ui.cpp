@@ -14,6 +14,7 @@
 #include "styles/style_layers.h"
 #include "styles/style_widgets.h"
 #include <QPointer>
+#include <QWidget>
 
 namespace Capy {
 namespace {
@@ -41,12 +42,23 @@ QString StatusText(Connection::Service &service) {
 	Unexpected("Connection phase");
 }
 
-void ShowConnection(not_null<Window::SessionController*> controller) {
-	if (Core::App().passcodeLocked()) return;
-	const auto session = &controller->session();
+void ShowConnection(
+		std::shared_ptr<Ui::Show> show,
+		Main::Session *session,
+		QWidget *introOwner) {
+	if (!show || Core::Quitting() || Core::App().passcodeLocked()) return;
 	const auto weakSession = base::make_weak(session);
-	controller->uiShow()->showBox(Box([=](not_null<Ui::GenericBox*> box) {
-		if (!weakSession || Core::App().passcodeLocked()) {
+	const auto weakOwner = QPointer<QWidget>(introOwner);
+	const auto needsSession = (session != nullptr);
+	const auto needsOwner = (introOwner != nullptr);
+	const auto allowed = [=] {
+		return (!needsSession || weakSession)
+			&& (!needsOwner || weakOwner)
+			&& !Core::Quitting()
+			&& !Core::App().passcodeLocked();
+	};
+	show->showBox(Box([=](not_null<Ui::GenericBox*> box) {
+		if (!allowed()) {
 			box->closeBox();
 			return;
 		}
@@ -67,17 +79,22 @@ void ShowConnection(not_null<Window::SessionController*> controller) {
 		Core::App().passcodeLockChanges() | rpl::on_next([=](bool locked) {
 			if (locked) box->closeBox();
 		}, box->lifetime());
-		session->account().sessionChanges() | rpl::on_next([=](Main::Session*) {
-			box->closeBox();
-		}, box->lifetime());
+		if (needsSession) {
+			weakSession->account().sessionChanges() | rpl::on_next([=](Main::Session*) {
+				box->closeBox();
+			}, box->lifetime());
+		}
+		if (needsOwner) {
+			QObject::connect(weakOwner.data(), &QObject::destroyed, box.get(), [=] {
+				box->closeBox();
+			});
+		}
 		Lang::Updated() | rpl::on_next([=] { box->closeBox(); }, box->lifetime());
 		box->addButton(rpl::single(Text(u"Enable / retry"_q, u"Включить / повторить"_q)), [=] {
-			if (service && weakSession && !Core::Quitting()
-				&& !Core::App().passcodeLocked()) service->setEnabled(true);
+			if (service && allowed()) service->setEnabled(true);
 		});
 		box->addLeftButton(rpl::single(Text(u"Disable"_q, u"Выключить"_q)), [=] {
-			if (service && weakSession && !Core::Quitting()
-				&& !Core::App().passcodeLocked()) service->setEnabled(false);
+			if (service && allowed()) service->setEnabled(false);
 		});
 		box->addButton(tr::lng_close(), [=] { box->closeBox(); });
 	}));
@@ -85,13 +102,22 @@ void ShowConnection(not_null<Window::SessionController*> controller) {
 
 } // namespace
 
+QString ConnectionButtonText() {
+	return Text(u"CapybaraGram connection"_q, u"Подключение CapybaraGram"_q);
+}
+
+void ShowIntroConnection(std::shared_ptr<Ui::Show> show,
+		not_null<QWidget*> owner) {
+	ShowConnection(std::move(show), nullptr, owner.get());
+}
+
 void AddConnectionAction(not_null<Window::SessionController*> controller,
 		const Window::PeerMenuCallback &addAction) {
 	if (Core::App().passcodeLocked()) return;
 	const auto weak = base::make_weak(controller);
 	addAction(Text(u"CapybaraGram · Connection"_q,
 		u"CapybaraGram · Подключение"_q), [=] {
-		if (weak) ShowConnection(weak.get());
+		if (weak) ShowConnection(weak->uiShow(), &weak->session(), nullptr);
 	}, nullptr);
 }
 

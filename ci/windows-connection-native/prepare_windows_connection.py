@@ -12,7 +12,8 @@ SOURCE_SHA = '80158983dba09d3bf5d96701f21473d6c34bf5f5'
 PREFIX = 'Telegram/SourceFiles/'
 FILES = ['Telegram/CMakeLists.txt'] + [PREFIX + p for p in (
     'core/application.h', 'core/application.cpp', 'mtproto/session.cpp',
-    'core/proxy_rotation_manager.cpp', 'window/window_peer_menu.cpp')]
+    'core/proxy_rotation_manager.cpp', 'window/window_peer_menu.cpp',
+    'intro/intro_widget.h', 'intro/intro_widget.cpp')]
 ADDED = {PREFIX + 'capybara/' + p: HERE / p for p in (
     'capy_connection_service.h', 'capy_connection_service.cpp',
     'capy_connection_ui.h', 'capy_connection_ui.cpp')}
@@ -153,6 +154,49 @@ void Application::proxyRotationSettingsChanged() {''')
         return replace(text, '\tCapy::AddArchiveAction(controller, request, callback);',
             '\tCapy::AddArchiveAction(controller, request, callback);\n'
             '\tCapy::AddConnectionAction(controller, callback);')
+    if name == PREFIX + 'intro/intro_widget.h':
+        return replace(text,
+            '\tobject_ptr<Ui::FadeWrap<Ui::RoundButton>> _settings;',
+            '\tobject_ptr<Ui::FadeWrap<Ui::RoundButton>> _settings;\n'
+            '\tobject_ptr<Ui::FadeWrap<Ui::RoundButton>> _capyConnection;')
+    if name == PREFIX + 'intro/intro_widget.cpp':
+        text = replace(text, '#include "intro/intro_widget.h"',
+            '#include "intro/intro_widget.h"\n#include "capybara/capy_connection_ui.h"')
+        text = replace(text, ', _next(\n', '''
+, _capyConnection(
+	this,
+	object_ptr<Ui::RoundButton>(
+		this,
+		rpl::single(Capy::ConnectionButtonText()),
+		st::defaultBoxButton))
+, _next(
+'''.lstrip('\n'))
+        text = replace(text,
+            '\t_settings->entity()->setTextTransform(Ui::RoundButtonTextTransform::ToUpper);',
+            '''	_settings->entity()->setTextTransform(Ui::RoundButtonTextTransform::ToUpper);
+	_capyConnection->entity()->setClickedCallback([=] {
+		Capy::ShowIntroConnection(getData()->controller->uiShow(), this);
+	});''')
+        text = replace(text, 'void Widget::refreshLang() {\n',
+            'void Widget::refreshLang() {\n'
+            '\t_capyConnection->entity()->setText(rpl::single(Capy::ConnectionButtonText()));\n')
+        text = replace(text,
+            '\t_settings->toggle(!stepHasCover, anim::type::normal);',
+            '\t_settings->toggle(!stepHasCover, anim::type::normal);\n'
+            '\t_capyConnection->toggle(!stepHasCover, anim::type::normal);')
+        text = replace(text, '\t_settings->toggle(!hasCover, anim::type::instant);',
+            '\t_settings->toggle(!hasCover, anim::type::instant);\n'
+            '\t_capyConnection->toggle(!hasCover, anim::type::instant);')
+        text = replace(text, '\t_settings->hide(anim::type::instant);',
+            '\t_settings->hide(anim::type::instant);\n'
+            '\t_capyConnection->hide(anim::type::instant);')
+        text = replace(text, '\t_settings->raise();\n\t_back->raise();',
+            '\t_settings->raise();\n\t_capyConnection->raise();\n\t_back->raise();')
+        text = replace(text, '\t_settings->raise();\n\tif (_update) {',
+            '\t_settings->raise();\n\t_capyConnection->raise();\n\tif (_update) {')
+        return replace(text, '\t_settings->moveToRight(skip, controlsTop + skip);',
+            '\t_settings->moveToRight(skip, controlsTop + skip);\n'
+            '\t_capyConnection->moveToRight(skip, controlsTop + skip + _settings->height() + skip);')
     raise ValueError('Unexpected connection host')
 
 

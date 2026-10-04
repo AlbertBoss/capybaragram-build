@@ -81,5 +81,26 @@
   "cmake_helpers_sha": "428f37a41f936922cd3bb0159a357cca22ad359c",
   "crt_source": "https://github.com/desktop-app/cmake_helpers/blob/428f37a41f936922cd3bb0159a357cca22ad359c/variables.cmake",
   "static_crt_policy": "MultiThreaded$<$<CONFIG:Debug>:Debug>",
-  "production_release_verified": false
+  "production_release_verified": false,
+  "prelogin_ui": {
+    "entry_points": [
+      "phone login",
+      "QR login",
+      "existing authenticated chat menu"
+    ],
+    "intro_owner_destruction_closes_dialog": true,
+    "session_change_and_passcode_guards_retained": true,
+    "guarded_host_count": 8,
+    "native_payload_count": 7,
+    "source_preparation_checks": [
+      "eight composed hosts and seven payloads validate against output digests",
+      "drift in each of eight hosts rejects without partial writes",
+      "CRLF checkout produces the identical normalized plan",
+      "payload collision refuses overwrite",
+      "second application refuses an already installed integration",
+      "changed bytes in each of seven installed payloads reject verification"
+    ],
+    "whole_client_compiled": false,
+    "live_telegram_tested": false
+  }
 }
