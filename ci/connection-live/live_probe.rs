@@ -118,7 +118,12 @@ async fn round_trip(engine: &EmbeddedTunnel, dc: u16, media: bool) -> Result<usi
     let mut response = vec![0u8; count];
     client.read_exact(&mut response).await.map_err(|e| e.to_string())?;
     decrypt.apply_keystream(&mut response);
-    validate_res_pq(&response, &nonce).map_err(str::to_owned)
+    validate_res_pq(&response, &nonce).map_err(|reason| {
+        // Only public structural integers, never response bytes, nonce or routing token.
+        let body = read_u32(&response, 16).ok().map(|value| value as usize);
+        let padding = body.and_then(|size| response.len().checked_sub(20 + size));
+        format!("{reason}; frame_bytes={count}; body_bytes={body:?}; padding_bytes={padding:?}")
+    })
 }
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 2)]
