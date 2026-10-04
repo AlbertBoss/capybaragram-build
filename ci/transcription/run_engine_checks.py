@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 """Actual pinned CPU speech inference and Android cross-compilation, not Telegram acceptance."""
-import hashlib,json,os,subprocess,sys,urllib.request,zipfile
+import argparse,hashlib,json,os,re,shutil,subprocess,sys,urllib.request,zipfile
 from pathlib import Path,PurePosixPath
 source=Path(__file__).resolve().parent
 pins=json.loads((source/'source-pins.json').read_text())
@@ -30,11 +30,13 @@ with zipfile.ZipFile(archive) as z:
         if entry.file_size>100*1048576:raise ValueError('Oversized source entry')
         target=out/'whisper'/str(p);target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(z.read(entry))
 build=out/'build'
-kind=sys.argv[1] if len(sys.argv)>1 else 'cpu'
+parser=argparse.ArgumentParser();parser.add_argument('kind',choices=['cpu','android']);parser.add_argument('--install-to',type=Path)
+arguments=parser.parse_args();kind=arguments.kind
+if arguments.install_to is not None and kind!='android':raise ValueError('Install is Android-only')
 args=['cmake','-S',str(source),'-B',str(build),'-DCAPY_WHISPER_SOURCE='+str(out/'whisper'),'-DCMAKE_BUILD_TYPE=Release']
 if kind=='android':
     sdk=Path(os.environ['ANDROID_HOME']);ndk=sdk/'ndk/27.2.12479018'
-    args+=['-DCMAKE_TOOLCHAIN_FILE='+str(ndk/'build/cmake/android.toolchain.cmake'),'-DANDROID_ABI=arm64-v8a','-DANDROID_PLATFORM=android-23','-G','Ninja']
+    args+=['-DCMAKE_TOOLCHAIN_FILE='+str(ndk/'build/cmake/android.toolchain.cmake'),'-DANDROID_ABI=arm64-v8a','-DANDROID_PLATFORM=android-23','-DANDROID_STL=c++_static','-G','Ninja']
 subprocess.run(args,check=True,timeout=120)
 target='capy_voice_jni' if kind=='android' else 'capy_voice_runtime_test'
 subprocess.run(['cmake','--build',str(build),'--config','Release','--target',target,'--parallel','2'],check=True,timeout=900)
@@ -51,7 +53,24 @@ if kind=='cpu':
 else:
     libraries=list(build.rglob('libcapy_voice_jni.so'));assert len(libraries)==1
     data=libraries[0].read_bytes();assert data[:4]==b'\x7fELF' and data[4]==2 and int.from_bytes(data[18:20],'little')==183
-    (report/'engine-result.txt').write_text('CAPY_ANDROID_JNI=COMPILED ARM64\n')
+    readelf=ndk/'toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf'
+    dynamic=subprocess.run([str(readelf),'-d',str(libraries[0])],capture_output=True,text=True,check=True,timeout=30).stdout
+    needed=set(re.findall(r'Shared library: \[([^\]]+)\]',dynamic))
+    if not needed<=set(['libc.so','libm.so','libdl.so','liblog.so','libandroid.so']):raise ValueError('Unexpected JNI runtime dependency')
+    phoff=int.from_bytes(data[32:40],'little');phsize=int.from_bytes(data[54:56],'little');phnum=int.from_bytes(data[56:58],'little')
+    if phsize<56 or phnum>128 or phoff+phsize*phnum>len(data):raise ValueError('Invalid ELF program table')
+    alignments=[int.from_bytes(data[phoff+i*phsize+48:phoff+i*phsize+56],'little') for i in range(phnum)
+                if int.from_bytes(data[phoff+i*phsize:phoff+i*phsize+4],'little')==1]
+    if not alignments or min(alignments)<16384:raise ValueError('JNI requires 16 KiB load alignment')
+    if arguments.install_to is not None:
+        client=arguments.install_to.resolve(strict=True)
+        head=subprocess.run(['git','-C',str(client),'rev-parse','HEAD'],capture_output=True,text=True,check=True,timeout=30).stdout.strip()
+        if head!='62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c':raise ValueError('Wrong production Android revision')
+        target=client/'TMessagesProj/jni/arm64-v8a/libcapy_voice_jni.so'
+        if target.exists() or target.is_symlink() or not target.resolve().is_relative_to(client):raise ValueError('JNI destination already exists or escapes client')
+        target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(libraries[0],target)
+        if target.read_bytes()!=data:raise ValueError('Installed JNI bytes differ')
+    (report/'engine-result.txt').write_text('CAPY_ANDROID_JNI=COMPILED ARM64 16KiB-aligned\n')
 result={'kind':kind,'source_commit':pins['commit'],'source_archive_sha256':pins['zip_sha256'],
         'model':pins['model'] if kind=='cpu' else None,'result':'PASS','client_ui_integrated':False,
         'russian_voice_accuracy_tested':False,'offline_network_packet_capture_performed':False,

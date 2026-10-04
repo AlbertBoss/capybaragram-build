@@ -1,0 +1,19 @@
+{
+  "source_sha": "62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c",
+  "pre": {
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "5872751e27b5e479ac1879ba5467772c0ef4d291868880d48042ee24c1193966",
+    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "7a0f349bd02391a47e2a67239c36fdfe913a3611b7329badfff87a11390d5828"
+  },
+  "post": {
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "1d43f410dba5aed8edb9efe0c36b98cee55d73d4c4535dbf6eafbddb26e1f71e",
+    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "006f61c1cbe7244eb8cfb8d5aec821c749c1ebac9dd0fc72231fa34fc8461a6e"
+  },
+  "added": {
+    "TMessagesProj/src/main/java/org/capybaragram/voice/OfflineSpeech.java": "806dafaaccd78e261673fc1102fd4ae3e4eb9c41114994723151f9a504f05e99",
+    "TMessagesProj/src/main/java/org/capybaragram/voice/SpeechModel.java": "15c168b254588185fa87afe6f6919d21928cbeb576f4419c6803264ada560341",
+    "TMessagesProj/src/main/java/org/capybaragram/voice/AndroidPcmDecoder.java": "78d2cf695f165f7482c847f2efbf71b6886e60ff2a75e7ce1a9aed2a336662ae",
+    "TMessagesProj/src/main/java/org/capybaragram/voice/CapyVoiceUi.java": "8f4f6465e4ceaca23ea6e968060adc8f627533e96afb9491b60087e8c3241bf9",
+    "TMessagesProj/src/main/res/values/capy_voice.xml": "7de9d37f21fd7dcd93905df73883d8bcb990e551f1982b3da5238ce4313224c6",
+    "TMessagesProj/src/main/res/values-ru/capy_voice.xml": "ebeb7078a26dccaae55e9eb2b2626fe76579fdb921d28e73bf45f6edabb1969c"
+  }
+}

@@ -1,10 +1,14 @@
 # Offline voice transcription — development module
 
-This module is not yet part of a CapybaraGram APK or EXE. It contains an actual
+The Android candidate pipeline now includes native voice menus and the engine;
+a full APK with this integration is pending. The Windows client UI is pending.
+The module contains an actual
 CPU Whisper engine, Android JNI, a local MediaCodec audio decoder, one-use
-cancelable jobs and a hash-pinned model downloader. Client menus, account/session
-lifecycle gates, encrypted temporary input, message download handling and Windows
-audio decoding remain to be integrated before this is a usable client feature.
+cancelable jobs and a hash-pinned model downloader. Android menu/UI gates capture the account generation and close/cancel on chat
+pause, destruction, logout or app lock. Only already-downloaded voice messages
+are decoded; encrypted cache files and one-view media need a separate adapter.
+No plaintext temporary audio file is created. Windows audio/UI integration and
+actual Android client acceptance remain necessary.
 
 Source: ggml-org/whisper.cpp v1.9.4, commit and archive digest in source-pins.json.
 All 1,959 Git blobs were verified locally before review. Upstream MIT notice is
@@ -23,6 +27,7 @@ UTF-8 filesystem handling supports Cyrillic Windows paths in the engine.
 
 The manual native workflow builds/runs actual CPU recognition on Linux and Windows
 with the upstream JFK fixture, checks cancellation and input rejection, and
-cross-compiles Android ARM64 JNI. It does not verify Russian accuracy, codec
+cross-compiles Android ARM64 JNI. Run 37163441147 passed actual recognition on Linux/Windows and Android JNI
+compilation for the first engine. This does not verify Russian accuracy, codec
 runtime, real Telegram behaviour, resource use on the owner's machine or packet
 capture. Those remain explicit acceptance tasks.

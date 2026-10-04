@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CapySpeech">CapybaraGram · Offline transcript</string>
+    <string name="CapySpeechDescription">Recognise a downloaded voice message on this device. No Premium or audio upload. The result may contain errors. Up to three minutes; cancellation is available.</string>
+    <string name="CapySpeechStart">Recognise</string>
+    <string name="CapySpeechWorking">Recognising on this device</string>
+    <string name="CapySpeechDownloading">Downloading the speech model</string>
+    <string name="CapySpeechModel">Download the multilingual speech model (78 MB) once. Later recognition works offline. Mobile data charges from your carrier may apply.</string>
+    <string name="CapySpeechDownload">Download model</string>
+    <string name="CapySpeechFailure">Could not recognise this audio. Check that it is downloaded and no longer than three minutes. Encrypted cache files and unsupported audio formats are not supported in this version.</string>
+    <string name="CapySpeechEmpty">No speech recognised.</string>
+</resources>

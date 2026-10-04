@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CapySpeech">CapybaraGram · Расшифровка без сети</string>
+    <string name="CapySpeechDescription">Распознаём скачанное голосовое на этом устройстве. Premium не нужен, аудио никуда не отправляется. В тексте возможны ошибки. До трёх минут; можно отменить.</string>
+    <string name="CapySpeechStart">Распознать</string>
+    <string name="CapySpeechWorking">Распознаём на устройстве</string>
+    <string name="CapySpeechDownloading">Загружаем модель речи</string>
+    <string name="CapySpeechModel">Один раз скачайте модель для разных языков (78 МБ). После этого распознавание работает без сети. При мобильном подключении действует тариф вашего оператора.</string>
+    <string name="CapySpeechDownload">Скачать модель</string>
+    <string name="CapySpeechFailure">Не удалось распознать аудио. Проверьте, что оно скачано и длится не более трёх минут. Зашифрованный кеш и неподдерживаемые форматы в этой версии пока не распознаются.</string>
+    <string name="CapySpeechEmpty">Речь не распознана.</string>
+</resources>

@@ -18,6 +18,7 @@ target_include_directories(capy_offline_voice PUBLIC "${CMAKE_CURRENT_SOURCE_DIR
 if(ANDROID)
   add_library(capy_voice_jni SHARED android_jni.cpp)
   target_link_libraries(capy_voice_jni PRIVATE capy_offline_voice)
+  target_link_options(capy_voice_jni PRIVATE "-Wl,-z,max-page-size=16384")
 else()
   add_executable(capy_voice_runtime_test offline_engine_test.cpp)
   target_link_libraries(capy_voice_runtime_test PRIVATE capy_offline_voice)
