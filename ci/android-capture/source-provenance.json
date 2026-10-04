@@ -18,7 +18,7 @@
     "CapyCaptureUi.java": "3ae23a2a34c5db14abf564d1d7b5345faf80129b171c3310bb62c71b0f17c576",
     "CapyScreenshotRequest.java": "764c8e2eff4c39247b248b0867b8dc7d5c89f4fa44b18d18012edc627db598a6"
   },
-  "whole_client_compiled": false,
+  "whole_client_compiled": true,
   "api_34_registration_executed": false,
   "hardware_screenshot_observed": false,
   "live_telegram_service_event": false,
@@ -29,5 +29,17 @@
     "native queue denies changed session or withdrawn consent",
     "real server Updates only; no local success event",
     "no pixels or inferred specific message/region"
-  ]
+  ],
+  "full_candidate_build": {
+    "run": 37201227437,
+    "control_head": "cb7f3187ab28a61129bd1f49243a0735eabd26ce",
+    "conclusion": "success",
+    "apk_sha256": "e0be0365329d9555cf251cf40f4f147c6591c83c868f796601ff9b1aa5d7518e",
+    "production_integration_classes": 32,
+    "persistent_signature_and_native_alignment_verified": true,
+    "unique_os_permission_verified": true,
+    "main_ui_executed": false,
+    "hardware_screenshot_tested": false,
+    "live_telegram_service_event_tested": false
+  }
 }
