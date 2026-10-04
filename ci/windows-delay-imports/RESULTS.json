@@ -1,0 +1,62 @@
+{
+  "run": 37243233804,
+  "head": "1724e752394c08363c597823501340a5e284d51f",
+  "run_conclusion": "success",
+  "artifact_id": 11318007388,
+  "archive_sha256": "b3aea1d8df2bf33d95acc966dafd181c066fc9ceb02f682c80382b8574b0fa34",
+  "full_client_built": false,
+  "live_accounts_accepted": false,
+  "owner_credentials_used": false,
+  "file_sha256": {
+    "cpp_delayed_control-compile.txt": "6abbf6b64bccf59f83ae7ece3b83e4fdf60f225b5f619065da55eed653131467",
+    "cpp_delayed_control-runtime.txt": "146ec5925df8f91d12ede0688e07c71d019a16fa74002ff869c79850bff819f5",
+    "mixed_delayed-compile.txt": "6abbf6b64bccf59f83ae7ece3b83e4fdf60f225b5f619065da55eed653131467",
+    "mixed_delayed-runtime.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mixed_eager_fix-compile.txt": "6abbf6b64bccf59f83ae7ece3b83e4fdf60f225b5f619065da55eed653131467",
+    "mixed_eager_fix-runtime.txt": "146ec5925df8f91d12ede0688e07c71d019a16fa74002ff869c79850bff819f5",
+    "rust-compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verification.json": "6eccba1a88959626599b1b3a660a0f386e28602d9c9db42498728554c97bc997"
+  },
+  "exact_source_or_windows_crlf_checkout": "PASS",
+  "native": {
+    "checked_utc": "2026-10-04T23:18:21.993076+00:00",
+    "toolset": "14.44.35207",
+    "sdk": "10.0.26100.0",
+    "rust": "1.88.0",
+    "owner_credentials_used": false,
+    "registry_mutated": false,
+    "full_client_built": false,
+    "live_accounts_accepted": false,
+    "source_sha256": {
+      "raw_registry.rs": "072aca5ca0187dd5519d776e7368e8428daf7bd786b2ea178377919949c8fe80",
+      "registry_probe.cpp": "f7f805cbe76df99832d9d3503396e998017cb7b040273d990e5e0ad9011ce4a3",
+      "run_probe.py": "629634145b8c2183237d2d36defe74751ad336a8a707c103dedeff05ea0c6f46"
+    },
+    "cases": [
+      {
+        "name": "cpp_delayed_control",
+        "returncode": 0,
+        "exit_hex": "0x0",
+        "acceptance_marker": true,
+        "exe_sha256": "98e288ea0d1269315f04600ae1e032586a4544e1699ca1205f8e669d8cefd30d"
+      },
+      {
+        "name": "mixed_delayed",
+        "returncode": 3221225477,
+        "exit_hex": "0xc0000005",
+        "acceptance_marker": false,
+        "exe_sha256": "e1991aede9a387ae67167007f1a38a5b63e5fb1455fb05e29ce0a34858a154b8"
+      },
+      {
+        "name": "mixed_eager_fix",
+        "returncode": 0,
+        "exit_hex": "0x0",
+        "acceptance_marker": true,
+        "exe_sha256": "53dc444c1febc24eb4094283e000c57840952f39c577b74e4d552c156bb5059b"
+      }
+    ],
+    "baseline_crash_reproduced": true,
+    "eager_import_probe_passed": true,
+    "result": "PASS"
+  }
+}
