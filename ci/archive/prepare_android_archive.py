@@ -12,7 +12,9 @@ STORAGE = JAVA + 'org/telegram/messenger/MessagesStorage.java'
 CHAT = JAVA + 'org/telegram/ui/ChatActivity.java'
 CONFIG = JAVA + 'org/telegram/messenger/UserConfig.java'
 VAULT = JAVA + 'org/capybaragram/telegram/CapyVault.java'
-FILES = [STORAGE, CHAT, CONFIG, VAULT]
+MEDIA_VIEWER = JAVA + 'org/telegram/ui/SecretMediaViewer.java'
+VOICE_VIEWER = JAVA + 'org/telegram/ui/SecretVoicePlayer.java'
+FILES = [STORAGE, CHAT, CONFIG, VAULT, MEDIA_VIEWER, VOICE_VIEWER]
 ARCHIVE = 'org.capybaragram.archive.CapyMessageArchive'
 UI = 'org.capybaragram.archive.CapyArchiveUi'
 ADDED = {JAVA + 'org/capybaragram/archive/' + n: HERE / n for n in (
@@ -29,6 +31,29 @@ def once(text, old, new):
 
 
 def transform(name, text):
+    if name == MEDIA_VIEWER:
+        text = once(text, '    private Runnable onClose;\n',
+            '    private ' + 'org.capybaragram.archive.AndroidArchiveCoordinator.Token capyArchiveViewToken;\n'
+            '    private Runnable onClose;\n')
+        old = '        ignoreDelete = messageObject.messageOwner.ttl == 0x7FFFFFFF;\n'
+        text = once(text, old, '        capyArchiveViewToken = ' + ARCHIVE + '.beginView(messageObject);\n' + old)
+        old = '''        if (onClose != null) {
+            onClose.run();'''
+        # Both normal closing and forced viewer destruction can consume a file.
+        if text.count(old) != 2: raise ValueError('Secret-media close paths changed')
+        return text.replace(old, '''        if (onClose != null) {
+            ''' + ARCHIVE + '''.captureViewed(capyArchiveViewToken, currentMessageObject);
+            capyArchiveViewToken = null;
+            onClose.run();''')
+    if name == VOICE_VIEWER:
+        text = once(text, '    private Runnable openAction, closeAction;\n',
+            '    private org.capybaragram.archive.AndroidArchiveCoordinator.Token capyArchiveViewToken;\n'
+            '    private Runnable openAction, closeAction;\n')
+        old = '        messageObject = cell != null ? cell.getMessageObject() : null;\n'
+        text = once(text, old, old + '        capyArchiveViewToken = ' + ARCHIVE + '.beginView(messageObject);\n')
+        old = '        if (this.closeAction != null) {\n'
+        return once(text, old, old + '            ' + ARCHIVE + '.captureViewed(capyArchiveViewToken, messageObject);\n'
+            '            capyArchiveViewToken = null;\n')
     if name == STORAGE:
         old = '    private ArrayList<Long> markMessagesAsDeletedInternal(long dialogId, ArrayList<Integer> messages, boolean deleteFiles, int mode, int threadMessageId) {\n'
         text = once(text, old, old + '        if (mode == ChatActivity.MODE_DEFAULT) ' + ARCHIVE + '.captureDeleted(currentAccount, database, dialogId, messages);\n')

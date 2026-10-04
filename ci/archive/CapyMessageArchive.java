@@ -100,6 +100,75 @@ public final class CapyMessageArchive {
         }
     }
 
+    /** Hold the already downloaded original before a once/TTL viewer consumes it. */
+    public static AndroidArchiveCoordinator.Token beginView(MessageObject object) {
+        if (object == null || object.messageOwner == null || !object.isSecretMedia()) return null;
+        final int account = object.currentAccount;
+        if (!enabled(account) || SharedConfig.appLocked || SharedConfig.isWaitingForPasscodeEnter) return null;
+        final AndroidArchiveCoordinator coordinator = get();
+        final AndroidArchiveCoordinator.Token token = coordinator.captureBackground(account);
+        captureViewed(token, object);
+        return token;
+    }
+
+    /** Retries use the same viewer generation; slot reuse cannot adopt old media. */
+    public static void captureViewed(AndroidArchiveCoordinator.Token token, MessageObject object) {
+        if (token == null || object == null || object.messageOwner == null || !object.isSecretMedia()) return;
+        final int account = object.currentAccount;
+        final AndroidArchiveCoordinator coordinator = get();
+        if (account != token.account || !coordinator.isCurrent(token) || !enabled(account)
+                || SharedConfig.appLocked || SharedConfig.isWaitingForPasscodeEnter) return;
+        final long dialog = object.getDialogId();
+        final int messageId = object.getId();
+        if (token == null || dialog == 0 || messageId == 0) return;
+        NativeByteBuffer data = null;
+        byte[] bytes = null;
+        CapyArchiveMediaSource source = null;
+        try {
+            final TLRPC.Message message = object.messageOwner;
+            final int size = message.getObjectSize();
+            if (size <= 0 || size > AndroidArchiveStore.MAX_TL_BYTES) { problem(); return; }
+            data = new NativeByteBuffer(size);
+            message.serializeToStream(data);
+            if (data.position() != size) { problem(); return; }
+            bytes = new byte[size];
+            ByteBuffer copy = data.buffer.asReadOnlyBuffer(); copy.position(0); copy.limit(size); copy.get(bytes);
+            try { source = CapyArchiveMediaSource.open(account, message); }
+            catch (Exception unavailable) { problem(); }
+            final byte[] tl = bytes;
+            final CapyArchiveMediaSource original = source;
+            final String text = message.message == null ? "" : message.message;
+            // Ownership transfers to the bounded FIFO before native onOpen/onClose.
+            coordinator.persistViewed(token, store -> {
+                long id = store.save(dialog, messageId, EXPIRED_MEDIA, tl, text, true);
+                if (original != null && coordinator.isCurrent(token)) {
+                    try { store.saveOriginal(id, original.input, original.size, original.mime); }
+                    catch (Exception incomplete) { problem(); }
+                }
+                return null;
+            }, () -> {
+                try { if (original != null) original.close(); }
+                catch (Exception closeFailure) { problem(); }
+                finally { Arrays.fill(tl, (byte) 0); }
+            });
+            bytes = null; source = null;
+        } catch (Exception failure) { problem(); }
+        finally {
+            try { if (source != null) source.close(); }
+            catch (Exception closeFailure) { problem(); }
+            if (bytes != null) Arrays.fill(bytes, (byte) 0);
+            if (data != null) {
+                // NativeByteBuffer's pool must not retain our serialized copy.
+                try {
+                    if (data.buffer != null) {
+                        ByteBuffer wipe = data.buffer.duplicate(); wipe.position(0);
+                        while (wipe.hasRemaining()) wipe.put((byte) 0);
+                    }
+                } finally { data.reuse(); }
+            }
+        }
+    }
+
     private static void rows(int account, SQLiteDatabase database, String sql, int reason) {
         rows(account, database, sql, reason, null);
     }

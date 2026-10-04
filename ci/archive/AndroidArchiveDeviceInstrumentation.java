@@ -247,9 +247,11 @@ public final class AndroidArchiveDeviceInstrumentation extends Instrumentation {
         try {
             byte[] body=bytes("123456789");Files.write(file.toPath(),body);Files.write(keyFile.toPath(),new byte[48]);
             try(VerifiedMediaInput input=VerifiedMediaInput.open(file,body.length,null,null)) {
+                require(file.delete() && !file.exists());
                 byte[] copy=new byte[body.length];require(input.read(copy)==copy.length && input.read()==-1);
                 require(input.read(copy,0,0)==0 && Arrays.equals(body,copy));
             }
+            Files.write(file.toPath(),body);
             int[] position={0};
             try(VerifiedMediaInput input=VerifiedMediaInput.open(file,body.length,keyFile,(out,key,iv,start,count,offset)->{
                 if(offset!=position[0] || count<=0)throw new AssertionError("Wrong decrypt range");position[0]+=count;
@@ -310,5 +312,54 @@ public final class AndroidArchiveDeviceInstrumentation extends Instrumentation {
         rejects(GeneralSecurityException.class,()->AndroidVaultKeys.load(clearGeneration));
         require(!AndroidArchiveStore.file(context,clearGeneration).exists());
         c.onLogout(0);c.onLogout(1);
+        exerciseViewedCoordinator();
+    }
+
+    private void exerciseViewedCoordinator() throws Exception {
+        Context context=getTargetContext();String prefix="archive-viewed-test-"+UUID.randomUUID()+"-";
+        AtomicLongArray owners=new AtomicLongArray(new long[]{300,400});
+        AndroidArchiveCoordinator.Host host=new AndroidArchiveCoordinator.Host() {
+            @Override public long currentOwner(int account){return owners.get(account);}
+            @Override public boolean unlocked(){return true;}
+            @Override public SharedPreferences preferences(int account){return context.getSharedPreferences(prefix+account,Context.MODE_PRIVATE);}
+            @Override public void storageProblem(){ }
+        };
+        AndroidArchiveCoordinator c=new AndroidArchiveCoordinator(context,host,2);
+        CountDownLatch entered=new CountDownLatch(1),release=new CountDownLatch(1),cleaned=new CountDownLatch(1);
+        c.submit(c.capture(0),store->{entered.countDown();if(!release.await(20,TimeUnit.SECONDS))throw new IOException("barrier");return true;},(value,error)->{});
+        require(entered.await(20,TimeUnit.SECONDS));
+        File file=new File(context.getCacheDir(),"viewed-original-test.bin");byte[] body=bytes("original-before-once-unlink");
+        Files.write(file.toPath(),body);
+        VerifiedMediaInput input=VerifiedMediaInput.open(file,body.length,null,null);
+        AtomicBoolean accepted=new AtomicBoolean();
+        runOnMainSync(()->accepted.set(c.persistViewed(c.captureBackground(0),store->{
+            long id=store.save(55,1,2,bytes("once-tl"),"once caption",true);
+            store.saveOriginal(id,input,body.length,"audio/ogg");return null;
+        },()->{try{input.close();}catch(IOException ignored){}cleaned.countDown();})));
+        // UI returned while the worker is deliberately blocked; no synchronous wait.
+        require(accepted.get() && cleaned.getCount()==1 && file.delete());
+        release.countDown();require(cleaned.await(20,TimeUnit.SECONDS));
+        byte[] restored=call(c,c.capture(0),store->{
+            long id=store.list(55,0).get(0).id;ByteArrayOutputStream out=new ByteArrayOutputStream();store.writeOriginal(id,out);return out.toByteArray();
+        });
+        require(Arrays.equals(body,restored));Arrays.fill(restored,(byte)0);Arrays.fill(body,(byte)0);
+        rejects(IOException.class,()->input.read());
+
+        CountDownLatch waiting=new CountDownLatch(1),resume=new CountDownLatch(1),discarded=new CountDownLatch(4);
+        c.submit(c.capture(0),store->{waiting.countDown();if(!resume.await(20,TimeUnit.SECONDS))throw new IOException("barrier");return true;},(value,error)->{});
+        require(waiting.await(20,TimeUnit.SECONDS));
+        AndroidArchiveCoordinator.Token old=c.captureBackground(0);
+        AtomicBoolean staleWrite=new AtomicBoolean();java.util.concurrent.atomic.AtomicInteger cleanupCount=new java.util.concurrent.atomic.AtomicInteger();
+        for(int i=0;i<4;i++)require(c.persistViewed(old,store->{staleWrite.set(true);return null;},()->{cleanupCount.incrementAndGet();discarded.countDown();}));
+        AtomicBoolean overflowClosed=new AtomicBoolean();
+        require(!c.persistViewed(old,store->{throw new AssertionError("Overflow work ran");},()->overflowClosed.set(true)));
+        require(overflowClosed.get());
+        c.onLogout(0);owners.set(0,301);c.onOwnerChanged(0,300,301);resume.countDown();
+        require(discarded.await(20,TimeUnit.SECONDS) && cleanupCount.get()==4 && !staleWrite.get());
+        require(call(c,c.capture(0),store->store.list(55,0)).isEmpty());
+        CountDownLatch failedCleanup=new CountDownLatch(1);
+        require(c.persistViewed(c.captureBackground(0),store->{throw new IOException("synthetic operation failure");},failedCleanup::countDown));
+        require(failedCleanup.await(20,TimeUnit.SECONDS));
+        c.onLogout(0);c.onLogout(1);file.delete();
     }
 }

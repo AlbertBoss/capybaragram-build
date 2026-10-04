@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicIntegerArray;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
@@ -28,6 +29,7 @@ public final class AndroidArchiveCoordinator {
     private final AtomicLongArray epochs;
     private final AtomicIntegerArray retired;
     private final AtomicLong lockEpoch = new AtomicLong();
+    private final AtomicInteger pendingViewSnapshots = new AtomicInteger();
     private volatile Thread workerThread;
     private final Object metadataLock = new Object();
     private final SharedPreferences cleanup;
@@ -113,6 +115,45 @@ public final class AndroidArchiveCoordinator {
                 catch (ExecutionException failure) { host.storageProblem(); return false; }
             }
         } finally { if (interrupted) Thread.currentThread().interrupt(); }
+    }
+
+    /**
+     * Viewer-owned descriptors must be held before upstream expires/unlinks files.
+     * Never wait on the UI. Cleanup runs exactly once, including stale owner,
+     * full queue and failure. At most four pending/active viewer snapshots.
+     * No plaintext callback is posted to the UI.
+     */
+    public boolean persistViewed(Token token, Work<Void> operation, Runnable cleanup) {
+        if (operation == null || cleanup == null) throw new IllegalArgumentException();
+        if (token == null || !token.background) {
+            cleanup.run();
+            return false;
+        }
+        if (pendingViewSnapshots.incrementAndGet() > 4) {
+            pendingViewSnapshots.decrementAndGet();
+            cleanup.run();
+            return false;
+        }
+        try {
+            worker.execute(() -> {
+                try {
+                    if (!isCurrent(token)) return;
+                    try (AndroidArchiveStore store = open(token)) {
+                        if (isCurrent(token)) operation.run(store);
+                    }
+                } catch (Exception failure) {
+                    if (isCurrent(token)) host.storageProblem();
+                } finally {
+                    try { cleanup.run(); }
+                    finally { pendingViewSnapshots.decrementAndGet(); }
+                }
+            });
+        } catch (RuntimeException rejected) {
+            pendingViewSnapshots.decrementAndGet();
+            cleanup.run();
+            return false;
+        }
+        return true;
     }
 
     public <T> void submit(Token token, Work<T> operation, Callback<T> callback) {

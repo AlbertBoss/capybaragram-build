@@ -2,7 +2,7 @@
 
 Opt-in per Telegram account; disabled by default. A native chat-menu entry enables
 capture and reads the archive for that chat. Existing messages are captured only
-when an observed deletion, media-expiry or edited-message replacement occurs.
+when an observed deletion, media-expiry or edited-message replacement occurs. Once/TTL viewer entry also captures before playback/display; viewer closing retries the same account generation if the original became available later.
 
 The Telegram storage queue waits for the separate archive worker to commit before
 continuing the original mutation. Disk/key failures do not block Telegram deletion;
@@ -18,7 +18,7 @@ app directory. No claim of full-database encryption or rollback prevention.
 Limits: 2,000 snapshots per account, 60,000 serialized bytes per message, 20 entries per page; 32 MiB per original and 128 MiB total authenticated attachment storage. Quota uses actual encrypted bytes, including overhead. Oldest originals may be pruned while their text snapshots remain. Schema v1 migrates additively to v2 without replacing snapshot ciphertext or key. Unsupported versions are preserved. Disabling retains data; archive clearing
 retires its key/database without signing out. Logout retires the account generation.
 
-Preparation composes four pinned native source files after account, note,
+Preparation composes six pinned native source files after account, note,
 read-mode and appearance changes. Test classes and the standalone test manifest
 are not in the production-file allowlist. The full Android candidate workflow
 compiles the native chat UI and hooks. The manually dispatched runtime workflow
@@ -29,3 +29,7 @@ A passing standalone test does not prove live Telegram behaviour.
 The archive page exposes attachment buttons. Image previews are sampled to at most two million pixels; audio/video use Android MediaPlayer with a bounded in-memory MediaDataSource. Plaintext media is not written to disk or passed to external apps. Lock, logout, account/location changes or closing the dialog release playback and wipe the buffer; stale worker results are also disposed. Other file formats are stored but their preview/export is not implemented.
 
 V2 backend and instrumented checks compile against Android API 36. Run 37166315419 passed actual V2 SQLite/AndroidKeyStore checks on the API 30 emulator, including complete original roundtrip, quota and V1 migration. All eight tested source digests match this implementation. Native Telegram compilation and live scenarios are pending. Tests now cover multi-chunk roundtrip, incomplete/extra input rollback, ciphertext tampering, missing chunks, maximum-file quota, cascade cleanup, unchanged V1 ciphertext migration, and encrypted-input read ranges. The standalone decrypt callback test does not establish Telegram native AES-CTR integration.
+
+Early viewer capture is now hooked into SecretMediaViewer and SecretVoicePlayer. The UI serializes a bounded message snapshot and holds a source descriptor before the native consume callbacks. A separate FIFO encrypts/copies the original; at most four viewer snapshots are pending/active. Descriptors close and copied TL bytes are wiped on success, failure, overflow and stale owner/generation. The closing retry reuses the token captured at opening, so a logout/slot reuse cannot rebind an old viewer to the new account. No read/listen RPC or extra playback is invoked by archive capture. Native compilation and live once/TTL/secret scenarios for these new hooks remain pending.
+
+The previous V2 client APK (37167432589) compiled and passed signer/class/JNI/notice inspection. New runtime checks also exercise an open descriptor after source unlink, nonblocking UI enqueue, bounded overflow rejection, stale-generation cleanup and operation-failure cleanup. These checks have compiled locally; their actual Android execution is pending.

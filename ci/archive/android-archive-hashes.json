@@ -4,18 +4,22 @@
     "TMessagesProj/src/main/java/org/telegram/messenger/MessagesStorage.java": "c8e6d712b08853b61b54659dad84bd47ccd2d56315d2c66df7b3a52d1716f0cb",
     "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "f7d47f846665cf9ec7eed72b19d37288ebf95508f5783e9b96128e2340719967",
     "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java": "3137df15d84755dd36928887a546fc8bf278f7133c5655536a795e945cff250a",
-    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "abc584e8e3097b307dc73a4a05f07914b5067c1587b641baf75bd2a7b9147968"
+    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "abc584e8e3097b307dc73a4a05f07914b5067c1587b641baf75bd2a7b9147968",
+    "TMessagesProj/src/main/java/org/telegram/ui/SecretMediaViewer.java": "92f3d8382f01599aeceb908977d53963c6f00f09e90376ee4b5293826c9e8edb",
+    "TMessagesProj/src/main/java/org/telegram/ui/SecretVoicePlayer.java": "5619a3801d73d722dca8ac1f1f528355d66fa16d00812e86afbcda9220be4641"
   },
   "post": {
     "TMessagesProj/src/main/java/org/telegram/messenger/MessagesStorage.java": "ffd559d4b5ee567db3d97815ed12993ae998c8feaa0c8b399b9446e85ee46a09",
     "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "5872751e27b5e479ac1879ba5467772c0ef4d291868880d48042ee24c1193966",
     "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java": "dcdaf6648c8cbd1d539633350e75dfb0c3b3f70ed73e2bafbdfaa22feba33d56",
-    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "7a0f349bd02391a47e2a67239c36fdfe913a3611b7329badfff87a11390d5828"
+    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "7a0f349bd02391a47e2a67239c36fdfe913a3611b7329badfff87a11390d5828",
+    "TMessagesProj/src/main/java/org/telegram/ui/SecretMediaViewer.java": "60e7c5b27f0a23aec65dcb8a28e3ac286055624ed280750acc1ec80b6e7632ca",
+    "TMessagesProj/src/main/java/org/telegram/ui/SecretVoicePlayer.java": "a5d8c44eeee3d688728cb7c30a61427811ef0a39881559a5631d908ba3457631"
   },
   "added": {
     "TMessagesProj/src/main/java/org/capybaragram/archive/AndroidArchiveStore.java": "dcf923739afbe1675729c91401df2f86067ff45f6d24459f2307281e7625744c",
-    "TMessagesProj/src/main/java/org/capybaragram/archive/AndroidArchiveCoordinator.java": "e3698f47cd4a4d280a815351dd061583be2b22d5773bbc40a0b3b3093ebee7e3",
-    "TMessagesProj/src/main/java/org/capybaragram/archive/CapyMessageArchive.java": "059893dec49fcb2635be5c4781378430204c85629266286644c66fc8cacd4108",
+    "TMessagesProj/src/main/java/org/capybaragram/archive/AndroidArchiveCoordinator.java": "3a2b432d04da6e82e9e9d0b46fba633e0fcb4744003400c005767f10450b5f87",
+    "TMessagesProj/src/main/java/org/capybaragram/archive/CapyMessageArchive.java": "1316790cfe58cd6e9e5180ba874e354b55d2c20bfe78ae1aba209bf4983576fa",
     "TMessagesProj/src/main/java/org/capybaragram/archive/CapyArchiveUi.java": "79b88a98466ab91984ccc33f48c0cc15f1e96f4ab6d433df397e38b03d8e9e0f",
     "TMessagesProj/src/main/java/org/capybaragram/archive/VerifiedMediaInput.java": "06eae163da5a8a402fb80903d3a25a0e9afd51fb26040670c5654e1452a265d9",
     "TMessagesProj/src/main/java/org/capybaragram/archive/CapyArchiveMediaSource.java": "00278d4c9e36e1f349e19b057eb09bb5c15775461c3281cba485269c585f525f",
