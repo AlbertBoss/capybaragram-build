@@ -56,8 +56,16 @@ def main():
         common = ["cargo", "+" + RUST]
         test = run("runtime", common + ["test", "--locked", "--no-default-features", "--features", "cli", "--lib", "--bins"])
         suites = re.findall(r"test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored", test)
-        if not suites or any(int(failed) or int(ignored) for _, failed, ignored in suites):
-            raise ValueError("Missing, failed or ignored runtime suite")
+        if not suites or any(int(failed) for _, failed, _ in suites):
+            raise ValueError("Missing or failed runtime suite")
+        skipped = re.findall(r"^test ([\w:]+) \.\.\. ignored, requires live Telegram network access$", test, re.M)
+        expected_skips = {
+            "proxy::tests::accepts_mtproto_and_builds_live_media_tunnel",
+            "transport::tests::connects_to_all_production_data_centers",
+        }
+        if set(skipped) != expected_skips or sum(int(ignored) for _, _, ignored in suites) != 2:
+            raise ValueError("Unexpected ignored tests; only two upstream external-network tests may be skipped")
+        result["upstream_live_network_tests_skipped"] = skipped
         result["tests_passed"] = sum(int(passed) for passed, _, _ in suites)
         required = [
             "capy_socks_dc_preface_expires_and_releases_connection",
