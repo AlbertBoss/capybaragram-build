@@ -12,8 +12,8 @@ import xml.etree.ElementTree as ET
 if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('RUNNER_OS')!='Linux':
     raise RuntimeError('This check is restricted to a disposable Linux CI emulator.')
 PACKAGE='org.capybaragram'
-RUN=37201227437
-APK_SHA='e0be0365329d9555cf251cf40f4f147c6591c83c868f796601ff9b1aa5d7518e'
+RUN=37208052043
+APK_SHA='55be0b59ed089e5867fdc1ed1e6f8fa0ee3b8673dab5f7da38b491f0234a8c2b'
 CERT_SHA='8254ebe4b00d6e4a95ee07dd27a30f8bd95b066b83c72affb39e4d25e7bff282'
 sdk=Path(os.environ['ANDROID_HOME'])
 scratch=Path(os.environ['RUNNER_TEMP'])/'capy-current-candidate-runtime'
@@ -77,7 +77,15 @@ def open_connection(tree,name):
         raise RuntimeError('Expected native CapybaraGram connection dialog.')
     return tree
 def ordinary(tree):
-    return any(n.get('text','').startswith('Обычное подключение: напрямую, через ваш VPN') for n in own(tree))
+    return any(n.get('text','').startswith('Обычное подключение: напрямую, через VPN') for n in own(tree))
+def require_readable_dialog(tree):
+    # The old 320dp captures expose a genuinely scrollable message panel, with
+    # the account-wide/lifetime paragraph below its initial visible viewport.
+    phrase='Режим общий для всех аккаунтов.'
+    panels=[n for n in own(tree) if n.get('class','').endswith('ScrollView')
+            and any(phrase in c.get('text','') for c in n.iter('node'))]
+    if len(panels)!=1 or panels[0].get('scrollable')!='false':
+        raise RuntimeError('Connection disclosure still requires scrolling at the tested 320dp width.')
 
 apks=list((Path(os.environ['RUNNER_TEMP'])/'candidate-input').rglob('*.apk'))
 if len(apks)!=1 or hashlib.sha256(apks[0].read_bytes()).hexdigest()!=APK_SHA:
@@ -99,7 +107,7 @@ process=subprocess.Popen([str(emulator),'-avd','capy-current','-no-window','-no-
     '-change-locale','ru-RU'],stdout=log,stderr=subprocess.STDOUT,env=env)
 result={'apk_run':RUN,'apk_sha256':APK_SHA,'certificate_sha256':CERT_SHA,'install':'PENDING','launch':'PENDING',
     'light_dark_intro':'PENDING','phone_form':'PENDING','connection_dialog':'PENDING','arm64_tunnel_local_start':'PENDING',
-    'explicit_route_disable':'PENDING','cold_restart':'PENDING','visual_review':'PENDING',
+    'explicit_route_disable':'PENDING','cold_restart':'PENDING','connection_description_fits':'PENDING','visual_review':'PENDING',
     'real_account_login':False,'real_chat_read_archive_voice_acceptance':False,'provider_vpn_acceptance':False,
     'android_14_capture_hardware_acceptance':False,'physical_arm64_device':False}
 try:
@@ -175,18 +183,22 @@ try:
     tree=open_connection(tree,'05-connection-default')
     if not ordinary(tree):
         raise RuntimeError('Fresh application connection mode was not ordinary.')
+    require_readable_dialog(tree)
     result['connection_dialog']='PASS (native prelogin dialog, default ordinary route)'
-    action(tree,{'Включить встроенный маршрут'})
+    action(tree,{'Включить маршрут'})
     time.sleep(12); tree=snapshot('06-route-started-phone')
     tree=open_connection(tree,'07-connection-local-ready')
     if not any(n.get('text','').startswith('Встроенный маршрут запущен.') for n in own(tree)):
         raise RuntimeError('Actual ARM64 native tunnel did not report LOCAL_READY.')
+    require_readable_dialog(tree)
     result['arm64_tunnel_local_start']='PASS (actual production APK, translated ARM64 JNI; loopback readiness only)'
     action(tree,{'Обычное подключение'})
     time.sleep(3); tree=snapshot('08-route-disabled-phone')
     tree=open_connection(tree,'09-connection-disabled')
     if not ordinary(tree):
         raise RuntimeError('Explicit ordinary route did not restore native UI state.')
+    require_readable_dialog(tree)
+    result['connection_description_fits']='PASS (all three initial dialog states non-scrollable at 320dp; account-wide disclosure included)'
     result['explicit_route_disable']='PASS'
     action(tree,{'Отмена','Cancel'})
     device('shell','am','force-stop',PACKAGE)
