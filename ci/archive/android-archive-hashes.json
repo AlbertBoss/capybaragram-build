@@ -13,12 +13,12 @@
     "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "7a0f349bd02391a47e2a67239c36fdfe913a3611b7329badfff87a11390d5828"
   },
   "added": {
-    "TMessagesProj/src/main/java/org/capybaragram/archive/AndroidArchiveStore.java": "0a82bae0ec86a11b3b67ce854989c5c2ce2dfc456f5dcd51ef9e09bfc767442d",
+    "TMessagesProj/src/main/java/org/capybaragram/archive/AndroidArchiveStore.java": "dcf923739afbe1675729c91401df2f86067ff45f6d24459f2307281e7625744c",
     "TMessagesProj/src/main/java/org/capybaragram/archive/AndroidArchiveCoordinator.java": "e3698f47cd4a4d280a815351dd061583be2b22d5773bbc40a0b3b3093ebee7e3",
     "TMessagesProj/src/main/java/org/capybaragram/archive/CapyMessageArchive.java": "059893dec49fcb2635be5c4781378430204c85629266286644c66fc8cacd4108",
     "TMessagesProj/src/main/java/org/capybaragram/archive/CapyArchiveUi.java": "79b88a98466ab91984ccc33f48c0cc15f1e96f4ab6d433df397e38b03d8e9e0f",
     "TMessagesProj/src/main/java/org/capybaragram/archive/VerifiedMediaInput.java": "06eae163da5a8a402fb80903d3a25a0e9afd51fb26040670c5654e1452a265d9",
-    "TMessagesProj/src/main/java/org/capybaragram/archive/CapyArchiveMediaSource.java": "c7b7f2fcbda03577953255a21f757dad42e3f844a5f0ec85c42bd0f15a490b09",
+    "TMessagesProj/src/main/java/org/capybaragram/archive/CapyArchiveMediaSource.java": "00278d4c9e36e1f349e19b057eb09bb5c15775461c3281cba485269c585f525f",
     "TMessagesProj/src/main/java/org/capybaragram/archive/ArchiveMediaBuffer.java": "ad516eaa614800b63196752d8db0769b1e2637c677462ca7f350c873a4711df6",
     "TMessagesProj/src/main/res/values/capy_archive.xml": "d96406bda53fe0761f1d2dbce6ff631466126a757d8b6f5192bd78e0a2eb79a0",
     "TMessagesProj/src/main/res/values-ru/capy_archive.xml": "384ba801b4814f0735e1d0c156652a3a54b7b3491c587128cab7d0d0b1699e31"

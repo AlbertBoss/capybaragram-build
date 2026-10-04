@@ -149,7 +149,7 @@ public final class AndroidArchiveStore implements AutoCloseable {
     public void saveOriginal(long id, InputStream input, long expectedSize, String mime) throws Exception {
         ready();
         if (input == null || expectedSize <= 0 || expectedSize > MAX_ORIGINAL_BYTES || mime == null
-                || mime.length() > 127 || !mime.matches("[a-zA-Z0-9.+-]+/[a-zA-Z0-9.+-]+"))
+                || mime.length() > 127 || !mime.matches("[a-zA-Z][a-zA-Z0-9.+-]*/[a-zA-Z0-9][a-zA-Z0-9.+-]*"))
             throw new IllegalArgumentException("Invalid original.");
         authenticateSnapshot(id);
         if (originalInfo(id) != null) return;
@@ -222,7 +222,7 @@ public final class AndroidArchiveStore implements AutoCloseable {
                 String mime = b.getString("mime"), sha = b.getString("sha256");
                 if (b.getInt("version") != 1 || size <= 0 || size > MAX_ORIGINAL_BYTES
                         || chunks != (size+CHUNK_BYTES-1)/CHUNK_BYTES || !sha.matches("[0-9A-F]{64}")
-                        || mime.length()>127 || !mime.matches("[a-zA-Z0-9.+-]+/[a-zA-Z0-9.+-]+"))
+                        || mime.length()>127 || !mime.matches("[a-zA-Z][a-zA-Z0-9.+-]*/[a-zA-Z0-9][a-zA-Z0-9.+-]*"))
                     throw new IOException("Original descriptor invalid.");
                 return new Original(size,mime,sha,chunks);
             } finally { Arrays.fill(plain,(byte)0); }

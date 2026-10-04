@@ -42,7 +42,7 @@ public final class CapyArchiveMediaSource implements AutoCloseable {
             dc=largest.location.dc_id+(largest.location.local_id<<16);
         } else return null;
         if(size<=0 || size>AndroidArchiveStore.MAX_ORIGINAL_BYTES)return null;
-        if(mime==null || !mime.matches("[a-zA-Z0-9.+-]+/[a-zA-Z0-9.+-]+"))mime="application/octet-stream";
+        if(mime==null || !mime.matches("[a-zA-Z][a-zA-Z0-9.+-]*/[a-zA-Z0-9][a-zA-Z0-9.+-]*"))mime="application/octet-stream";
         FileLoader loader=FileLoader.getInstance(account);
         // getPathToAttach(false) in this upstream consults selectedAccount. Resolve our own DB explicitly.
         if(!cache) {
