@@ -106,7 +106,7 @@ def run():
     fixture = json.loads(fixture_raw)
     ffmpeg = shutil.which('ffmpeg')
     source_manifest = (HERE / 'sources.json').read_bytes()
-    assert sha(source_manifest) == '242b50774e2a986274a5f632df7a8bbc91105c3fe8f1c5883adb2bdac53b8464'
+    assert sha(source_manifest) == '35849a9e39e7f95161e060d44c49c1ca83cfaf242bec151362eb871fbb566d56'
     build_file = Path(os.environ['GITHUB_WORKSPACE']) / 'vosk-source-build-report/source-build.json'
     build = json.loads(build_file.read_text())
     assert build['source_build_completed'] and build['phase'] == 'complete'

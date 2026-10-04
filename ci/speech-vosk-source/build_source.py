@@ -21,7 +21,7 @@ import urllib.request
 import zipfile
 
 HERE=Path(__file__).resolve().parent
-MANIFEST_SHA='242b50774e2a986274a5f632df7a8bbc91105c3fe8f1c5883adb2bdac53b8464'
+MANIFEST_SHA='35849a9e39e7f95161e060d44c49c1ca83cfaf242bec151362eb871fbb566d56'
 ALLOWED_SYSTEM_LIBS={'libstdc++.so.6','libm.so.6','libgcc_s.so.1','libc.so.6','libpthread.so.0','libdl.so.2'}
 
 def sha(raw):
@@ -153,16 +153,58 @@ def run():
     for component in ('f2c','blas','lapack'):
         libraries=list(clapack_build.rglob('lib'+component+'.a'));assert len(libraries)==1
         shutil.copyfile(libraries[0],prefix/'lib'/libraries[0].name)
+    # The CBLAS-only OpenBLAS intentionally has no LAPACKE. Use real CLAPACK
+    # declarations together with its actual f2c implementation, not a fake header.
+    for header in ('f2c.h','clapack.h'):
+        original=stage/'clapack/INCLUDE'/header
+        expected=inputs['clapack']['selected_review_files']['INCLUDE/'+header]['sha256']
+        assert sha(original.read_bytes())==expected
+        shutil.copyfile(original,prefix/'include'/header)
     step('openfst-autoreconf',['autoreconf','-fi'],stage/'openfst',120)
     step('openfst-configure',['bash','./configure','--prefix='+str(prefix),'--enable-static','--enable-shared','--with-pic','--disable-bin','--enable-lookahead-fsts','--enable-ngram-fsts'],stage/'openfst',180,{'CXXFLAGS':'-O2 -g0 -DFST_NO_DYNAMIC_LINKING'})
     step('openfst',['make','-j2'],stage/'openfst',1800)
     step('openfst-install',['make','-j2','install'],stage/'openfst',120)
     kaldi=stage/'kaldi/src'
     step('kaldi-configure',['bash','./configure','--shared','--use-cuda=no','--mathlib=OPENBLAS_CLAPACK','--openblas-clapack-root='+str(prefix),'--fst-root='+str(prefix),'--fst-version=1.8.0'],kaldi,120,{'CXXFLAGS':'-O2 -g0 -DFST_NO_DYNAMIC_LINKING'})
+    # This pinned configure selects linux_openblas.mk even for OPENBLAS_CLAPACK.
+    # Correct the generated macro for CBLAS + real CLAPACK on this Linux host.
+    generated=kaldi/'kaldi.mk';original=generated.read_text()
+    assert original.count('-DHAVE_OPENBLAS')==1 and '-DHAVE_CLAPACK' not in original
+    corrected=original.replace('-DHAVE_OPENBLAS','-DHAVE_CLAPACK')
+    generated.write_text(corrected)
+    state['math_configuration']={'mode':'CBLAS-only OpenBLAS plus CLAPACK/f2c',
+        'generated_kaldi_mk_before_sha256':sha(original.encode()),
+        'generated_kaldi_mk_after_sha256':sha(corrected.encode()),
+        'have_openblas_macro':False,'have_clapack_macro':True,'dummy_lapacke_header':False}
+    save()
+    smoke=stage/'math-abi.cpp'
+    smoke.write_text('''#include "matrix/kaldi-blas.h"
+#include <cmath>
+#include <cstdio>
+static_assert(sizeof(KaldiBlasInt)==sizeof(int), "Kaldi/CLAPACK integer ABI");
+int main() {
+  const double a[]={1,2,3,4}, b[]={5,6,7,8}; double c[4]={};
+  cblas_dgemm(CblasRowMajor,CblasNoTrans,CblasNoTrans,2,2,2,1.0,a,2,b,2,0.0,c,2);
+  const double expected[]={19,22,43,50};
+  for(int i=0;i<4;++i) if(std::fabs(c[i]-expected[i])>1e-10) return 11;
+  integer n=2,nrhs=1,lda=2,ldb=2,info=-1,pivots[2]={};
+  double matrix[]={3,1,1,2}, rhs[]={9,8};
+  dgesv_(&n,&nrhs,matrix,&lda,pivots,rhs,&ldb,&info);
+  if(info!=0 || std::fabs(rhs[0]-2)>1e-10 || std::fabs(rhs[1]-3)>1e-10) return 12;
+  std::puts("CAPY_CBLAS_CLAPACK_ABI=PASS");return 0;
+}
+''')
+    math_libs=[str(prefix/'lib'/('lib'+name+'.a')) for name in ('openblas','lapack','blas','f2c')]
+    smoke_exe=stage/'math-abi'
+    step('math-abi-build',['g++-12','-std=c++17','-DHAVE_CLAPACK','-I'+str(kaldi),
+        '-I'+str(prefix/'include'),str(smoke),*math_libs,'-lm','-lpthread','-ldl','-o',str(smoke_exe)],stage,90)
+    step('math-abi-run',[str(smoke_exe)],stage,15)
+    state['math_configuration']['actual_cblas_and_clapack_abi_smoke']='PASS';save()
     step('kaldi',['make','-j2','online2','lm','rnnlm'],kaldi,2400)
     native_dir=stage/'native';native_dir.mkdir()
     step('vosk-api',['make','-j2','KALDI_ROOT='+str(stage/'kaldi'),'OPENFST_ROOT='+str(prefix),'OPENBLAS_ROOT='+str(prefix),
                      'OUTDIR='+str(native_dir),'CXX=g++-12','USE_SHARED=0','HAVE_CUDA=0',
+                     'EXTRA_CFLAGS=-DHAVE_CLAPACK -DKALDI_DOUBLEPRECISION=0 -O2 -g0',
                      'EXTRA_LDFLAGS=-lm -lpthread -ldl -Wl,-z,defs,-z,relro,-z,now,-soname,libvosk.so'],stage/'api/src',240)
     native=native_dir/'libvosk.so';raw=native.read_bytes()
     assert raw[:5]==b'\x7fELF\x02' and raw[18:20]==b'\x3e\x00'

@@ -29,13 +29,13 @@
     },
     "kaldi": {
       "repository": "alphacep/kaldi",
-      "commit": "b692077807b4832cb4e1a8dd0889ed5f0a71b5b8",
-      "archive_url": "https://codeload.github.com/alphacep/kaldi/zip/b692077807b4832cb4e1a8dd0889ed5f0a71b5b8",
-      "archive_sha256": "5ffb1622438c6625a7d06276419d7df1a051b9e3c893de48aad4ff19fb1500ed",
-      "archive_bytes": 19778829,
-      "archive_root": "kaldi-b692077807b4832cb4e1a8dd0889ed5f0a71b5b8",
-      "uncompressed_bytes": 52591675,
-      "git_blobs_verified": 8266,
+      "commit": "93ef0019b847272a239fbb485ef97f29feb1d587",
+      "archive_url": "https://codeload.github.com/alphacep/kaldi/zip/93ef0019b847272a239fbb485ef97f29feb1d587",
+      "archive_sha256": "27ae74a0fca136681ed5bb4e0d8f3d5dde117617ee2b67db32468d97d4146861",
+      "archive_bytes": 19777414,
+      "archive_root": "kaldi-93ef0019b847272a239fbb485ef97f29feb1d587",
+      "uncompressed_bytes": 52586889,
+      "git_blobs_verified": 8265,
       "selected_review_files": {
         "COPYING": {
           "sha256": "3fd3dd523b1717f1fb2ae40896df943d767fa5e664e46156c2dba7094f0d7172",
@@ -48,14 +48,14 @@
           "bytes": 8393
         },
         "src/configure": {
-          "sha256": "6f6417887eb32a810d759b592011dc96a09d0407ef88f13a8ec8d5eaf684e5f4",
-          "git_blob": "b02a2dc73b86da24b4a035a17fed3ae2601b70d2",
-          "bytes": 57914
+          "sha256": "fa58f7f39abd7262a87ccd87d2b2d974db18c689bac212369ffe88f4adb5873e",
+          "git_blob": "ed62daa501787744c79a5066deeb25b404a1fe71",
+          "bytes": 56410
         },
         "src/makefiles/android_openblas.mk": {
-          "sha256": "9d2b25c91a43f4c1bfc10406ac51028c8f20db9049b21171d65fb07877a8a0f3",
-          "git_blob": "c34ec01f109e7c081beecd56a40c90d71b742982",
-          "bytes": 1178
+          "sha256": "83ed2e3cd690bbf2f5a0b11831c9a6864f42ebc856f9485f17b83046e2d3b204",
+          "git_blob": "4310e47f68c7817c7ccfd0cce9856dee184a17aa",
+          "bytes": 1266
         },
         "src/makefiles/cuda_64bit.mk": {
           "sha256": "43d202e25af1fe6b4a05c3274f614fbcb82de96aae3999bedc82f133a032e3f0",
@@ -78,14 +78,9 @@
           "bytes": 1569
         },
         "src/makefiles/default_rules.mk": {
-          "sha256": "165f175de4f1b4f96956c1cd02c16691dbfc2edf325e49ddcc030e75bc3ae821",
-          "git_blob": "edcb7e15bb85ac79739bd43381c76cd6b71226e7",
-          "bytes": 5356
-        },
-        "src/makefiles/ios.mk": {
-          "sha256": "e599ad53fb9707886b760d28604abc9c0125339552d1f011bbedb91ca2527e8a",
-          "git_blob": "535d2925f206f13a474a201abcf680a3508e2d29",
-          "bytes": 1092
+          "sha256": "d406aa2cc39a54fe722d83f816d56cbeb2b99000ac0c3f97e23490dad05d8c5b",
+          "git_blob": "3ae5ed5e2ddd0d417bfd9300842aa959633b6e76",
+          "bytes": 5117
         },
         "src/makefiles/linux_atlas.mk": {
           "sha256": "cfea3bcb86a923fb0c54d25da6ba329fc2df9e5d8de63212bb7a09295b6aeddc",
@@ -132,15 +127,15 @@
           "git_blob": "4f74eea5637c57246c95867fb820c8349d208121",
           "bytes": 1372
         },
+        "src/makefiles/linux_openblas_riscv64.mk": {
+          "sha256": "0761e410294cbe0b456c2853367b7e3e7fa1dc6b293507870c26e4726b594d53",
+          "git_blob": "d81990aed7a5fefbd25a45162e328a51cd0d5e55",
+          "bytes": 1315
+        },
         "src/makefiles/linux_x86_64_mkl.mk": {
           "sha256": "99468814d76493969833db40392e3ec09a55d415e791c1c74c40a4d8cc6bd244",
           "git_blob": "2489938a18ad9d5669b709f8d4dc008c7f65e7fb",
           "bytes": 1462
-        },
-        "src/makefiles/mingw.mk": {
-          "sha256": "c34bc7ab2b7e13a76df44bae97575425fb911ea147d971f266dd098ab2e57f03",
-          "git_blob": "f326f78e8e925d19f539098c1cbdd48afad8e2c9",
-          "bytes": 893
         },
         "src/online2/Makefile": {
           "sha256": "faf4b2bb0f3eeb9430f5f5aa8e74c31104e74c512050b4bd214a794551998e3c",
@@ -153,9 +148,19 @@
           "bytes": 6793
         },
         "tools/extras/install_openblas_clapack.sh": {
-          "sha256": "b898bcf58c56533d5f2aab8e607c29df6b4d6e43b34beca31a5046337e7494b2",
-          "git_blob": "6ae52e96965bf98649ce35ce78a52a99b2c3b371",
+          "sha256": "afddb78755f6fe38cdd455367ae70d4ef3ad4973714b073984c5de679768651d",
+          "git_blob": "08274d25775d5083e9dfcb21677755be724d0e3e",
           "bytes": 598
+        },
+        "src/matrix/kaldi-blas.h": {
+          "bytes": 4258,
+          "sha256": "c0c5090c8cce7456eb282e7f2c615d7667d74631e3d206e73bc841c69eb61464",
+          "git_blob": "215f596cc9c95f2a58c0ae639e9af6567658f1d1"
+        },
+        "src/matrix/cblas-wrappers.h": {
+          "bytes": 21208,
+          "sha256": "90eae75967c18b492b60a36c5fc0f0f3ffbee19df2e24d3e3ded18484eaf76d6",
+          "git_blob": "f869ab7e078e6f4a09b5ce9d6088c1aa04d56f3a"
         }
       },
       "symlink_count": 792,
@@ -383,6 +388,16 @@
           "sha256": "df52ae41f6eee7de3af1f9ca74a384ec4e449adc1192a33b922fbd2c238fd2b5",
           "git_blob": "ac4cce3ebd79c3ce500497a52fc65c59ba6b989e",
           "bytes": 19077
+        },
+        "INCLUDE/f2c.h": {
+          "bytes": 4700,
+          "sha256": "c305294aee16157cf6b76a714b7dbadd3c93723747e55bba1dcd973b850e8f36",
+          "git_blob": "726f3d44eedab6953749dff2f7e40881afc531d2"
+        },
+        "INCLUDE/clapack.h": {
+          "bytes": 343301,
+          "sha256": "3a4c918d196151192bcf58141b5b84f93189df243ccc711e8e7af35633366de5",
+          "git_blob": "d22da9811b671a5b354141c485c611eaebc60413"
         }
       },
       "symlink_count": 0,
@@ -391,7 +406,7 @@
     }
   },
   "all_source_blobs_checked_against_git": true,
-  "selection": "Kaldi/OpenFST branch history before API v0.3.45; currently resolved CLAPACK v3.2.1 and stable OpenBLAS v0.3.34",
+  "selection": "Linux Kaldi vosk branch and OpenFST history before API v0.3.45; pinned CLAPACK v3.2.1 and OpenBLAS v0.3.34",
   "source_archive_build_correspondence_proven": false,
   "production_admitted": false,
   "full_security_audit": false,
@@ -402,5 +417,15 @@
     "No private voices, sessions, API keys, microphone or Telegram account in this workflow",
     "Source build commands execute only after network syscall denial; no mutable Docker image or vendor downloader",
     "No binaries/models/source archives are uploaded by this experiment"
-  ]
+  ],
+  "math_abi": "Real CLAPACK/f2c declarations with CBLAS-only OpenBLAS; generated HAVE_CLAPACK for Kaldi and matching API flags; native GEMM/linear-solve check before Kaldi build",
+  "previous_source_build": {
+    "run": 37237447876,
+    "head": "c153c03063422179e9077cc259130b302d075785",
+    "conclusion": "failure",
+    "phase": "kaldi",
+    "diagnostic": "lapacke.h missing in OpenBLAS-only-CBLAS mode",
+    "first_three_dependencies_compiled": true,
+    "product_changed": false
+  }
 }
