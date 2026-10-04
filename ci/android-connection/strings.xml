@@ -2,13 +2,13 @@
 <resources>
     <string name="CapyConnection">CapybaraGram · Connection</string>
     <string name="CapyConnectionLogin">Connection</string>
-    <string name="CapyConnectionEnable">Enable built-in route</string>
+    <string name="CapyConnectionEnable">Enable route</string>
     <string name="CapyConnectionDisable">Use normal connection</string>
     <string name="CapyConnectionProxySettings">Proxy settings</string>
     <string name="CapyConnectionStarting">Starting the built-in route… Reopen this screen to check its status.</string>
-    <string name="CapyConnectionLocalReady">The built-in route is running. Check Telegram’s connection indicator to confirm that the service is reachable.</string>
-    <string name="CapyConnectionDisabled">Normal connection: direct, your VPN or your configured proxy.</string>
+    <string name="CapyConnectionLocalReady">The built-in route is running. Check Telegram’s connection indicator.</string>
+    <string name="CapyConnectionDisabled">Normal connection: direct, your VPN or your proxy.</string>
     <string name="CapyConnectionFailed">The built-in route could not start. Your normal connection has been restored. You can try again.</string>
     <string name="CapyConnectionChanged">Connection settings changed. Reopen this screen.</string>
-    <string name="CapyConnectionDescription">The built-in route uses Telegram WebSocket endpoints and can help when a direct connection is unavailable. It does not require an external proxy app, but availability depends on your network. It is a connection option, not a VPN or an anonymity service.\n\nThe mode applies to all accounts in this app and stays enabled until you disable it, choose a normal proxy or restart the app. Your saved proxy settings remain intact.</string>
+    <string name="CapyConnectionDescription">May help when Telegram cannot connect. Runs inside this app; availability depends on your network.\n\nApplies to all accounts until you select normal connection, choose a proxy or restart the app. Saved proxy settings stay unchanged.</string>
 </resources>

@@ -20,7 +20,7 @@
     "TMessagesProj/src/main/java/org/capybaragram/connection/NativeTunnel.java": "4d2dfdd1d7e80d55fb575c4c1a2d382f05e7e014e49701ac9ea799d5225724bb",
     "TMessagesProj/src/main/java/org/capybaragram/connection/CapyConnectionService.java": "df320b131a4eab1f80d606ef70781edcef4b2831bc844ea6846757fec8e23ad3",
     "TMessagesProj/src/main/java/org/capybaragram/connection/CapyConnectionUi.java": "e7387bbb1a54bd2eb02136422798963fc669d050a18355c47836721821ff9cdd",
-    "TMessagesProj/src/main/res/values/capy_connection.xml": "3928346b996a501b770a96c46a9061bd5d0971bdea3a6130da4777e12ba0b402",
-    "TMessagesProj/src/main/res/values-ru/capy_connection.xml": "a1e60eac227ef6df2f5c2f9ecd294f0c3d301d6d42889f251aee41d15519307d"
+    "TMessagesProj/src/main/res/values/capy_connection.xml": "619ca82c584691ee19dec486ce55073255a6c2d138b2ba40e4b1d53723ab8e5b",
+    "TMessagesProj/src/main/res/values-ru/capy_connection.xml": "9b5f803a88795bd73e82c1de92abb96297a12bdc8629b66d852b6d53e858586c"
   }
 }
