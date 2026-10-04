@@ -1,0 +1,11 @@
+# Windows startup regression, 5 October 2026
+
+The candidate from run `37218130339` compiles, but is **not accepted for use or final delivery**. The owner reports that it does not open. Two bounded debugger launches with fresh empty profiles reproduce an access violation (`0xc0000005`) in the EXE at RVA `0x43ce940`, followed by `0xc000041d`. No owner session or account data was used in these experiments.
+
+The failing function is the MSVC delay-load helper. Qt's monitor EDID reader calls a registry import at IAT RVA `0xd9eb480`, but the shared thunk supplies the `advapi32.dll` descriptor whose IAT begins at `0xd9ec1e0`. That slot is outside the descriptor's table: the helper computes index `4294966868` and reads beyond the lookup table. This is an observed linker-table mismatch; the computer's speed and account authorization are not established causes.
+
+The proposed source fix uses normal eager Windows imports for the seven modules shared by SDK and Rust raw-dylib records: ADVAPI32, Winsock, Crypt32, BCrypt, Secur32, Userenv and Synchronization. Optional DirectX imports remain delayed. Account handling, protocol, DLL search restrictions and vendor code stay intact. `ci/windows_startup_link_fix.py` verifies the complete predecessor CMake digest, changes only seven pinned flags, and checks the result by exact inverse reconstruction.
+
+`Windows mixed import startup regression` is a manual, finite native reproducer with the same MSVC 14.44 / SDK 10.0.26100.0 / Rust 1.88.0. It compares the SDK-only control, the mixed delayed case and the eager fix. It reads a deliberately nonexistent registry value and never writes registry or account state. This small test is not acceptance of the complete client: after it passes, a full rebuilt EXE still needs startup, login and two-account checks.
+
+At the time of this source change, the native reproducer and rebuilt client are **pending**. The existing working runtime and original profile are retained separately. No automatic task or timer is added.

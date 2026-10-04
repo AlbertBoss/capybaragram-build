@@ -118,6 +118,10 @@ if ($Phase -eq 'Build') {
             if ($LASTEXITCODE -ne 0) { throw 'Desktop connection preparation failed.' }
             & python (Join-Path $PSScriptRoot 'windows-connection-native/prepare_windows_connection.py') $src --check
             if ($LASTEXITCODE -ne 0) { throw 'Desktop connection source verification failed.' }
+            & python (Join-Path $PSScriptRoot 'windows_startup_link_fix.py') $src
+            if ($LASTEXITCODE -ne 0) { throw 'Mixed SDK/Rust startup import preparation failed.' }
+            & python (Join-Path $PSScriptRoot 'windows_startup_link_fix.py') $src --check
+            if ($LASTEXITCODE -ne 0) { throw 'Mixed SDK/Rust startup import verification failed.' }
             & rustup toolchain install 1.88.0 --profile minimal
             if ($LASTEXITCODE -ne 0) { throw 'Connection Rust compiler setup failed.' }
             $connectionBatch = Join-Path $env:RUNNER_TEMP 'capy-windows-connection.cmd'
