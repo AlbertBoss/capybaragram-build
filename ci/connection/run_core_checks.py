@@ -30,6 +30,7 @@ def run(name, arguments, timeout=600):
 
 
 def main():
+    sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace")
     REPORT.mkdir(exist_ok=False)
     manifest = prepare(WORK)
     result = {

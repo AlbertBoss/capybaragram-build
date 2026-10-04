@@ -184,7 +184,22 @@ async fn read_socks5_request<S>(
     mtproto = source["src/mtproto.rs"].decode("utf-8")
     mtproto = replace_once(mtproto, "    if value.len() != 32 {\n",
                            "    if value.len() != 32 || !value.bytes().all(|b| b.is_ascii_hexdigit()) {\n", "UTF-8 safe secret parser")
+    mtproto = replace_once(mtproto, 'write!(output, "{:02x}", byte)',
+                           'write!(output, "{byte:02x}")', "strict hexadecimal formatting")
     source["src/mtproto.rs"] = mtproto.encode("utf-8")
+    transport = source["src/transport.rs"].decode("utf-8")
+    format_updates = {
+        'format!("127.0.0.1:{}", port)': 'format!("127.0.0.1:{port}")',
+        'format!("/apiws?dst={}&dc={}", destination, dc)': 'format!("/apiws?dst={destination}&dc={dc}")',
+        'format!("kws{}.web.telegram.org", websocket_dc)': 'format!("kws{websocket_dc}.web.telegram.org")',
+        'format!("kws{}-1.web.telegram.org", websocket_dc)': 'format!("kws{websocket_dc}-1.web.telegram.org")',
+    }
+    for prefix in ["соединение не открылось", "TCP_NODELAY", "WebSocket request", "WebSocket protocol header",
+                   "рукопожатие WebSocket", "TLS setup", "TLS/WebSocket handshake"]:
+        format_updates['format!("' + prefix + ': {}", error)'] = 'format!("' + prefix + ': {error}")'
+    for old, new in format_updates.items():
+        transport = replace_once(transport, old, new, "strict upstream format: " + old)
+    source["src/transport.rs"] = transport.encode("utf-8")
     cli = source["src/bin/cli.rs"].decode("utf-8")
     cli = replace_once(cli, "    let mut out = std::io::stdout().lock();\n",
                        "    let text = tglock::diagnostic::single_line(text);\n    let mut out = std::io::stdout().lock();\n", "CLI diagnostics")

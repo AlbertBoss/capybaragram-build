@@ -19,8 +19,9 @@ int main() {
         handle = capy_connection_start(&endpoint);
         check(handle != 0 && endpoint.abi_version == 1 && endpoint.port != 0);
         check(endpoint.reserved == 0 && endpoint.secret[34] == 0);
-        for (unsigned char value : endpoint.secret) {
-            check(value == 0 || (value >= '0' && value <= '9') || (value >= 'a' && value <= 'f'));
+        for (int index = 0; index != 34; ++index) {
+            const auto value = endpoint.secret[index];
+            check((value >= '0' && value <= '9') || (value >= 'a' && value <= 'f'));
         }
         CapyConnectionStatus status{};
         check(capy_connection_status(handle, &status) == 1 && status.running == 1);
