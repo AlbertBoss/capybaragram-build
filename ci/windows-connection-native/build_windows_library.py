@@ -110,8 +110,8 @@ def main():
             run(module_name + '_compile', ['cmake', '--build', str(native), '--parallel', '2', '--verbose'],
                 work, report, env, 180)
             commands = json.loads((native / 'compile_commands.json').read_text(encoding='utf-8'))
-            if not commands or any(not re.search(r'(?:^|\s)/MT(?:\s|$)', c['command'])
-                                   or re.search(r'(?:^|\s)/MD', c['command']) for c in commands):
+            if not commands or any(not re.search(r'(?:^|\s)[/-]MT(?:\s|$)', c['command'])
+                                   or re.search(r'(?:^|\s)[/-]MD', c['command']) for c in commands):
                 raise ValueError('C++ probe does not use the static release CRT')
             binary = native / (executable + '.exe')
             output = run(module_name + '_runtime', [str(binary)], work, report, env, 60)
