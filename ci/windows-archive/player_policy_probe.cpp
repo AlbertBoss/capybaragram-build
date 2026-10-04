@@ -86,8 +86,12 @@ struct Input final {
 	bool open(const AVInputFormat *demuxer = nullptr) {
 		AVDictionary *options = nullptr;
 		av_dict_set(&options, "rw_timeout", "3000000", 0);
-		const auto result = avformat_open_input(&format, nullptr, demuxer, &options);
+		// An HLS master needs a non-empty base URL even when its bytes come
+		// exclusively from custom IO; this is a format hint, not a file load.
+		const auto hint = demuxer ? "memory.m3u8" : nullptr;
+		const auto result = avformat_open_input(&format, hint, demuxer, &options);
 		av_dict_free(&options);
+		if (result < 0) std::cerr << "OPEN_FAILED code=" << result << '\n';
 		return result >= 0;
 	}
 	~Input() {
