@@ -32,14 +32,25 @@ with zipfile.ZipFile(archive) as z:
 build=out/'build'
 parser=argparse.ArgumentParser();parser.add_argument('kind',choices=['cpu','android']);parser.add_argument('--install-to',type=Path)
 parser.add_argument('--android-abi',choices=['arm64-v8a','x86_64'],default='arm64-v8a')
+parser.add_argument('--strict-msvc-configure',action='store_true')
 arguments=parser.parse_args();kind=arguments.kind
+if arguments.strict_msvc_configure and (kind!='cpu' or os.name!='nt'):
+    raise ValueError('Strict MSVC check requires native Windows CPU')
 if arguments.install_to is not None and kind!='android':raise ValueError('Install is Android-only')
 if arguments.install_to is not None and arguments.android_abi!='arm64-v8a':raise ValueError('Production install requires ARM64')
 args=['cmake','-S',str(source),'-B',str(build),'-DCAPY_WHISPER_SOURCE='+str(out/'whisper'),'-DCMAKE_BUILD_TYPE=Release']
+if arguments.strict_msvc_configure:
+    # Match Desktop's Ninja/MSVC environment and reject every CMake dev/deprecation warning.
+    args+=['-G','Ninja','-Werror=dev','-Werror=deprecated']
 if kind=='android':
     sdk=Path(os.environ['ANDROID_HOME']);ndk=sdk/'ndk/27.2.12479018'
     args+=['-DCMAKE_TOOLCHAIN_FILE='+str(ndk/'build/cmake/android.toolchain.cmake'),'-DANDROID_ABI='+arguments.android_abi,'-DANDROID_PLATFORM=android-23','-DANDROID_STL=c++_static','-G','Ninja']
 subprocess.run(args,check=True,timeout=120)
+if arguments.strict_msvc_configure:
+    cache=(build/'CMakeCache.txt').read_text()
+    compiler=re.search(r'^CMAKE_CXX_COMPILER:FILEPATH=(.+)$',cache,re.M)
+    assert compiler and compiler.group(1).strip().lower().endswith('cl.exe'), 'Strict check did not use MSVC'
+    assert re.search(r'^CMAKE_GENERATOR:INTERNAL=Ninja$',cache,re.M)
 target='capy_voice_jni' if kind=='android' else 'capy_voice_runtime_test'
 subprocess.run(['cmake','--build',str(build),'--config','Release','--target',target,'--parallel','2'],check=True,timeout=900)
 if kind=='cpu':
@@ -76,7 +87,9 @@ else:
     (report/'engine-result.txt').write_text('CAPY_ANDROID_JNI=COMPILED '+arguments.android_abi+' 16KiB-aligned\n')
 result={'kind':kind,'source_commit':pins['commit'],'source_archive_sha256':pins['zip_sha256'],
         'android_abi':arguments.android_abi if kind=='android' else None,
+        'strict_msvc_configure':arguments.strict_msvc_configure,
+        'cmake_version':subprocess.run(['cmake','--version'],capture_output=True,text=True,check=True,timeout=15).stdout.splitlines()[0],
         'model':pins['model'] if kind=='cpu' else None,'result':'PASS','client_ui_integrated':False,
         'russian_voice_accuracy_tested':False,'offline_network_packet_capture_performed':False,
-        'our_source_sha256':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in source.iterdir() if p.is_file()}}
+        'our_source_sha256':{p.name:hashlib.sha256(p.read_bytes().replace(b'\r\n',b'\n')).hexdigest() for p in source.iterdir() if p.is_file()}}
 (report/'verification.json').write_text(json.dumps(result,indent=2)+'\n')

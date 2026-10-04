@@ -26,6 +26,8 @@
 #include <QJsonObject>
 #include <QPainter>
 #include <QPointer>
+#include <algorithm>
+#include <vector>
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
@@ -43,6 +45,13 @@ QString Failure() {
 	return Text(u"Could not load this archive. Try again; existing records are preserved."_q,
 		u"Не удалось загрузить архив. Попробуйте снова; существующие записи сохранены."_q);
 }
+
+// Worker callbacks transfer ownership of plaintext. Wipe it even if the box
+// closed before delivery or allocating the native QByteArray throws.
+struct WipeMedia final {
+	std::string &bytes;
+	~WipeMedia() { if (!bytes.empty()) SecureZeroMemory(bytes.data(), bytes.size()); }
+};
 
 struct Context final {
 	base::weak_ptr<Main::Session> session;
@@ -95,14 +104,30 @@ private:
 	QImage _image;
 };
 
+struct OpenPreview final {
+	std::weak_ptr<void> account;
+	QPointer<Ui::GenericBox> box;
+};
+std::vector<OpenPreview> OpenPreviews; // UI thread only; no session credentials owned here.
+void CloseAccountPreviews(const std::shared_ptr<void> &account) {
+	const auto entries = OpenPreviews;
+	for (const auto &entry : entries) {
+		if (entry.account.lock() == account && entry.box) entry.box->closeBox();
+	}
+	OpenPreviews.erase(std::remove_if(OpenPreviews.begin(), OpenPreviews.end(),
+		[](const OpenPreview &entry) { return !entry.box || entry.account.expired(); }), OpenPreviews.end());
+}
+
 void Browse(Context context, std::size_t offset = 0);
 
 void Preview(Context context, std::string id, Archive::Snapshot snapshot) {
 	if (!Available(context)) return;
+	CloseAccountPreviews(context.handle);
 	context.show->showBox(Box([=](not_null<Ui::GenericBox*> box) {
 		if (!Available(context)) { box->closeBox(); return; }
 		const auto closed = Protect(box, context);
 		const auto weak = QPointer<Ui::GenericBox>(box.get());
+		OpenPreviews.push_back({context.handle, weak});
 		box->setWidth(st::boxWideWidth);
 		box->setMaxHeight(st::boxWideWidth);
 		box->setTitle(rpl::single(Reason(snapshot.reason)));
@@ -137,11 +162,11 @@ void Preview(Context context, std::string id, Archive::Snapshot snapshot) {
 				button->setDisabled(true);
 				const auto accepted = Core::App().capyArchiveWorker().media(context.handle, id,
 					[=](Archive::Worker::Result result) {
+						const auto wipe = WipeMedia{result.media};
 						if (!weak || *closed) return;
 						*pending = false;
 						if (!result.ok) { status->setText(Failure()); button->setDisabled(false); return; }
 						auto bytes = QByteArray::fromStdString(result.media);
-						if (!result.media.empty()) SecureZeroMemory(result.media.data(), result.media.size());
 						auto buffer = QBuffer(&bytes);
 						buffer.open(QIODevice::ReadOnly);
 						auto reader = QImageReader(&buffer, previewFormat);
@@ -184,12 +209,12 @@ void Preview(Context context, std::string id, Archive::Snapshot snapshot) {
 				button->setDisabled(true);
 				const auto accepted = Core::App().capyArchiveWorker().media(context.handle, id,
 					[=](Archive::Worker::Result result) {
+						const auto wipe = WipeMedia{result.media};
 						if (!weak || *closed) return;
 						*pending = false;
 						button->setDisabled(false);
 						if (!result.ok) { status->setText(Failure()); return; }
 						auto bytes = QByteArray::fromStdString(result.media);
-						if (!result.media.empty()) SecureZeroMemory(result.media.data(), result.media.size());
 						*player = box->addRow(object_ptr<ArchivePlayer>(box, std::move(bytes), video,
 							[=](QString text) { if (weak && !*closed) status->setText(text); }), st::boxPadding);
 					});
@@ -225,6 +250,7 @@ void Clear(Context context) {
 		box->addButton(rpl::single(Text(u"Clear archive"_q, u"Очистить архив"_q)), [=] {
 			if (*pending || !Available(context)) return;
 			*pending = true;
+			CloseAccountPreviews(context.handle);
 			Core::App().capyArchiveWorker().clear(context.handle, [=](Archive::Worker::Result result) {
 				if (!weak || *closed) return;
 				*pending = false;

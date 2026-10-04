@@ -11,6 +11,14 @@ endif()
 # Do not overwrite the parent project's BUILD_SHARED_LIBS or CPU/backend cache.
 function(capy_add_pinned_whisper)
   set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+  if(MSVC AND WIN32)
+    # Only the pinned third-party child needs compatibility with current CMake.
+    # GGML enables ASM on x64 Windows but supplies no MSVC assembler sources.
+    set(CMAKE_POLICY_VERSION_MINIMUM 3.10)
+    if(POLICY CMP0194)
+      set(CMAKE_POLICY_DEFAULT_CMP0194 OLD)
+    endif()
+  endif()
   set(BUILD_SHARED_LIBS OFF)
   foreach(flag WHISPER_BUILD_TESTS WHISPER_BUILD_EXAMPLES WHISPER_BUILD_SERVER WHISPER_CURL WHISPER_USE_SYSTEM_GGML WHISPER_USE_SYSTEM_LLAMA GGML_NATIVE GGML_AVX GGML_AVX2 GGML_AVX512 GGML_FMA GGML_F16C GGML_OPENMP GGML_BACKEND_DL GGML_RPC GGML_CUDA GGML_VULKAN GGML_METAL)
     set(${flag} OFF)
