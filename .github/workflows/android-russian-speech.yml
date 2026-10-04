@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: MIT
+name: Android exact ARM64 Russian speech observations
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: capybaragram-russian-speech
+  cancel-in-progress: false
+jobs:
+  speech:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          repository: AlbertBoss/capybaragram-build
+          run-id: 37208052043
+          name: capybaragram-android-candidate-arm64
+          path: ${{ runner.temp }}/candidate-input
+          github-token: ${{ github.token }}
+      - name: Prepare API 30 emulator and Java tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -c /dev/kvm
+          sudo chmod 666 /dev/kvm
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-36' 'build-tools;36.0.0' 'platform-tools' 'emulator' 'system-images;android-30;google_apis;x86_64'
+      - name: Measure public Russian clips through exact release ARM64 JNI
+        run: python3 ci/speech-ru/run_runtime.py
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capybaragram-android-russian-speech-observations
+          path: ci/speech-ru/runtime-results/
+          retention-days: 3
+          if-no-files-found: error

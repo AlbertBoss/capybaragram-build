@@ -1,0 +1,95 @@
+{
+  "format": 1,
+  "dataset": "PolyAI/minds14",
+  "dataset_revision": "8123482db0c6a7b82694c1b92760a7e40e05c428",
+  "configuration": "ru-RU",
+  "original_parquet_sha256": "2846c833feb8f341086f33335582a411f968da62e0ce6d4a589ca5a61830c79b",
+  "original_parquet_bytes": 34494545,
+  "source_page": "https://huggingface.co/datasets/PolyAI/minds14/tree/8123482db0c6a7b82694c1b92760a7e40e05c428",
+  "license": "CC-BY-4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "attribution": "PolyAI, MInDS-14; recordings and provided native-language transcriptions. Daniela Gerz, Pei-Hao Su, Razvan Kusztos, Avishek Mondal, Michal Lis, Eshan Singhal, Nikola Mrksic, Tsung-Hsien Wen, Ivan Vulic.",
+  "citation": "Multilingual and Cross-Lingual Intent Detection from Spoken Data (2021), https://arxiv.org/abs/2104.08524",
+  "changes": "Original mono8kHz WAV recordings (source codec retained per row) converted to Opus48k mono; row0 also to stereo AAC44.1k. Metadata removed; no time trimming or content edits.",
+  "selection": "First five rows (0 through4), selected before any recognition result; no performance-based selection.",
+  "original_dataset_rows": 539,
+  "ffmpeg_version": "ffmpeg version 9.0-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "owner_telegram_audio_used": false,
+  "samples": [
+    {
+      "row_index": 0,
+      "source_path": "ru-RU~LATEST_TRANSACTIONS/6030093cbb1e6d0fbce93a74.wav",
+      "source_wav_bytes": 159802,
+      "source_wav_sha256": "c33244e6bdbee99bd157b015f225e1e797a7ef7f4f6d0f29c961de7ce86bd156",
+      "source_duration_seconds": 19.968,
+      "reference": "Здравствуйте я бы хотела пересмотреть свои предыдущие последние операции которые проходили по моей карте прямым помимо ему счёту Покажите пожалуйста операции последних трёх месяцев",
+      "source_codec": "pcm_mulaw",
+      "opus": {
+        "file": "ru-0.ogg",
+        "bytes": 59355,
+        "sha256": "469875f45874faf54106b52b0ad1773a57ea429f3b5711524acc77f319d9f585"
+      },
+      "aac": {
+        "file": "ru-0.m4a",
+        "bytes": 164575,
+        "sha256": "fa023f12502162b3f575eb208cdcf190fa8503f8d47d5136a497f86fd7369ba9"
+      }
+    },
+    {
+      "row_index": 1,
+      "source_path": "ru-RU~LATEST_TRANSACTIONS/60301265bb1e6d0fbce93c59.wav",
+      "source_wav_bytes": 70648,
+      "source_wav_sha256": "22ebc967c427d093fd32d6d1adc6e560feae18d911b9e7583f9c44452b93d62c",
+      "source_duration_seconds": 8.823625,
+      "reference": "Покажи мне мои последние транзакции если платёж который я не знаю Да я признаю платёж",
+      "source_codec": "pcm_mulaw",
+      "opus": {
+        "file": "ru-1.ogg",
+        "bytes": 26039,
+        "sha256": "0789571ecf76f4c4b5472dba9bdba7589c92821b611dd4fd034892b88dcd639e"
+      }
+    },
+    {
+      "row_index": 2,
+      "source_path": "ru-RU~LATEST_TRANSACTIONS/603011c505f96973d67951c7.wav",
+      "source_wav_bytes": 53990,
+      "source_wav_sha256": "62692880406fd5a880fa61a0b375366189a3fb5a97a58891bec2adadcbe2844a",
+      "source_duration_seconds": 6.741375,
+      "reference": "покажите мне мои последние последние транзакции",
+      "source_codec": "pcm_mulaw",
+      "opus": {
+        "file": "ru-2.ogg",
+        "bytes": 17455,
+        "sha256": "1f81b0c094fc81e4ff5950caa8733dec85240062662226335db1c719ea5a23a0"
+      }
+    },
+    {
+      "row_index": 3,
+      "source_path": "ru-RU~LATEST_TRANSACTIONS/60300a88963e11ccd901e706.wav",
+      "source_wav_bytes": 49894,
+      "source_wav_sha256": "00a34e141218f38339a9e5ccd806b6aa1785c82fe99835a0e674e47337768524",
+      "source_duration_seconds": 6.229375,
+      "reference": "Покажи мне информацию о всех моих платежах за последнюю неделю",
+      "source_codec": "pcm_mulaw",
+      "opus": {
+        "file": "ru-3.ogg",
+        "bytes": 18261,
+        "sha256": "3151045d72c474d972389a11abf220db33aef77b8431767607b76fd410c45d29"
+      }
+    },
+    {
+      "row_index": 4,
+      "source_path": "ru-RU~LATEST_TRANSACTIONS/6030060f5f67b421554f706c.wav",
+      "source_wav_bytes": 75106,
+      "source_wav_sha256": "b8dcd738617f321f5a164b3a4bdd0e38d221c1fa0e1574b05f49a6ff8f1cde2a",
+      "source_duration_seconds": 9.380875,
+      "reference": "Я хочу узнать свои последние транзакции за сегодня",
+      "source_codec": "pcm_mulaw",
+      "opus": {
+        "file": "ru-4.ogg",
+        "bytes": 24388,
+        "sha256": "ebd6be453ad92ae1b09cfe5783c6a22c2098b70950140c7324571be5b8c93d24"
+      }
+    }
+  ]
+}
