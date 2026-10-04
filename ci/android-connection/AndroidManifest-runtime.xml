@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.capybaragram.connectiontest">
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="36" />
+    <!-- Android requires INTERNET even for loopback sockets. Fixtures reject
+         SOCKS before any outbound connection and never contain Telegram keys. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application android:label="Synthetic CapybaraGram Connection Test" android:allowBackup="false" android:extractNativeLibs="true" />
+    <instrumentation android:name="org.capybaragram.connection.AndroidConnectionDeviceInstrumentation"
+        android:targetPackage="org.capybaragram.connectiontest" />
+</manifest>

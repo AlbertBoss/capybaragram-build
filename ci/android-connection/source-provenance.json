@@ -127,9 +127,12 @@
     "CMakeLists.txt": "24d4bd51393ec60a95d4cc1d29bb88c5c294abb3921d00f57487c9cd33ab6727",
     "NativeTunnel.java": "4d2dfdd1d7e80d55fb575c4c1a2d382f05e7e014e49701ac9ea799d5225724bb",
     "prepare_android_core.py": "685ad4ffc118f72a4437c24946312bde90016a83150a757e8d6215d23f57be11",
-    "README.md": "ae0e4d7fbd06a796336b3c21d26ccfac1831162fa77ce5226a33f34b9b1f5306",
+    "README.md": "80d737c5fd27de5a6546a9967b8d5614adc03650b27b01cafb1a21fe554b6e4c",
     "run_android_checks.py": "1beac4d5e29be437efeabe3c0412bfc6d219f52e6eca82c75ba4a2e15bd80ef0",
-    "tls_regressions.rs": "2739990b76c6b267b51686adb9ee66f0800891f68d02160cf0980d3caf1a7a99"
+    "tls_regressions.rs": "2739990b76c6b267b51686adb9ee66f0800891f68d02160cf0980d3caf1a7a99",
+    "AndroidConnectionDeviceInstrumentation.java": "c3fb9a7e5761fbd8c3d60f03412c847af17c652b97d44660949789d54c41d563",
+    "AndroidManifest-runtime.xml": "04dbbc4df01e812292d4a65bf63946cccae5435ca7ebce44a625da787b8a48fd",
+    "run_android_runtime.py": "176ecd80c8bc6ffb8b5fac88c9954618d0768d13c9beb4102c947a660fa8de0a"
   },
   "cargo_lock_sha256": "2ec6ea1fe4057e82d1cd666f1f08fddc535dab81accdbc35a5d24f560bae2d5b",
   "compiled_at_creation": false,
@@ -139,5 +142,19 @@
     "head": "b1bd7a0305cc15772c712061d532c6f6afb829e6",
     "artifact_sha256": "919905bbc07296c5013159417c1616ef4017327c83da87252c321f1a5291b0a6",
     "runtime_result": "failed test fixture WebSocket subprotocol; not a runtime proof"
+  },
+  "native_compilation_proof": {
+    "run": 37192578101,
+    "head": "c57a6c7a54106310e42e41b50857fbbfd821de5e",
+    "artifact_sha256": "32344ee749bbcb87179e63e1d4a05cc8ed935c1cb7b5225c57b304c02835b892",
+    "tests": 90,
+    "cpp_abi_assertions": 632,
+    "abis": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "android_jni_runtime_tested": false,
+    "client_integrated": false,
+    "live_telegram_tested": false
   }
 }

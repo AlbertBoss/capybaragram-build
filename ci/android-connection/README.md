@@ -48,3 +48,21 @@ These selected advisory checks are not a full dependency or client security audi
 Registry checksums and declared licenses for the new TLS dependencies are stored
 in `source-provenance.json`; final license notices and the complete frozen lock
 inventory must accompany a redistributed APK.
+
+## Confirmed native compilation, 2026-10-04
+
+[37192578101](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37192578101)
+passed 90 Rust tests including the actual TLS/WebSocket certificate checks, Clippy
+with warnings as errors and 632 actual C++ ABI assertions. JNI compiled for both
+ARM64 and x86_64 with verified 16 KiB ELF load alignment and system-only imports.
+The frozen lock and 12 package hashes were independently verified. Its 111 registry
+versions had no OSV database matches at the recorded check time; this is not a
+source audit. The initial synthetic server omitted the binary WebSocket response
+subprotocol; its fixture was corrected without weakening certificate validation.
+
+The newly added `android-connection-device.yml` is a separate manual gate for
+actual JNI execution in an isolated API 30 emulator, including boundary rejection,
+independent listeners, repeated shutdown and stale handles. It uses only synthetic
+loopback traffic and a disposable test signer. It does not test Telegram login,
+real providers, VPN transitions or production ARM64 execution. Client integration
+and actual device runtime remain pending.
