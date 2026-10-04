@@ -49,7 +49,7 @@ recorded in the package README and source provenance.
 candidate and installs the JNI with checksummed normal/build dependency notices.
 It does not repeat unchanged isolated native test suites. The candidate collector
 requires this JNI and the exact notice asset. Package metadata and notice contents
-are checked against the registry lock and `.cargo-checksum.json`.
+are checked against the registry lock and the original checksummed `.crate` archive.
 
 The transport includes Apache-2.0 code. Telegram's Android source uses GPLv2 or
 later, so the intended combined distribution path is GPLv3, subject to review of

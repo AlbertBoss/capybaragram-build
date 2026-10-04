@@ -1,15 +1,32 @@
 # SPDX-License-Identifier: MIT
 """Collect checksummed notices for normal/build dependencies of the ARM64 library."""
 import hashlib
+import io
 import json
 from pathlib import Path
 import re
 import subprocess
+import tarfile
 import tomllib
 
 HERE=Path(__file__).resolve().parent
 ALLOWED={'MIT','Apache-2.0','ISC','BSD-2-Clause','BSD-3-Clause','0BSD','Zlib','Unlicense',
          'CC0-1.0','CDLA-Permissive-2.0','BSL-1.0','Unicode-3.0','Unicode-DFS-2016'}
+
+def checked_notice(crate,name,version,checksum,relative):
+    # .cargo-checksum.json belongs to `cargo vendor`, not the ordinary registry cache.
+    # Verify the cached original .crate archive instead of trusting loose cache files.
+    archive=crate.parent.parent.parent/'cache'/crate.parent.name/(name+'-'+version+'.crate')
+    if archive.is_symlink() or not archive.is_file() or archive.stat().st_size>50*1048576:
+        raise ValueError('Missing or unsafe cached registry archive: '+name)
+    raw=archive.read_bytes()
+    if hashlib.sha256(raw).hexdigest()!=checksum:raise ValueError('Registry archive checksum differs: '+name)
+    with tarfile.open(fileobj=io.BytesIO(raw),mode='r:gz') as tar:
+        member=tar.getmember(name+'-'+version+'/'+relative)
+        if not member.isfile() or member.size>262144:raise ValueError('Unsafe archived dependency notice')
+        handle=tar.extractfile(member)
+        if handle is None:raise ValueError('Unreadable archived dependency notice')
+        with handle:return handle.read()
 
 def build_notices(work,env):
     work=Path(work).resolve(strict=True)
@@ -44,8 +61,6 @@ def build_notices(work,env):
         identifiers=set(re.findall(r'[A-Za-z0-9][A-Za-z0-9.+-]*',expression or ''))-{'OR','AND'}
         if not identifiers or not identifiers<=ALLOWED:raise ValueError('Unreviewed transport license: '+name+' '+str(expression))
         crate=Path(package['manifest_path']).resolve(strict=True).parent
-        checksum=json.loads((crate/'.cargo-checksum.json').read_text())
-        if checksum.get('package')!=locked['checksum']:raise ValueError('Crate archive checksum differs')
         files=set()
         if package.get('license_file'):
             path=Path(package['license_file'])
@@ -61,7 +76,8 @@ def build_notices(work,env):
             if path.is_symlink() or not path.resolve(strict=True).is_relative_to(crate) or path.stat().st_size>262144:
                 raise ValueError('Unsafe dependency notice')
             relative=path.relative_to(crate).as_posix();raw=path.read_bytes();sha=hashlib.sha256(raw).hexdigest()
-            if checksum['files'].get(relative)!=sha:raise ValueError('Dependency notice content differs from registry archive')
+            if raw!=checked_notice(crate,name,version,locked['checksum'],relative):
+                raise ValueError('Dependency notice content differs from registry archive')
             pieces.append('\n-- '+relative+' --\n'+raw.decode('utf-8')+'\n');reviewed[relative]=sha
         index.append({'name':name,'version':version,'license':expression,'archive_sha256':locked['checksum'],'notice_sha256':reviewed})
     text=''.join(pieces).encode('utf-8')

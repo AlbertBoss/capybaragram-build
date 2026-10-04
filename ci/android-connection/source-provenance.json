@@ -182,7 +182,7 @@
       "prepare_android_connection.py": "f3245a3d5c535d236246ab5e8f3d23e676276c4c8ba0026cf769107903d8f4cd",
       "native-host-hashes.json": "8183b4fb16d19da23f8e48adad09ccdf398189154ad6b73c97d3f87c18face7e",
       "build_android_library.py": "7821c2c6f98a5596d49c4f65c5db96077eb3603fdfc16ac121a3f343fcfd1541",
-      "connection_notices.py": "637a6cac3de186bfb4f4201d70dc2918cab852b89f2e00ac396f278a8df618db"
+      "connection_notices.py": "907c8c58c30a22584923e013276cf30095ab781b42a220fd6ee8d9e92004ca1a"
     },
     "controller_assertions": 27,
     "route_assertions": 24,
