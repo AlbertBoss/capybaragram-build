@@ -9,7 +9,8 @@ VAULT=JAVA+'org/capybaragram/telegram/CapyVault.java'
 FILES=[CHAT,VAULT]
 ADDED={JAVA+'org/capybaragram/voice/'+n:HERE/n for n in ('OfflineSpeech.java','SpeechModel.java','AndroidPcmDecoder.java','CapyVoiceUi.java')}
 ADDED.update({'TMessagesProj/src/main/res/values/capy_voice.xml':HERE/'strings.xml',
-              'TMessagesProj/src/main/res/values-ru/capy_voice.xml':HERE/'strings-ru.xml'})
+              'TMessagesProj/src/main/res/values-ru/capy_voice.xml':HERE/'strings-ru.xml',
+              'TMessagesProj/src/main/assets/capy_whisper_license.txt':HERE/'UPSTREAM-LICENSE.txt'})
 def once(text,old,new):
     if text.count(old)!=1:raise ValueError('Voice anchor differs: '+old[:100])
     return text.replace(old,new)

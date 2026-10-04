@@ -14,6 +14,7 @@
     "TMessagesProj/src/main/java/org/capybaragram/voice/AndroidPcmDecoder.java": "78d2cf695f165f7482c847f2efbf71b6886e60ff2a75e7ce1a9aed2a336662ae",
     "TMessagesProj/src/main/java/org/capybaragram/voice/CapyVoiceUi.java": "8f4f6465e4ceaca23ea6e968060adc8f627533e96afb9491b60087e8c3241bf9",
     "TMessagesProj/src/main/res/values/capy_voice.xml": "7de9d37f21fd7dcd93905df73883d8bcb990e551f1982b3da5238ce4313224c6",
-    "TMessagesProj/src/main/res/values-ru/capy_voice.xml": "ebeb7078a26dccaae55e9eb2b2626fe76579fdb921d28e73bf45f6edabb1969c"
+    "TMessagesProj/src/main/res/values-ru/capy_voice.xml": "ebeb7078a26dccaae55e9eb2b2626fe76579fdb921d28e73bf45f6edabb1969c",
+    "TMessagesProj/src/main/assets/capy_whisper_license.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
   }
 }

@@ -119,6 +119,10 @@ def collect(source, output, profile='offline', certificate_sha256=None):
             raise RuntimeError('Expected ARM64 libraries only.')
         if 'lib/arm64-v8a/libtmessages.49.so' not in libraries:
             raise RuntimeError('Telegram native library is absent.')
+        if 'lib/arm64-v8a/libcapy_voice_jni.so' in libraries:
+            expected_notice = (Path(__file__).resolve().parent / 'transcription/UPSTREAM-LICENSE.txt').read_bytes().replace(b'\r\n', b'\n')
+            if archive.read('assets/capy_whisper_license.txt') != expected_notice:
+                raise RuntimeError('Offline speech copyright notice is missing or altered.')
         for name in libraries:
             with archive.open(name) as library:
                 header = library.read(20)
@@ -152,6 +156,10 @@ def collect(source, output, profile='offline', certificate_sha256=None):
     for name in ['LICENSE', 'LICENSE.md', 'LEGAL']:
         if (source / name).is_file():
             shutil.copyfile(source / name, output / name)
+    if 'lib/arm64-v8a/libcapy_voice_jni.so' in libraries:
+        notice = (Path(__file__).resolve().parent / 'transcription/UPSTREAM-LICENSE.txt').read_bytes().replace(b'\r\n', b'\n')
+        with (output / 'LICENSE').open('ab') as notices:
+            notices.write(b'\n\nThird-party offline speech engine: whisper.cpp / ggml\n\n' + notice)
     print('PASS: ' + profile + ' APK structure, signature and package; runtime not tested.')
 
 if __name__ == '__main__':
