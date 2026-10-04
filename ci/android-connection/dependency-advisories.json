@@ -1,0 +1,9 @@
+{
+  "checked_utc": "2026-10-04T09:30:41.232009+00:00",
+  "source": "https://api.osv.dev/v1/querybatch",
+  "registry_packages_checked": 111,
+  "findings": [],
+  "full_code_audit": false,
+  "cargo_lock_sha256": "2ec6ea1fe4057e82d1cd666f1f08fddc535dab81accdbc35a5d24f560bae2d5b",
+  "scope": "Exact registry versions in the frozen Android lock; database matches only, no source audit"
+}

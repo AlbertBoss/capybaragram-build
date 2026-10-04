@@ -129,9 +129,15 @@
     "prepare_android_core.py": "685ad4ffc118f72a4437c24946312bde90016a83150a757e8d6215d23f57be11",
     "README.md": "ae0e4d7fbd06a796336b3c21d26ccfac1831162fa77ce5226a33f34b9b1f5306",
     "run_android_checks.py": "1beac4d5e29be437efeabe3c0412bfc6d219f52e6eca82c75ba4a2e15bd80ef0",
-    "tls_regressions.rs": "6d1efb63a18593f1e66f9c1ba56588348a5211baa92738e14a7ec8f9a6362bc9"
+    "tls_regressions.rs": "2739990b76c6b267b51686adb9ee66f0800891f68d02160cf0980d3caf1a7a99"
   },
-  "cargo_lock_sha256": null,
+  "cargo_lock_sha256": "2ec6ea1fe4057e82d1cd666f1f08fddc535dab81accdbc35a5d24f560bae2d5b",
   "compiled_at_creation": false,
-  "client_integrated": false
+  "client_integrated": false,
+  "lock_resolution": {
+    "run": 37191349688,
+    "head": "b1bd7a0305cc15772c712061d532c6f6afb829e6",
+    "artifact_sha256": "919905bbc07296c5013159417c1616ef4017327c83da87252c321f1a5291b0a6",
+    "runtime_result": "failed test fixture WebSocket subprotocol; not a runtime proof"
+  }
 }

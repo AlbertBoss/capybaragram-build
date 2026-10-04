@@ -29,7 +29,14 @@ async fn capy_tls_fixture(hostname: &str, trust_test_certificate: bool) -> bool 
     let server = tokio::spawn(async move {
         let (socket, _) = listener.accept().await.expect("test TCP accept");
         let Ok(tls) = acceptor.accept(socket).await else { return false; };
-        let Ok(mut websocket) = tokio_tungstenite::accept_async(tls).await else { return false; };
+        let Ok(mut websocket) = tokio_tungstenite::accept_hdr_async(tls,
+            |request: &tokio_tungstenite::tungstenite::handshake::server::Request,
+             mut response: tokio_tungstenite::tungstenite::handshake::server::Response| {
+                assert_eq!(request.headers().get("Sec-WebSocket-Protocol").expect("binary request"), "binary");
+                response.headers_mut().insert("Sec-WebSocket-Protocol", "binary".parse().expect("binary header"));
+                Ok(response)
+            },
+        ).await else { return false; };
         websocket.send(Message::Binary(vec![7, 11, 19])).await.is_ok()
     });
     let client_config = if trust_test_certificate {
