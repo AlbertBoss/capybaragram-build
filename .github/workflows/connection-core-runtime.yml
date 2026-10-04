@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: MIT
+name: Connection core runtime
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-connection-core-runtime
+  cancel-in-progress: false
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2025, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+      - name: Install exact Rust toolchain
+        shell: bash
+        run: rustup toolchain install 1.88.0 --profile minimal --component clippy
+      - name: Run native transport and security regressions
+        run: python ci/connection/run_core_checks.py
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capy-connection-core-${{ matrix.os }}
+          path: ci/connection/test-results/
+          retention-days: 1
+          if-no-files-found: error

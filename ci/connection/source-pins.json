@@ -1,0 +1,60 @@
+{
+  "repository": "https://github.com/by-sonic/tglock",
+  "revision": "8617d25f3ae9bddb158a6703d1d02e453ebd39ba",
+  "license": "MIT",
+  "source_files": {
+    "Cargo.toml": {
+      "sha256": "e5fc233479fd754266012f41c1a21d1684daed83a0ac8c1214cf2fd8d93bdeaf",
+      "git_blob": "0bfb59d83399117718087969e92f484b3330ea38"
+    },
+    "Cargo.lock": {
+      "sha256": "b9fac05c715930353370158ad6609fa0843f0d2324220b97efd8a5cf81f5f5ed",
+      "git_blob": "48574e711d52fbf44a77ef1b8dea8d130f703040"
+    },
+    "LICENSE": {
+      "sha256": "412bff26064b5685c05e822e55325c6c5f1f88f2af59fdc832067e507d6fd55e",
+      "git_blob": "80bff63170733ed63f3fb79cdf6dd0a8b1a2a036"
+    },
+    "build.rs": {
+      "sha256": "59d80c9bed9a905e28e18362d4ed7431b8d7f0d07b7d225e371068f9a163d9f7",
+      "git_blob": "550a60b1db54e6c74fbe7f58384bd7aa94ef0b7a"
+    },
+    "src/lib.rs": {
+      "sha256": "0d3614b7b318a334dddd25814d9b78df723fa0b5a7f8ff859c87ab8cec2cf3a3",
+      "git_blob": "20373d49e3b386c594f5bcbe9650e716279ee737"
+    },
+    "src/config.rs": {
+      "sha256": "7b3f1c76fb952cdfeaacebaa56953fb8a738bc48dd637c4d224698649af3da50",
+      "git_blob": "08e6f0639f10b39f0ddf462b3f78adc274869c9e"
+    },
+    "src/mtproto.rs": {
+      "sha256": "57e436c6c548a7e0ac275dbdfb64131a8bb94ce5855963d27fae3f96659d072a",
+      "git_blob": "26e9a99b840b10fcb69036d40349f57fc80952cb"
+    },
+    "src/proxy.rs": {
+      "sha256": "8f216dd4f0a5f37d231f227d7f10043a6f1899fde2ecefdb754d10a81c3daf94",
+      "git_blob": "6b6c3b11210ef260a5124fa8392ca74e60c84388"
+    },
+    "src/telegram_net.rs": {
+      "sha256": "5b43dbb544ddfb968b3ec98f49476796f6e5eae5c1e5569bdb04a1ab9f204c08",
+      "git_blob": "ce98bb7fa857edaee7bf4c948336627eec3f7726"
+    },
+    "src/transport.rs": {
+      "sha256": "cc25575eeacbffbca2e0013aa0c3b20dfd7d5330519f8dca9e72064aa2b3cc95",
+      "git_blob": "18e2cf2ea907700ffaee6ee3712bf78b55bafcee"
+    },
+    "src/cli_settings.rs": {
+      "sha256": "99f6d97ecb78bd932c73ceaeb9823bc39747fd72a8270a22c513a642fcfbde86",
+      "git_blob": "9c1facfc07b0d70f95c1c60b3b54fda80679a679"
+    },
+    "src/main.rs": {
+      "sha256": "cefec545baf3c030cefd847929d57820d36e23f19f722ff1d678c6572fbe4063",
+      "git_blob": "1cc7232a8dbc9b8e07133d52d88df25c24d292fa"
+    },
+    "src/bin/cli.rs": {
+      "sha256": "458cc5f0497d5a8c35008b24b16bb88bd12340ae7d17922b4b38acaf69548d7d",
+      "git_blob": "44be4a2de4fb51be94a42de30b0f968e8206a7bf"
+    }
+  },
+  "production_client_integration": false
+}
