@@ -43,3 +43,5 @@ SHA-256 архива; upstream-файлы не редактируются. Ли�
 Источники: [закреплённый Whisper](https://github.com/ggml-org/whisper.cpp/tree/927cfce34f31707e17f2bff35c349632fb9e2c3a),
 [Qt: политика HTTPS-переходов и тайм-ауты](https://doc.qt.io/qt-6/qnetworkrequest.html),
 [FFmpeg: custom IO и io_open](https://ffmpeg.org/doxygen/trunk/structAVFormatContext.html).
+
+[Запуск 37169057966](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37169057966) прошёл на Windows и Linux: по 21 проверке, фактическое распознавание, Opus/AAC, отмена, отсутствующая модель и путь к модели с кириллицей. Хеши артефактов и исходников сверены; для Windows подтверждено только ожидаемое преобразование LF в CRLF из `text=auto`. Полный клиент и его окно этим запуском не проверялись.
