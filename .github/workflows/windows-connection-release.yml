@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: MIT
+name: Windows connection release compatibility
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-windows-connection-release
+  cancel-in-progress: false
+jobs:
+  msvc:
+    runs-on: windows-2025
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install exact Rust compiler
+        shell: pwsh
+        run: |
+          rustup toolchain install 1.88.0 --profile minimal
+          if ($LASTEXITCODE -ne 0) { throw 'Rust compiler setup failed.' }
+      - name: Build and exercise production release ABI
+        shell: pwsh
+        run: |
+          $vswhere = 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe'
+          $installation = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if ($LASTEXITCODE -ne 0 -or -not $installation) { throw 'MSVC installation unavailable.' }
+          $vcvars = Join-Path $installation.Trim() 'VC\Auxiliary\Build\vcvars64.bat'
+          if (-not (Test-Path -LiteralPath $vcvars)) { throw 'MSVC environment unavailable.' }
+          $batch = Join-Path $env:RUNNER_TEMP 'capy-release-connection.cmd'
+          @('@echo off', ('call "' + $vcvars + '" 10.0.26100.0 -vcvars_ver=14.44'), 'if errorlevel 1 exit /b 1',
+            'python ci/windows-connection-native/build_windows_library.py --probe', 'exit /b %errorlevel%') | Set-Content -LiteralPath $batch -Encoding ascii
+          & cmd.exe /d /c $batch
+          if ($LASTEXITCODE -ne 0) { throw 'Connection release compile or runtime failed.' }
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capy-windows-connection-release-results
+          path: ci/windows-connection-native/test-results/
+          retention-days: 1
+          if-no-files-found: error

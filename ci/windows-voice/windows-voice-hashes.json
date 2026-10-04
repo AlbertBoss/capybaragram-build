@@ -14,7 +14,7 @@
   },
   "added": {
     "Telegram/SourceFiles/capybara/voice_worker.h": "8ce2b0ca20f23bb8dc007cc979ec8fb0c77b1136632bc655e3a5f20f7dab4a82",
-    "Telegram/SourceFiles/capybara/voice_worker.cpp": "0d2e140b71f15b0f16745d934afde39645a45f7a52beb6d34a722b0e58bb801b",
+    "Telegram/SourceFiles/capybara/voice_worker.cpp": "b8522b48915c928591e1ec1f3ad974dd5f22a4eb54301a1f5ecf210b47470acc",
     "Telegram/SourceFiles/capybara/voice_decoder.h": "60c3f0ee2eb9532e426d409e0499aa553a71aa5e512802b494e6e3abdd3ee381",
     "Telegram/SourceFiles/capybara/voice_decoder.cpp": "38289c5f476e46a92ad24ad8cc59ea722345b6b638f1698a9a0cba1ae657f69a",
     "Telegram/SourceFiles/capybara/capy_voice_ui.h": "f184a1efc1711c2db2ba5c46388f64c00bc0139e1997507a91388cca61be1e10",

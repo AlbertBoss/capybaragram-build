@@ -1,0 +1,28 @@
+{
+  "source_sha": "80158983dba09d3bf5d96701f21473d6c34bf5f5",
+  "pre": {
+    "Telegram/CMakeLists.txt": "ca3187e5f5b8be9a828f5106f4a7dce170c7eb9d55aad80a10655ea4b8a67e51",
+    "Telegram/SourceFiles/core/application.h": "89074f1362cbf7ec668955a909d12eb61d108d71fba6eec289cd5d5bb7723b73",
+    "Telegram/SourceFiles/core/application.cpp": "3775b716f2dddbd1b1ede73e5f2440acc16a9743b9cff1baf0891d6ce3c71b5a",
+    "Telegram/SourceFiles/mtproto/session.cpp": "31d010cec1b52746f0c6b8d013d57947bbe8a930e23bc4daaab11c04b13e50b7",
+    "Telegram/SourceFiles/core/proxy_rotation_manager.cpp": "91b76d38e52483b801236d9e148a2c9ab54992797ae8b823533906fef5ffe536",
+    "Telegram/SourceFiles/window/window_peer_menu.cpp": "4bf176bc686bd4a18a6241350e0f9e68ef39ec88320f92add68603661cdae931"
+  },
+  "post": {
+    "Telegram/CMakeLists.txt": "fb788d16c0109c9adadc5a69fe179453cbe6a4cb367884dac64bdf17cf932319",
+    "Telegram/SourceFiles/core/application.h": "d80885c2c2202c72d316169fed3514c9745ab016f029689f4379ce63313e1c86",
+    "Telegram/SourceFiles/core/application.cpp": "065ef0ab9f11b4762b2472f9d088091573140cdf07c6f2672ccad82c055045b2",
+    "Telegram/SourceFiles/mtproto/session.cpp": "32bf8df5b7b308bb5186fcfcc6ba023e5dc71185c2a70d59767cc739fc7f2cf0",
+    "Telegram/SourceFiles/core/proxy_rotation_manager.cpp": "8515233d5d095cbc53d2feb948ce471ace27dec791190a355226057e752211f7",
+    "Telegram/SourceFiles/window/window_peer_menu.cpp": "1557ee9b789dca3267f29ee0553a14f636d150472fb2cedce05eb212c38e45d5"
+  },
+  "added": {
+    "Telegram/SourceFiles/capybara/capy_connection_service.h": "aa728ba6b7dc4100815423d961891b0c68f7e3fe5dccdec253a3f52d79461949",
+    "Telegram/SourceFiles/capybara/capy_connection_service.cpp": "b4d3fd4ac3782abc0278886b3ae485dc0e72d458f67b7ee2e97a6f1a342d30f0",
+    "Telegram/SourceFiles/capybara/capy_connection_ui.h": "b1228b71f1928e64f964dca5f6079e763bec934efd4fc5951e47b2e724df240e",
+    "Telegram/SourceFiles/capybara/capy_connection_ui.cpp": "4e3a57240f65ef3dc94f60bed2d41f08e276bf95d38ac5a918364310ac74996c",
+    "Telegram/SourceFiles/capybara/connection_worker.h": "ebb61546cc65411c010ddc0e2c3994092b7028456cb19f79d461701917292ff5",
+    "Telegram/SourceFiles/capybara/connection_worker.cpp": "5794d413b6f4a0bce16d1d5f1812cd703e6375ee7b3962a57e75e18ed9a7685c",
+    "Telegram/SourceFiles/capybara/native_api.h": "6bca6b36bc9da29ac514195ccd1a2bdf08e47781587bcb8dd816e734f3fed321"
+  }
+}

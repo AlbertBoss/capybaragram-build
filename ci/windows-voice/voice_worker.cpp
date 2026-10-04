@@ -8,9 +8,9 @@
 #include <QEventLoop>
 #include <QFile>
 #include <QFileInfo>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
+#include <QtNetwork/QNetworkRequest>
 #include <QSaveFile>
 #include <QTimer>
 #include <QUrl>

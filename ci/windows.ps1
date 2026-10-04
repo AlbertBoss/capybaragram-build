@@ -113,6 +113,27 @@ if ($Phase -eq 'Build') {
         if ($LASTEXITCODE -ne 0) { throw 'Desktop archive preparation failed.' }
         & python (Join-Path $PSScriptRoot 'windows-archive/prepare_windows_archive.py') $src --check
         if ($LASTEXITCODE -ne 0) { throw 'Desktop archive source verification failed.' }
+        if ($Profile -eq 'Candidate') {
+            & python (Join-Path $PSScriptRoot 'windows-connection-native/prepare_windows_connection.py') $src
+            if ($LASTEXITCODE -ne 0) { throw 'Desktop connection preparation failed.' }
+            & python (Join-Path $PSScriptRoot 'windows-connection-native/prepare_windows_connection.py') $src --check
+            if ($LASTEXITCODE -ne 0) { throw 'Desktop connection source verification failed.' }
+            & rustup toolchain install 1.88.0 --profile minimal
+            if ($LASTEXITCODE -ne 0) { throw 'Connection Rust compiler setup failed.' }
+            $connectionBatch = Join-Path $env:RUNNER_TEMP 'capy-windows-connection.cmd'
+            $connectionScript = Join-Path $PSScriptRoot 'windows-connection-native/build_windows_library.py'
+            @('@echo off', 'call "%CAPY_VSDEVCMD%" -no_logo -arch=x64 -host_arch=x64 -winsdk=10.0.26100.0 -vcvars_ver=14.44',
+              'if errorlevel 1 exit /b 1', ('python "' + $connectionScript + '" --probe'),
+              'exit /b %errorlevel%') | Set-Content -LiteralPath $connectionBatch -Encoding ascii
+            & $connectionBatch
+            if ($LASTEXITCODE -ne 0) { throw 'Connection production library compile or ABI runtime failed.' }
+            $connectionReport = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'windows-connection-native/test-results/verification.json') -Raw | ConvertFrom-Json
+            if ($connectionReport.result -ne 'PASS' -or $connectionReport.abi_and_worker_real_runtime -ne 'PASS') {
+                throw 'Connection production verification missing.'
+            }
+            $env:CAPY_WINDOWS_CONNECTION_LIBRARY = $connectionReport.library_path
+            $env:CAPY_WINDOWS_CONNECTION_LIBRARY_SHA = $connectionReport.library_sha256
+        }
         $env:CAPY_WINDOWS_API_CACHE = Join-Path $env:RUNNER_TEMP 'capy-windows-owner-api.cmake'
         & python (Join-Path $PSScriptRoot 'api_credentials.py') --windows-cache $env:CAPY_WINDOWS_API_CACHE
         if ($LASTEXITCODE -ne 0) { throw 'Owner API cache creation failed.' }
