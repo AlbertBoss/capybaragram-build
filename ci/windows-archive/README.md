@@ -49,6 +49,14 @@ strict archive key namespace. Results must be inspected before marking this stag
 verified. No scheduled execution, owner secrets, real Telegram accounts or paid
 services are used by this workflow.
 
+Storage and retained-original runtime passed in
+[37173494718](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37173494718)
+at `d2d7bfa3e9ee9265bbf490c731947d87996de1c1`: archive 72 assertions,
+vault 240, registry 94, worker 58. Artifact SHA-256 and all 14 tested source
+hashes were independently checked after download. This includes actual deleted
+file handle streaming and does not include native Telegram integration. Reparse
+rejection is implemented; a junction/symlink runtime fixture is still pending.
+
 Pending: bounded capture worker, opt-in settings and UI, native edit/delete/expiry
 hooks, original media admission before cache cleanup, account logout/passcode
 integration and full-client testing. Secret-chat protocol support is a separate
