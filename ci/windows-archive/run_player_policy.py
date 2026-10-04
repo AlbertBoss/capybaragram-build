@@ -67,7 +67,8 @@ def playlist(uri):
 http = root / 'nested-http.m3u8'
 local = root / 'nested-file.m3u8'
 http.write_text(playlist('http://127.0.0.1:' + str(server.server_port) + '/segment.ts'), encoding='utf-8')
-local.write_text(playlist(segment.as_uri()), encoding='utf-8')
+# FFmpeg's portable file:filename form, including a Windows drive letter.
+local.write_text(playlist('file:' + segment.as_posix()), encoding='utf-8')
 flags = shlex.split(subprocess.run(['pkg-config', '--cflags', '--libs', 'Qt6Core', 'libavformat', 'libavcodec', 'libavutil'],
     capture_output=True, text=True, check=True, timeout=30).stdout)
 # Package headers belong to external Qt/FFmpeg, not our warning-clean scaffold.

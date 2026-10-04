@@ -83,10 +83,10 @@ struct Input final {
 			Check(av_opt_set(format, "protocol_whitelist", "file,http,tcp", 0) == 0);
 		}
 	}
-	bool open() {
+	bool open(const AVInputFormat *demuxer = nullptr) {
 		AVDictionary *options = nullptr;
 		av_dict_set(&options, "rw_timeout", "3000000", 0);
-		const auto result = avformat_open_input(&format, nullptr, nullptr, &options);
+		const auto result = avformat_open_input(&format, nullptr, demuxer, &options);
 		av_dict_free(&options);
 		return result >= 0;
 	}
@@ -146,13 +146,13 @@ int main(int argc, char **argv) {
 			const auto playlist = Load(path);
 			{
 				auto blocked = Input(playlist, true);
-				const auto opened = blocked.open();
+				const auto opened = blocked.open(av_find_input_format("hls"));
 				if (opened) avformat_find_stream_info(blocked.format, nullptr);
 				Check(NestedOpened == 0);
 			}
 			{
 				auto control = Input(playlist, false);
-				const auto opened = control.open();
+				const auto opened = control.open(av_find_input_format("hls"));
 				if (opened) avformat_find_stream_info(control.format, nullptr);
 				Check(NestedOpened > 0);
 			}
@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
 			<< " avformat=" << avformat_version() << '\n';
 		return 0;
 	} catch (const std::exception &) {
-		std::cerr << "CAPY_ARCHIVE_PLAYER_POLICY=FAIL\n";
+		std::cerr << "CAPY_ARCHIVE_PLAYER_POLICY=FAIL checks=" << Checks << '\n';
 		return 1;
 	}
 }
