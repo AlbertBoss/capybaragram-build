@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.capybaragram.speechtest">
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="30" />
+    <application android:label="Synthetic Speech Test" android:allowBackup="false" android:largeHeap="true" />
+    <instrumentation android:name="org.capybaragram.voice.AndroidSpeechDeviceInstrumentation" android:targetPackage="org.capybaragram.speechtest" />
+</manifest>

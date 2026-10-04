@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: MIT
+name: Android offline speech runtime checks
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-speech-runtime
+  cancel-in-progress: false
+jobs:
+  speech:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Prepare Android test tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -c /dev/kvm
+          sudo chmod 666 /dev/kvm
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-36' 'build-tools;36.0.0' 'platform-tools' 'emulator' 'system-images;android-30;google_apis;x86_64' 'ndk;27.2.12479018'
+          if ! command -v ffmpeg >/dev/null; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
+      - name: Compile test ABI of pinned production JNI
+        run: python3 ci/transcription/run_engine_checks.py android --android-abi x86_64
+      - name: Decode actual Opus and recognise audio without Internet permission
+        run: python3 ci/transcription/run_android_runtime.py
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capybaragram-speech-runtime-results
+          path: |
+            ci/transcription/test-results/
+            ci/transcription/runtime-results/
+          retention-days: 1
+          if-no-files-found: error

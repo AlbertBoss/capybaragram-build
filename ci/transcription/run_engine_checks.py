@@ -31,12 +31,14 @@ with zipfile.ZipFile(archive) as z:
         target=out/'whisper'/str(p);target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(z.read(entry))
 build=out/'build'
 parser=argparse.ArgumentParser();parser.add_argument('kind',choices=['cpu','android']);parser.add_argument('--install-to',type=Path)
+parser.add_argument('--android-abi',choices=['arm64-v8a','x86_64'],default='arm64-v8a')
 arguments=parser.parse_args();kind=arguments.kind
 if arguments.install_to is not None and kind!='android':raise ValueError('Install is Android-only')
+if arguments.install_to is not None and arguments.android_abi!='arm64-v8a':raise ValueError('Production install requires ARM64')
 args=['cmake','-S',str(source),'-B',str(build),'-DCAPY_WHISPER_SOURCE='+str(out/'whisper'),'-DCMAKE_BUILD_TYPE=Release']
 if kind=='android':
     sdk=Path(os.environ['ANDROID_HOME']);ndk=sdk/'ndk/27.2.12479018'
-    args+=['-DCMAKE_TOOLCHAIN_FILE='+str(ndk/'build/cmake/android.toolchain.cmake'),'-DANDROID_ABI=arm64-v8a','-DANDROID_PLATFORM=android-23','-DANDROID_STL=c++_static','-G','Ninja']
+    args+=['-DCMAKE_TOOLCHAIN_FILE='+str(ndk/'build/cmake/android.toolchain.cmake'),'-DANDROID_ABI='+arguments.android_abi,'-DANDROID_PLATFORM=android-23','-DANDROID_STL=c++_static','-G','Ninja']
 subprocess.run(args,check=True,timeout=120)
 target='capy_voice_jni' if kind=='android' else 'capy_voice_runtime_test'
 subprocess.run(['cmake','--build',str(build),'--config','Release','--target',target,'--parallel','2'],check=True,timeout=900)
@@ -52,7 +54,8 @@ if kind=='cpu':
     print(result.stdout,flush=True)
 else:
     libraries=list(build.rglob('libcapy_voice_jni.so'));assert len(libraries)==1
-    data=libraries[0].read_bytes();assert data[:4]==b'\x7fELF' and data[4]==2 and int.from_bytes(data[18:20],'little')==183
+    data=libraries[0].read_bytes();machine=183 if arguments.android_abi=='arm64-v8a' else 62
+    assert data[:4]==b'\x7fELF' and data[4]==2 and int.from_bytes(data[18:20],'little')==machine
     readelf=ndk/'toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf'
     dynamic=subprocess.run([str(readelf),'-d',str(libraries[0])],capture_output=True,text=True,check=True,timeout=30).stdout
     needed=set(re.findall(r'Shared library: \[([^\]]+)\]',dynamic))
@@ -70,8 +73,9 @@ else:
         if target.exists() or target.is_symlink() or not target.resolve().is_relative_to(client):raise ValueError('JNI destination already exists or escapes client')
         target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(libraries[0],target)
         if target.read_bytes()!=data:raise ValueError('Installed JNI bytes differ')
-    (report/'engine-result.txt').write_text('CAPY_ANDROID_JNI=COMPILED ARM64 16KiB-aligned\n')
+    (report/'engine-result.txt').write_text('CAPY_ANDROID_JNI=COMPILED '+arguments.android_abi+' 16KiB-aligned\n')
 result={'kind':kind,'source_commit':pins['commit'],'source_archive_sha256':pins['zip_sha256'],
+        'android_abi':arguments.android_abi if kind=='android' else None,
         'model':pins['model'] if kind=='cpu' else None,'result':'PASS','client_ui_integrated':False,
         'russian_voice_accuracy_tested':False,'offline_network_packet_capture_performed':False,
         'our_source_sha256':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in source.iterdir() if p.is_file()}}

@@ -1,7 +1,7 @@
 # Offline voice transcription — development module
 
 The Android candidate pipeline now includes native voice menus and the engine;
-a full APK with this integration is pending. The Windows client UI is pending.
+APK run 37164244121 compiled successfully; its signature, 20 integration class definitions and 16 KiB-aligned ARM64 JNI were checked. The Windows client UI is pending.
 The module contains an actual
 CPU Whisper engine, Android JNI, a local MediaCodec audio decoder, one-use
 cancelable jobs and a hash-pinned model downloader. Android menu/UI gates capture the account generation and close/cancel on chat
@@ -31,3 +31,5 @@ cross-compiles Android ARM64 JNI. Run 37163441147 passed actual recognition on L
 compilation for the first engine. This does not verify Russian accuracy, codec
 runtime, real Telegram behaviour, resource use on the owner's machine or packet
 capture. Those remain explicit acceptance tasks.
+
+A separate manually dispatched Android speech runtime workflow now compiles the same JNI for x86_64 and runs the actual MediaExtractor/MediaCodec decoder and CPU recognizer on an ephemeral API 30 emulator. It creates Opus mono and AAC 44.1 kHz stereo fixtures from the pinned upstream JFK sample. The test APK has no Internet permission or shared UID; model bytes and fixture digests are checked before use. It also checks cancellation, UI-thread rejection, malformed audio and one-use jobs. Test classes, fixtures and test model are excluded from the production APK. Execution is pending; this English fixture does not establish Russian accuracy, ARM64 execution or live Telegram UI acceptance. Production JNI installation continues to require ARM64.
