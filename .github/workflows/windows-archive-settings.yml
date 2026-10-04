@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-name: Windows archive Qt setting runtime
+name: Windows archive Qt setting and decoder policy runtime
 on:
   workflow_dispatch:
 permissions:
@@ -25,13 +25,24 @@ jobs:
             mingw-w64-ucrt-x86_64-pkgconf
             mingw-w64-ucrt-x86_64-python
             mingw-w64-ucrt-x86_64-qt6-base
+            mingw-w64-ucrt-x86_64-ffmpeg
       - name: Compile and execute real Qt DataStream codec
         shell: msys2 {0}
         run: python ci/windows-archive/run_settings_runtime.py
+      - name: Test real decoder and exact pinned upstream URL policy
+        shell: msys2 {0}
+        run: python ci/windows-archive/run_player_policy.py
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
           name: capy-windows-archive-settings-results
           path: ci/windows-archive/settings-test-results/
+          retention-days: 1
+          if-no-files-found: error
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capy-windows-archive-player-policy-results
+          path: ci/windows-archive/player-policy-results/
           retention-days: 1
           if-no-files-found: error

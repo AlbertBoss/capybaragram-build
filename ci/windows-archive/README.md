@@ -60,7 +60,8 @@ file handle streaming and does not include native Telegram integration. Reparse
 rejection is implemented; a junction/symlink runtime fixture is still pending.
 
 The guarded `prepare_windows_archive.py` applies after the read-mode and voice
-recipes. It binds 14 normalized native host hashes and 12 module hashes, validates
+recipes. It binds 17 normalized native host hashes (14 modified and 3 unchanged decoder
+safety dependencies) and 14 module hashes, validates
 all inputs before writing and refuses changed sources or existing module files.
 The adapter captures existing text before server edits/deletion notifications,
 before TTL destruction and before original cache cleanup. It also captures at
@@ -70,7 +71,12 @@ file locations use a verified held file handle. It does not download missing
 originals or substitute thumbnails. Limits/failed admission produce an explicit
 record without a media copy; repeated early/final TTL snapshots are not deduplicated
 yet. The UI supports chat/topic paging, account opt-in, account archive clear and
-bounded static image preview. Original video/voice playback is still pending.
+bounded static image preview. The native player source adds original audio/video
+(including round video) playback from a QBuffer through Streaming::Reader/Player,
+pause/replay and ten-second seeking. Closing the preview permanently stops its
+player and releases its reader before layer fade-out. No real DocumentData,
+MTProto loader, plaintext temporary file or native download cache is modified.
+Full C++ compilation, actual speakers and live UI acceptance remain pending.
 
 Application/account wiring uses an independent registry, the same authorization
 identity, per-account settings, passcode lock/unlock and logout/forgotten-passcode
@@ -134,3 +140,11 @@ This GCC/test-only MSYS2 Qt result covers boolean round trips, missing/truncated
 tails and unknown tags/versions/values; it does not prove native account restart
 or full MSVC client compilation. The full build separately compiles/runs the same
 codec against production Qt before compiling Telegram.
+
+The memory player uses the pinned native FFmpeg path, whose exact
+`RestrictToCustomIO` function sets an empty protocol whitelist before opening
+input. The preparation binds that function, its native streaming caller and
+QBuffer loader source. A manually dispatched decoder policy probe embeds the
+exact pinned function (preserving its upstream notice), decodes synthetic Opus,
+AAC and H.264, and exercises file/HTTP playlist references with allowed and
+denied controls. Its result is separate from full client/player UI acceptance.

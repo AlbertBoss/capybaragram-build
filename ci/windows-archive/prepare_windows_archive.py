@@ -15,12 +15,15 @@ FILES = ['Telegram/CMakeLists.txt'] + [PREFIX + p for p in (
     'main/main_session_settings.h', 'main/main_session_settings.cpp',
     'window/window_peer_menu.cpp', 'history/view/history_view_top_bar_widget.cpp',
     'data/data_session.cpp', 'history/history_item.cpp',
-    'media/view/media_view_overlay_widget.cpp', 'chat_helpers/ttl_media_layer_widget.cpp')]
+    'media/view/media_view_overlay_widget.cpp', 'chat_helpers/ttl_media_layer_widget.cpp',
+    'ffmpeg/ffmpeg_utility.cpp', 'media/streaming/media_streaming_file.cpp',
+    'media/streaming/media_streaming_loader_local.cpp')]
 ADDED = {PREFIX + 'capybara/' + p: HERE / p for p in (
     'archive_store.h', 'archive_store.cpp', 'archive_worker.h', 'archive_worker.cpp',
     'verified_input.h', 'verified_input.cpp', 'capy_archive_ui.h', 'capy_archive_ui.cpp',
     'capy_archive_bridge.h', 'capy_archive_bridge.cpp',
-    'capy_archive_settings.h', 'capy_archive_settings_test.cpp')}
+    'capy_archive_settings.h', 'capy_archive_settings_test.cpp',
+    'capy_archive_player.h', 'capy_archive_player.cpp')}
 
 
 def digest(data):
@@ -39,7 +42,8 @@ def transform(name, text):
             ''.join('        ${src_loc}/capybara/' + p + '\n' for p in (
                 'archive_store.cpp', 'archive_store.h', 'archive_worker.cpp', 'archive_worker.h',
                 'verified_input.cpp', 'verified_input.h', 'capy_archive_ui.cpp', 'capy_archive_ui.h',
-                'capy_archive_bridge.cpp', 'capy_archive_bridge.h', 'capy_archive_settings.h'))
+                'capy_archive_bridge.cpp', 'capy_archive_bridge.h', 'capy_archive_settings.h',
+                'capy_archive_player.cpp', 'capy_archive_player.h'))
             + '        ${src_loc}/capybara/capy_voice_ui.cpp\n')
         text = replace(text, '        ${src_loc}/capybara/vault_store.cpp\n        ${src_loc}/capybara/vault_registry.cpp',
             '        ${src_loc}/capybara/archive_store.cpp\n'
@@ -190,6 +194,18 @@ Capy::Vault::Worker &Application::capyVaultWorker() {''')
             '\t\tnot_null<HistoryItem*> item) {\n'
             '\tCapy::CaptureArchive(item, Capy::Archive::Reason::Expired);\n'
             '\tconst auto parent = controller->content();')
+    # Unmodified pinned dependencies: bind the safety path used by our player.
+    if name == PREFIX + 'ffmpeg/ffmpeg_utility.cpp':
+        replace(text, '\tav_opt_set(format, "protocol_whitelist", "", 0);',
+            '\tav_opt_set(format, "protocol_whitelist", "", 0);')
+        replace(text, '\tRestrictToCustomIO(result);', '\tRestrictToCustomIO(result);')
+        return text
+    if name == PREFIX + 'media/streaming/media_streaming_file.cpp':
+        replace(text, '\tauto format = FFmpeg::MakeFormatPointer(', '\tauto format = FFmpeg::MakeFormatPointer(')
+        return text
+    if name == PREFIX + 'media/streaming/media_streaming_loader_local.cpp':
+        replace(text, '\tauto device = std::make_unique<QBuffer>();', '\tauto device = std::make_unique<QBuffer>();')
+        return text
     raise ValueError('Unexpected native archive host')
 
 

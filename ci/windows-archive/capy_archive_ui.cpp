@@ -2,6 +2,7 @@
 // Native archive UI. Client compilation and live Telegram acceptance are separate checks.
 #include "capybara/capy_archive_ui.h"
 #include "capybara/archive_worker.h"
+#include "capybara/capy_archive_player.h"
 #include "core/application.h"
 #include "data/data_forum_topic.h"
 #include "data/data_peer.h"
@@ -21,6 +22,8 @@
 #include <QBuffer>
 #include <QDateTime>
 #include <QImageReader>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QPainter>
 #include <QPointer>
 #ifndef NOMINMAX
@@ -160,6 +163,47 @@ void Preview(Context context, std::string id, Archive::Snapshot snapshot) {
 					});
 				if (!accepted) { *pending = false; button->setDisabled(false); status->setText(Failure()); }
 			});
+		}
+		const auto kind = QJsonDocument::fromJson(QByteArray::fromStdString(snapshot.content))
+			.object().value(u"kind"_q).toString();
+		const auto video = snapshot.mime.starts_with("video/") || kind == u"video"_q || kind == u"round"_q;
+		const auto audio = snapshot.mime.starts_with("audio/") || kind == u"voice"_q || kind == u"audio"_q;
+		if (snapshot.media == Archive::MediaState::Complete && (video || audio)) {
+			const auto player = box->lifetime().make_state<QPointer<ArchivePlayer>>();
+			const auto pending = box->lifetime().make_state<bool>(false);
+			// Stop audio and discard the reader at close/lock/logout, before fade-out.
+			box->boxClosing() | rpl::on_next([=] { if (*player) (*player)->stop(); }, box->lifetime());
+			const auto button = box->addRow(object_ptr<Ui::RoundButton>(box,
+				rpl::single(Text(u"Play / pause saved original"_q, u"Воспроизвести / пауза"_q)),
+				st::defaultActiveButton), st::boxPadding);
+			button->setClickedCallback([=] {
+				if (*closed || !Available(context)) return;
+				if (*player) { (*player)->toggle(); return; }
+				if (*pending) return;
+				*pending = true;
+				button->setDisabled(true);
+				const auto accepted = Core::App().capyArchiveWorker().media(context.handle, id,
+					[=](Archive::Worker::Result result) {
+						if (!weak || *closed) return;
+						*pending = false;
+						button->setDisabled(false);
+						if (!result.ok) { status->setText(Failure()); return; }
+						auto bytes = QByteArray::fromStdString(result.media);
+						if (!result.media.empty()) SecureZeroMemory(result.media.data(), result.media.size());
+						*player = box->addRow(object_ptr<ArchivePlayer>(box, std::move(bytes), video,
+							[=](QString text) { if (weak && !*closed) status->setText(text); }), st::boxPadding);
+					});
+				if (!accepted) { *pending = false; button->setDisabled(false); status->setText(Failure()); }
+			});
+			const auto addSeek = [=](crl::time delta, QString label) {
+				const auto seek = box->addRow(object_ptr<Ui::RoundButton>(box,
+					rpl::single(std::move(label)), st::defaultActiveButton), st::boxPadding);
+				seek->setClickedCallback([=] {
+					if (!*closed && Available(context) && *player) (*player)->seek(delta);
+				});
+			};
+			addSeek(-10000, Text(u"Back 10 seconds"_q, u"Назад на 10 секунд"_q));
+			addSeek(10000, Text(u"Forward 10 seconds"_q, u"Вперёд на 10 секунд"_q));
 		}
 		box->addButton(tr::lng_close(), [=] { box->closeBox(); });
 	}));

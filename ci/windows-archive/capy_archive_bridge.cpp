@@ -99,7 +99,10 @@ bool CaptureArchive(not_null<HistoryItem*> item, Archive::Reason reason) {
 		if (const auto document = media->document()) {
 			snapshot.mime = document->mimeString().toUtf8().toStdString();
 			if (snapshot.mime.empty()) snapshot.mime = "application/octet-stream";
-			metadata.insert(u"kind"_q, u"document"_q);
+			metadata.insert(u"kind"_q, document->isVideoMessage() ? u"round"_q
+				: document->isVoiceMessage() ? u"voice"_q
+				: (document->isVideoFile() || document->isAnimation()) ? u"video"_q
+				: document->isAudioFile() ? u"audio"_q : u"document"_q);
 			metadata.insert(u"document"_q, QString::number(document->id));
 			metadata.insert(u"filename"_q, document->filename());
 			if (document->size > 0 && document->size <= Archive::Store::MaxMediaBytes) {
