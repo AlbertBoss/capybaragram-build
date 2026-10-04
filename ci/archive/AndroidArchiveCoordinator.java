@@ -116,7 +116,13 @@ public final class AndroidArchiveCoordinator {
     }
 
     public <T> void submit(Token token, Work<T> operation, Callback<T> callback) {
-        if (operation == null || callback == null || (token != null && token.background)) throw new IllegalArgumentException();
+        submit(token,operation,callback,value -> {});
+    }
+
+    /** Resource-bearing results must be wiped when owner/lock changes suppress delivery. */
+    public interface Discard<T> { void accept(T value); }
+    public <T> void submit(Token token, Work<T> operation, Callback<T> callback, Discard<T> discard) {
+        if (operation == null || callback == null || discard == null || (token != null && token.background)) throw new IllegalArgumentException();
         worker.execute(() -> {
             if (!isCurrent(token)) return;
             T result = null;
@@ -132,6 +138,7 @@ public final class AndroidArchiveCoordinator {
             final boolean failed = failure;
             main.post(() -> {
                 if (isCurrent(token)) callback.complete(value, failed);
+                else if(value != null) discard.accept(value);
             });
         });
     }

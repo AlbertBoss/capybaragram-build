@@ -120,14 +120,26 @@ public final class CapyMessageArchive {
                     if (data.limit() > AndroidArchiveStore.MAX_TL_BYTES) { problem(); continue; }
                     ByteBuffer copy = data.buffer.asReadOnlyBuffer(); copy.position(0);
                     final byte[] tl = new byte[copy.remaining()]; copy.get(tl);
+                    try {
                     TLRPC.Message message = TLRPC.Message.TLdeserialize(data, data.readInt32(false), false);
-                    if (message == null) { Arrays.fill(tl, (byte) 0); problem(); continue; }
+                    if (message == null) { problem(); continue; }
+                    message.readAttachPath(data, token.owner);
                     final String text = message.message == null ? "" : message.message;
                     final boolean media = message.media != null && !(message.media instanceof TLRPC.TL_messageMediaEmpty);
+                    // Holding the source descriptor precedes upstream file deletion.
+                    CapyArchiveMediaSource source=null;
+                    if(media)try{source=CapyArchiveMediaSource.open(account,message);}catch(Exception unavailable){problem();}
+                    final CapyArchiveMediaSource original=source;
                     try {
                         coordinator.persistBackground(token, store -> {
-                            store.save(dialog, messageId, reason, tl, text, media); return null;
+                            long id=store.save(dialog, messageId, reason, tl, text, media);
+                            if(original!=null && coordinator.isCurrent(token)) {
+                                try {store.saveOriginal(id,original.input,original.size,original.mime);}
+                                catch(Exception incomplete){problem();}
+                            }
+                            return null;
                         });
+                    } finally {if(original!=null)original.close();}
                     } finally { Arrays.fill(tl, (byte) 0); }
                 } finally { data.reuse(); }
             }

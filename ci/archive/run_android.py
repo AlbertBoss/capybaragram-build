@@ -38,7 +38,7 @@ dex = out / 'dex'
 classes.mkdir()
 dex.mkdir()
 sources = [source / n for n in ('AndroidArchiveStore.java', 'AndroidArchiveCoordinator.java',
-    'ArchiveCipherTest.java', 'AndroidArchiveDeviceInstrumentation.java')]
+    'ArchiveCipherTest.java', 'AndroidArchiveDeviceInstrumentation.java', 'VerifiedMediaInput.java', 'ArchiveMediaBuffer.java')]
 sources += [source.parent / 'vault' / n for n in ('PayloadCipher.java', 'AndroidVaultKeys.java')]
 run([java / 'javac', '-encoding', 'UTF-8', '-source', '8', '-target', '8',
      '-Xlint:all,-options', '-Werror', '-cp', android, '-d', classes, *sources])

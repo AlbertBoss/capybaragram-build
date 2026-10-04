@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="CapyArchive">CapybaraGram · Message archive</string>
-    <string name="CapyArchiveDescription">Save local encrypted snapshots before deletion, media expiry and message edits. Off by default; enabling applies to future events for this account. This version saves text and message data, but does not save original media files. Up to 2,000 snapshots per account, with older snapshots removed first. Disabling keeps existing snapshots. Nothing is sent to another server.</string>
+    <string name="CapyArchiveDescription">Local encrypted archive of text and downloaded originals before deletion, media expiry and edits. Off by default; applies to future events for this account. Up to 2,000 snapshots and 128 MiB of attachments; 32 MiB per file. Oldest entries are removed first. Undownloaded attachments and earlier deletions cannot be recovered. Disabling keeps the archive. Nothing is sent to another server.</string>
     <string name="CapyArchiveEnable">Enable archive</string>
     <string name="CapyArchiveDisable">Disable archive</string>
     <string name="CapyArchiveOpen">Open chat archive</string>
@@ -16,4 +16,10 @@
     <string name="CapyArchiveOlder">Older snapshots</string>
     <string name="CapyArchiveClear">Clear archive</string>
     <string name="CapyArchiveClearConfirm">Delete the entire local archive for this account, including other chats? Telegram messages and notes are unaffected.</string>
+    <string name="CapyArchiveOriginalSaved">Original saved in the encrypted archive.</string>
+    <string name="CapyArchiveViewOriginal">View attachment</string>
+    <string name="CapyArchiveOriginalFailure">Could not open the original: corrupt file or unsupported format. The archive was preserved.</string>
+    <string name="CapyArchiveUnsupported">File saved. Preview of this format is not supported yet.</string>
+    <string name="CapyArchivePlay">Play</string>
+    <string name="CapyArchivePause">Pause</string>
 </resources>

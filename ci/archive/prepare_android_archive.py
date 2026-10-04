@@ -16,7 +16,8 @@ FILES = [STORAGE, CHAT, CONFIG, VAULT]
 ARCHIVE = 'org.capybaragram.archive.CapyMessageArchive'
 UI = 'org.capybaragram.archive.CapyArchiveUi'
 ADDED = {JAVA + 'org/capybaragram/archive/' + n: HERE / n for n in (
-    'AndroidArchiveStore.java', 'AndroidArchiveCoordinator.java', 'CapyMessageArchive.java', 'CapyArchiveUi.java')}
+    'AndroidArchiveStore.java', 'AndroidArchiveCoordinator.java', 'CapyMessageArchive.java', 'CapyArchiveUi.java',
+    'VerifiedMediaInput.java', 'CapyArchiveMediaSource.java', 'ArchiveMediaBuffer.java')}
 ADDED.update({'TMessagesProj/src/main/res/values/capy_archive.xml': HERE / 'strings.xml',
     'TMessagesProj/src/main/res/values-ru/capy_archive.xml': HERE / 'strings-ru.xml'})
 

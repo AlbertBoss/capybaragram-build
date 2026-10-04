@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="CapyArchive">CapybaraGram · Архив сообщений</string>
-    <string name="CapyArchiveDescription">Сохраняет локальные зашифрованные снимки перед удалением, исчезновением медиа и правками. По умолчанию выключен; включение действует на будущие события этого аккаунта. Эта версия сохраняет текст и данные сообщения, но пока не сохраняет оригиналы вложений. До 2000 снимков на аккаунт, старые удаляются первыми. Выключение оставляет прежние снимки. На сторонний сервер ничего не отправляется.</string>
+    <string name="CapyArchiveDescription">Локальный зашифрованный архив текста и скачанных оригиналов перед удалением, исчезновением медиа и правками. По умолчанию выключен; работает для будущих событий этого аккаунта. До 2000 снимков и 128 МиБ вложений, файл — до 32 МиБ. Старые записи удаляются первыми. Нескачанные вложения и сообщения до включения восстановить нельзя. Выключение оставляет архив. На сторонний сервер ничего не отправляется.</string>
     <string name="CapyArchiveEnable">Включить архив</string>
     <string name="CapyArchiveDisable">Выключить архив</string>
     <string name="CapyArchiveOpen">Открыть архив чата</string>
@@ -16,4 +16,10 @@
     <string name="CapyArchiveOlder">Более старые снимки</string>
     <string name="CapyArchiveClear">Очистить архив</string>
     <string name="CapyArchiveClearConfirm">Удалить весь локальный архив этого аккаунта, включая другие чаты? Сообщения Telegram и заметки сохранятся.</string>
+    <string name="CapyArchiveOriginalSaved">Оригинал сохранён в зашифрованном архиве.</string>
+    <string name="CapyArchiveViewOriginal">Просмотреть вложение</string>
+    <string name="CapyArchiveOriginalFailure">Не удалось открыть оригинал: файл повреждён или формат не поддерживается. Архив сохранён.</string>
+    <string name="CapyArchiveUnsupported">Файл сохранён. Просмотр этого формата пока не поддерживается.</string>
+    <string name="CapyArchivePlay">Воспроизвести</string>
+    <string name="CapyArchivePause">Пауза</string>
 </resources>
