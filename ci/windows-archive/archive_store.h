@@ -68,6 +68,10 @@ public:
 	void recover();
 
 private:
+	struct Weight final {
+		std::uint64_t bytes = 0;
+		std::uint32_t chunks = 0;
+	};
 	[[nodiscard]] Snapshot stored(const std::string &id) const;
 	[[nodiscard]] std::uint64_t entryBytes(const std::string &id,
 		const Snapshot &snapshot) const;
@@ -75,6 +79,9 @@ private:
 	Vault::Store &_vault;
 	const Limits _limits;
 	std::vector<std::string> _ids; // oldest first
+	std::vector<Weight> _weights; // actual ciphertext sizes, rebuilt during recovery
+	std::uint64_t _entryBytes = 0;
+	std::string _catalog; // expected authenticated catalog; never overwrite external corruption
 	bool _cleanupPending = false;
 };
 

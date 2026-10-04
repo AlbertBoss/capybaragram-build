@@ -39,7 +39,8 @@ public:
 	void setEnabled(const Handle &handle, bool enabled);
 	[[nodiscard]] bool usable(const Handle &handle) const;
 	[[nodiscard]] bool enabled(const Handle &handle) const;
-	// Max four queued/active captures. Reader must OWN resources (e.g. shared
+	// Max four queued/active media captures; 2000 lightweight snapshots with
+	// at most 64 MiB of queued text/metadata. Reader must OWN resources (e.g. shared
 	// VerifiedInput), not refer to a viewer that can disappear before execution.
 	// Encrypted captures already admitted may finish while locked or disabled.
 	[[nodiscard]] bool capture(const Handle &handle, Snapshot snapshot,
@@ -83,6 +84,8 @@ private:
 	std::unique_ptr<Vault::Registry> _registry; // worker only
 	bool _resetPending = false;
 	std::atomic<unsigned> _captures = 0;
+	std::atomic<unsigned> _textCaptures = 0;
+	std::atomic<std::size_t> _queuedTextBytes = 0;
 	std::atomic<unsigned> _requests = 0;
 	std::mutex _mutex;
 	std::condition_variable _wake;

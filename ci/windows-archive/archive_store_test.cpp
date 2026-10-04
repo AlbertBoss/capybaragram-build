@@ -235,6 +235,7 @@ void RecoveryAndQuota() {
 	const auto preserved = vault.archiveRecords();
 	vault.write("archive-index", "CPGAI9\n");
 	Reject([&] { auto unknown = Archive(vault); });
+	Reject([&] { (void)archive.add(Message(13)); }); // active store must not overwrite damaged index
 	Check(vault.archiveRecords() == preserved && vault.read("archive-index") == "CPGAI9\n");
 	vault.erase("archive-index");
 	Reject([&] { auto missing = Archive(vault); });

@@ -304,13 +304,50 @@ void BoundedAndRevoked() {
 	thread.join();
 	Check(wrongThread);
 }
+void BurstBehindMedia() {
+	Stage = "64-message text burst behind a held media source";
+	const auto root = std::filesystem::absolute("synthetic-archive-burst-" + Vault::NewId());
+	auto mailbox = Mailbox();
+	auto worker = Worker(root, 2, [&](auto callback) { mailbox.post(std::move(callback)); });
+	const auto handle = worker.attach(0, 400, true, Vault::NewId());
+	worker.setEnabled(handle, true);
+	const auto block = std::make_shared<Block>();
+	auto source = std::make_shared<Source>();
+	source->block = block;
+	Check(worker.capture(handle, Message(1), 1, Reader(source)));
+	source.reset();
+	block->wait();
+	for (auto id = 2; id != 66; ++id) {
+		auto snapshot = Message(id);
+		snapshot.text = "synthetic burst " + std::to_string(id);
+		Check(worker.capture(handle, std::move(snapshot)));
+	}
+	block->release();
+	auto count = std::size_t();
+	for (auto offset = std::size_t(); offset < 65; offset += 20) {
+		Check(worker.pageFor(handle, {1, 200, {}}, offset, [&](auto result) {
+			Check(result.ok && result.ids.size() == result.snapshots.size());
+			count += result.ids.size();
+			for (const auto &snapshot : result.snapshots) {
+				Check(snapshot.message >= 1 && snapshot.message <= 65);
+			}
+		}));
+		mailbox.take()();
+	}
+	Check(count == 65);
+}
 } // namespace
 
 int main() {
 	try {
+		const auto start = std::chrono::steady_clock::now();
 		Lifecycle();
 		BoundedAndRevoked();
-		std::cout << "CAPY_WINDOWS_ARCHIVE_WORKER=PASS checks=" << Checks << '\n';
+		BurstBehindMedia();
+		const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::steady_clock::now() - start).count();
+		std::cout << "CAPY_WINDOWS_ARCHIVE_WORKER=PASS checks=" << Checks
+			<< " elapsed_ms=" << elapsed << '\n';
 		return 0;
 	} catch (const std::exception &) {
 		std::cerr << "CAPY_WINDOWS_ARCHIVE_WORKER=FAIL stage=" << Stage << " checks=" << Checks << '\n';

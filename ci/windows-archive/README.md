@@ -75,7 +75,9 @@ originals. Native media selection and ownership gates remain pending.
 `archive_worker` owns an independent archive Registry on one serialized worker.
 Newly attached handles default to capture disabled; the host supplies each
 account's persisted opt-in. Captures are limited to four queued/active operations,
-foreground requests to eight. Rejecting an admission releases its owned reader.
+foreground requests to eight. The current burst revision separates four media
+captures from up to 2,000 lightweight text snapshots, with at most 64 MiB of
+queued text/metadata. Rejecting an admission releases its owned reader.
 Readers must capture owned resources such as `shared_ptr<VerifiedInput>`.
 
 Per-session live/revision checks stop queued or streaming work after logout,
@@ -90,6 +92,16 @@ Callbacks cannot dereference a destroyed Worker.
 This worker's source and synthetic runtime suite are added in the current stage;
 inspect its run before treating it as verified. It still needs application/account
 lifecycle wiring, persisted opt-in and native message adapters.
+
+The account-bound worker and typed-chat filtering passed in
+[37174689772](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37174689772):
+archive 81 assertions, archive worker 198, plus the existing vault suites. The
+following burst/performance revision is under verification: cached ciphertext
+weights replace repeated full-archive decryption on append; the authenticated
+catalog is still checked before access, and recovery rebuilds/verifies all
+weights. A changed or damaged catalog is rejected even in an already open store.
+The synthetic worker receipt records total elapsed time on its CI machine;
+this is not a weak-PC or native Telegram performance benchmark.
 
 API basis: [CryptProtectData](https://learn.microsoft.com/en-us/windows/win32/api/dpapi/nf-dpapi-cryptprotectdata)
 and [CreateFileW](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew).

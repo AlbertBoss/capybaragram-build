@@ -208,8 +208,8 @@ Store::Store(Vault::Store &vault, Limits limits)
 
 void Store::check() const {
 	// Includes the vault's retirement and serialized-thread checks.
-	(void)_vault.protectedBytes(Index);
-	if (_cleanupPending) Fail();
+	const auto catalog = _vault.read(Index);
+	if (!catalog || *catalog != _catalog || _cleanupPending) Fail();
 }
 
 Snapshot Store::stored(const std::string &id) const {
@@ -237,16 +237,21 @@ void Store::recover() {
 	}
 	if (!catalog) Fail();
 	auto ids = Parse(*catalog);
+	auto weights = std::vector<Weight>();
+	auto entryTotal = std::uint64_t();
 	auto wanted = std::set<std::string>{Index};
 	// Verify all catalog references before deleting any orphan.
 	for (const auto &id : ids) {
 		const auto s = stored(id);
+		auto bytes = _vault.protectedBytes(Vault::Store::Archive(id));
 		wanted.insert(Vault::Store::Archive(id));
 		for (auto part = 0U; part != s.chunks; ++part) {
 			const auto key = Vault::Store::ArchiveChunk(id, part);
-			(void)_vault.protectedBytes(key);
+			bytes += _vault.protectedBytes(key);
 			wanted.insert(key);
 		}
+		weights.push_back({bytes, s.chunks});
+		entryTotal += bytes;
 	}
 	_cleanupPending = true;
 	for (const auto &key : records) {
@@ -254,6 +259,9 @@ void Store::recover() {
 	}
 	_vault.cleanupArchiveTemporary();
 	_ids = std::move(ids);
+	_weights = std::move(weights);
+	_entryBytes = entryTotal;
+	_catalog = std::move(*catalog);
 	_cleanupPending = false;
 	if (_ids.size() > _limits.rows || protectedBytes() > _limits.protectedBytes) Fail();
 }
@@ -302,20 +310,41 @@ Added Store::add(Snapshot snapshot, std::uint64_t mediaBytes, Reader reader) {
 		_vault.write(key, payload);
 		auto chosen = _ids;
 		chosen.push_back(id);
-		auto bytes = IndexReserve + entryBytes(id, snapshot);
-		for (const auto &previous : _ids) bytes += entryBytes(previous, stored(previous));
+		auto chosenWeights = _weights;
+		const auto newBytes = entryBytes(id, snapshot);
+		chosenWeights.push_back({newBytes, snapshot.chunks});
+		auto bytes = IndexReserve + _entryBytes + newBytes;
 		auto prune = std::size_t();
 		while ((bytes > _limits.protectedBytes || chosen.size() - prune > _limits.rows)
 			&& prune < _ids.size()) {
-			bytes -= entryBytes(chosen[prune], stored(chosen[prune]));
+			const auto previous = stored(chosen[prune]);
+			if (previous.chunks != chosenWeights[prune].chunks
+				|| entryBytes(chosen[prune], previous) != chosenWeights[prune].bytes) Fail();
+			bytes -= chosenWeights[prune].bytes;
 			++prune;
 		}
 		if (bytes > _limits.protectedBytes) Fail();
+		const auto removed = std::vector<std::string>(chosen.begin(),
+			chosen.begin() + static_cast<std::ptrdiff_t>(prune));
+		const auto removedWeights = std::vector<Weight>(chosenWeights.begin(),
+			chosenWeights.begin() + static_cast<std::ptrdiff_t>(prune));
 		chosen.erase(chosen.begin(), chosen.begin() + static_cast<std::ptrdiff_t>(prune));
-		_vault.write(Index, Catalog(chosen)); // atomic commit, old catalog unchanged on failure
+		chosenWeights.erase(chosenWeights.begin(), chosenWeights.begin() + static_cast<std::ptrdiff_t>(prune));
+		auto nextCatalog = Catalog(chosen);
+		_vault.write(Index, nextCatalog); // atomic commit, old catalog unchanged on failure
 		committed = true;
 		_ids = std::move(chosen);
-		try { recover(); }
+		_weights = std::move(chosenWeights);
+		_entryBytes = bytes - IndexReserve;
+		_catalog = std::move(nextCatalog);
+		try {
+			for (auto i = std::size_t(); i != removed.size(); ++i) {
+				for (auto part = 0U; part != removedWeights[i].chunks; ++part) {
+					_vault.erase(Vault::Store::ArchiveChunk(removed[i], part));
+				}
+				_vault.erase(Vault::Store::Archive(removed[i]));
+			}
+		}
 		catch (const std::exception &) { _cleanupPending = true; }
 		return {id, _cleanupPending};
 	} catch (...) {
@@ -395,9 +424,7 @@ std::size_t Store::size() const {
 
 std::uint64_t Store::protectedBytes() const {
 	check();
-	auto result = _vault.protectedBytes(Index);
-	for (const auto &id : _ids) result += entryBytes(id, stored(id));
-	return result;
+	return _vault.protectedBytes(Index) + _entryBytes;
 }
 
 } // namespace Capy::Archive

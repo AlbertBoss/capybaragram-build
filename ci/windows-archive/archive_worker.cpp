@@ -16,6 +16,11 @@ struct Release final {
 	std::atomic<unsigned> &counter;
 	~Release() { --counter; }
 };
+struct ReleaseBytes final {
+	std::atomic<std::size_t> &counter;
+	std::size_t bytes;
+	~ReleaseBytes() { counter -= bytes; }
+};
 struct Wipe final {
 	Snapshot &snapshot;
 	~Wipe() {
@@ -225,16 +230,22 @@ void Worker::post(const Handle &handle, std::uint64_t revision, std::uint64_t ep
 bool Worker::capture(const Handle &handle, Snapshot snapshot, std::uint64_t bytes,
 		Store::Reader reader, Done done) {
 	checkThread();
-	if (!enabled(handle) || _captures >= 4 || bytes > Store::MaxMediaBytes
+	const auto media = bool(reader);
+	const auto weight = snapshot.text.size() + snapshot.content.size() + snapshot.mime.size() + 192;
+	if (!enabled(handle) || (media ? _captures >= 4 : _textCaptures >= 2000)
+		|| weight > 64 * 1024 * 1024 || _queuedTextBytes > 64 * 1024 * 1024 - weight
+		|| bytes > Store::MaxMediaBytes
 		|| (bytes != 0) != bool(reader) || snapshot.text.size() > 60000
 		|| snapshot.content.size() > 60000 || snapshot.mime.size() > 128) return false;
 	const auto revision = handle->revision.load();
 	const auto epoch = _gate->epoch.load();
-	++_captures;
+	++(media ? _captures : _textCaptures);
+	_queuedTextBytes += weight;
 	try {
-		enqueue([this, handle, revision, epoch, snapshot = std::move(snapshot), bytes,
+		enqueue([this, handle, revision, epoch, snapshot = std::move(snapshot), bytes, media, weight,
 				reader = std::move(reader), done = std::move(done)]() mutable {
-			const auto release = Release{_captures};
+			const auto release = Release{media ? _captures : _textCaptures};
+			const auto releaseBytes = ReleaseBytes{_queuedTextBytes, weight};
 			const auto wipe = Wipe{snapshot};
 			if (!Current(_gate, handle, revision)) return;
 			auto result = Result();
@@ -249,11 +260,14 @@ bool Worker::capture(const Handle &handle, Snapshot snapshot, std::uint64_t byte
 				result.id = added.id;
 				result.cleanupPending = added.cleanupPending;
 				_storage[handle->slot].recoveryPending = added.cleanupPending;
-			} catch (const std::exception &) { }
+			} catch (const std::exception &) {
+				_storage[handle->slot].recoveryPending = true;
+			}
 			post(handle, revision, epoch, std::move(result), std::move(done));
 		});
 	} catch (...) {
-		--_captures;
+		--(media ? _captures : _textCaptures);
+		_queuedTextBytes -= weight;
 		throw;
 	}
 	return true;
