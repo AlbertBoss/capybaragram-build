@@ -198,5 +198,17 @@
     "live_telegram_tested": false,
     "vpn_transition_tested": false,
     "documentation": "docs/ANDROID-CONNECTION.md"
+  },
+  "full_candidate_build": {
+    "run": 37196484742,
+    "control_head": "d9c9c520dc4b95f43f513d442d9193af3b712147",
+    "conclusion": "success",
+    "apk_sha256": "685f0918758f4686fef2fa2c68d4935743802998420668097e1f832a89712be7",
+    "full_client_compiled": true,
+    "production_integration_class_count": 28,
+    "persistent_signature_and_native_alignment_verified": true,
+    "main_client_ui_executed": false,
+    "live_telegram_tested": false,
+    "vpn_transitions_tested": false
   }
 }

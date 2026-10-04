@@ -1,0 +1,25 @@
+{
+  "source_sha": "62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c",
+  "pre": {
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "7e2d7d412ccf34ed8d1910f43a118d3303e5fdd4ebdf32eb609dbbcf78801d4f",
+    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "b336e6522a161d024e578bfd37c57791536422b078b321bd5b17f2044cb8c768",
+    "TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java": "d15bb1ff203155a3df8f66ca047d79c99754ca31486c32376032dc9dc742d306",
+    "TMessagesProj/src/main/java/org/telegram/messenger/SendMessagesHelper.java": "49369befb25de69254ad7cca6e3056d8e3cb223057d9ca61e3ce995d4cb19786",
+    "TMessagesProj/src/main/AndroidManifest.xml": "a627122a18c5670093cd758b8a75cc66296b3256cd6c9ecd846825722479326a"
+  },
+  "post": {
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "fe62caa6b3c29d116db7da8f3aeefff62b150043eb09746ed742e205b6d2e5c8",
+    "TMessagesProj/src/main/java/org/capybaragram/telegram/CapyVault.java": "c1cc7de52be3bde258fc9edb15112e1cd183b29bf3dc5752007652c46ef1c26e",
+    "TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java": "3f93b9a846f218f8ca46316ca4ecdb3e92e538c7422144778b148f845e38a3aa",
+    "TMessagesProj/src/main/java/org/telegram/messenger/SendMessagesHelper.java": "649031fbe5accf96cf232e5d6dfd537e1d3b7ce119744b55cc2003bb2cc343ea",
+    "TMessagesProj/src/main/AndroidManifest.xml": "d00bf2010f37d6962b83174d0c9d5d323fbc3fabb0b0880e4d9b7453469d72d3"
+  },
+  "added": {
+    "TMessagesProj/src/main/java/org/capybaragram/capture/CaptureGate.java": "4144969550c1c111af30bf7fc5278f0ab886db019afea45f21f84dfef9e88e0f",
+    "TMessagesProj/src/main/java/org/capybaragram/capture/CapyCapture.java": "ca4976870926fb761fe85792490201d7c73b5b9f24431d4ab146ab88632abf2e",
+    "TMessagesProj/src/main/java/org/capybaragram/capture/CapyCaptureUi.java": "3ae23a2a34c5db14abf564d1d7b5345faf80129b171c3310bb62c71b0f17c576",
+    "TMessagesProj/src/main/java/org/capybaragram/capture/CapyScreenshotRequest.java": "764c8e2eff4c39247b248b0867b8dc7d5c89f4fa44b18d18012edc627db598a6",
+    "TMessagesProj/src/main/res/values/capy_capture.xml": "910953fc0b04ba9901b7d7608fb1fc8f2b500995434edecb019ece4a399cad89",
+    "TMessagesProj/src/main/res/values-ru/capy_capture.xml": "08beabab8918553ba96af78b677a3ba793fc1579b217d7e30283e63f2cec0bd7"
+  }
+}

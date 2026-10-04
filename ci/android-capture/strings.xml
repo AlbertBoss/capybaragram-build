@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CapyCapture">CapybaraGram · Screenshot reports</string>
+    <string name="CapyCaptureOn">Reporting my screenshots to the other person is enabled for this account.</string>
+    <string name="CapyCaptureOff">Reporting my screenshots to the other person is disabled.</string>
+    <string name="CapyCaptureDescription">Optional exchange of screenshot events in private cloud chats on Android 14+. When Android reports a screenshot while a normal conversation is active, CapybaraGram sends the other person a Telegram service notification. This reveals that you viewed the chat even with silent reading enabled. No image, precise region or specific message is claimed. Secret chats and one-time media retain their existing Telegram behavior. Android does not report every capture method. This setting cannot detect another person using a client that does not report their screenshots. Enabled only after your choice; no screenshot pixels are stored.</string>
+    <string name="CapyCaptureEnable">Report my screenshots</string>
+    <string name="CapyCaptureDisable">Stop reporting my screenshots</string>
+    <string name="CapyCaptureUnsupported">This OS detector requires Android 14 or later. Existing Telegram screenshot events remain available.</string>
+    <string name="CapyCaptureUnavailable">Android could not register the screenshot detector. The setting remains disabled.</string>
+    <string name="CapyCaptureReportFailed">Telegram did not confirm the screenshot notification.</string>
+</resources>

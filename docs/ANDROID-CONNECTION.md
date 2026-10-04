@@ -1,8 +1,12 @@
 # Native Android connection integration
 
 This is development code. A successful isolated JNI test is not proof that the
-Telegram client, an actual provider or a VPN transition works. The first full
-Android candidate containing this integration has not yet passed its build.
+Telegram client, an actual provider or a VPN transition works. The full
+Android candidate [37196484742](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37196484742)
+passed its build. Its persistent signing certificate, 28 production integration
+classes, ARM64 JNI libraries/16 KiB alignment and exact bundled notices were
+verified locally. Installation, the main UI, live Telegram and VPN transitions
+remain unverified for this exact APK.
 
 The pinned Android source is
 [`62b56a07`](https://github.com/DrKLO/Telegram/tree/62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c).

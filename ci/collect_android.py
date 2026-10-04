@@ -100,6 +100,8 @@ def collect(source, output, profile='offline', certificate_sha256=None):
         if profile == 'candidate':
             require_disabled_flag(manifest,'debuggable')
             require_disabled_flag(manifest,'allowBackup')
+            if 'android.permission.DETECT_SCREEN_CAPTURE' not in manifest:
+                raise RuntimeError('Candidate screenshot OS permission is absent.')
     if ('android.permission.INTERNET' in permissions) != online:
         raise RuntimeError('INTERNET permission does not match the requested APK profile.')
     signature = checked([tools / 'apksigner', 'verify', '--verbose', '--print-certs', apk])

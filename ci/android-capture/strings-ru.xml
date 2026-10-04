@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CapyCapture">CapybaraGram · События скриншотов</string>
+    <string name="CapyCaptureOn">Для этого аккаунта включено сообщение собеседнику о моих скриншотах.</string>
+    <string name="CapyCaptureOff">Сообщение собеседнику о моих скриншотах выключено.</string>
+    <string name="CapyCaptureDescription">Добровольный обмен событиями скриншотов в личных облачных чатах на Android 14 и новее. Если Android сообщает о снимке при активной обычной переписке, CapybaraGram отправляет собеседнику служебное уведомление Telegram. Оно раскрывает факт просмотра чата даже при включённой нечиталке. Изображение, точная область и конкретное сообщение не определяются. Секретные чаты и одноразовые медиа сохраняют прежнее поведение Telegram. Android сообщает не обо всех способах съёмки. Настройка не обнаружит действия собеседника в клиенте, который не сообщает о своих скриншотах. Включается только по вашему выбору; изображение снимка не сохраняется.</string>
+    <string name="CapyCaptureEnable">Сообщать о моих скриншотах</string>
+    <string name="CapyCaptureDisable">Не сообщать о моих скриншотах</string>
+    <string name="CapyCaptureUnsupported">Этот системный детектор доступен с Android 14. Прежние события скриншотов Telegram остаются доступны.</string>
+    <string name="CapyCaptureUnavailable">Android не разрешил зарегистрировать детектор. Настройка осталась выключенной.</string>
+    <string name="CapyCaptureReportFailed">Telegram не подтвердил уведомление о скриншоте.</string>
+</resources>

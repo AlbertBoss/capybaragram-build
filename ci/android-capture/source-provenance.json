@@ -1,0 +1,33 @@
+{
+  "result": "PASS",
+  "source_sha": "62b56a07ca7e30e39f7fd00a6728d6bbd716ca1c",
+  "native_hosts": 5,
+  "installed_payloads": 6,
+  "source_preparation_checks": [
+    "drift in all five hosts rejected without partial writes",
+    "CRLF yields identical normalized preparation",
+    "payload collision rejected without overwrite",
+    "double application rejected",
+    "each of six installed payloads rejects changed bytes",
+    "unique OS permission and matching native English/Russian resource keys"
+  ],
+  "java_gate_runtime": "CAPY_CAPTURE_GATE=PASS checks=21",
+  "new_java_hashes": {
+    "CaptureGate.java": "4144969550c1c111af30bf7fc5278f0ab886db019afea45f21f84dfef9e88e0f",
+    "CapyCapture.java": "ca4976870926fb761fe85792490201d7c73b5b9f24431d4ab146ab88632abf2e",
+    "CapyCaptureUi.java": "3ae23a2a34c5db14abf564d1d7b5345faf80129b171c3310bb62c71b0f17c576",
+    "CapyScreenshotRequest.java": "764c8e2eff4c39247b248b0867b8dc7d5c89f4fa44b18d18012edc627db598a6"
+  },
+  "whole_client_compiled": false,
+  "api_34_registration_executed": false,
+  "hardware_screenshot_observed": false,
+  "live_telegram_service_event": false,
+  "source_review": [
+    "opt-in preference scoped to owner; disabled by default",
+    "API-34 types isolated in nested guarded class",
+    "revoked callback clears host lambdas and weak owners",
+    "native queue denies changed session or withdrawn consent",
+    "real server Updates only; no local success event",
+    "no pixels or inferred specific message/region"
+  ]
+}

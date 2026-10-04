@@ -57,7 +57,11 @@ CapybaraGram развивает привычный Telegram в сторону л
 | Шаблоны: создание, просмотр, вставка в черновик | Есть в сборке | Есть в сборке | Код интерфейса и хранения собран; отправка остаётся отдельным действием пользователя |
 | 10 локальных слотов аккаунтов | Есть в сборке | Есть в сборке | Изменения скомпилированы; десять одновременно авторизованных аккаунтов ещё не проверены |
 | Обработка ответов и ошибок сервера при изменении папок | Есть в сборке | Есть в сборке | Контролируемые тесты; двусторонняя синхронизация с официальным клиентом требует живой проверки |
-| «Нечиталка»: подавление подтверждений прочтения | Первая реализация в APK | Нативный код добавлен; новая сборка ожидается | Тесты политики, адаптера и запросов; сетевое поведение на двух аккаунтах ещё не принято |
+| «Нечиталка»: подавление подтверждений прочтения | Есть в APK 37196484742 | Нативный код добавлен; новая сборка ожидается | Политика и запросы проверены; сетевое поведение на двух аккаунтах ещё не принято |
+| Архив полученных сообщений, правок и скачанных медиа | Есть в APK 37196484742 | Нативный код добавлен; новая сборка ожидается | Шифрование, очередь и оригиналы проверены отдельно; живые сценарии и секретные чаты Windows не приняты |
+| Локальная расшифровка голоса без Premium | Есть в APK 37196484742 | Нативный код добавлен; новая сборка ожидается | Движок распознавал тестовое аудио; русский язык, ARM64 и реальные голосовые требуют приёмки |
+| Встроенное экспериментальное подключение | Есть в APK 37196484742, включая экран входа | Полная сборка с меню после входа выполняется; новая кнопка входа ещё не собрана | Библиотеки проверены; вход, доступность у провайдеров и VPN-переходы не приняты |
+| Добровольные события моих скриншотов | Добавлены в исходники для Android 14+ | Собственного расширения нет | Выключены по умолчанию; точная область и действия несообщающих клиентов неизвестны; полная компиляция ещё ожидается |
 | Установка и запуск | APK: проверены | EXE и установщик: проверены | Стартовые экраны, пустая форма входа; перезапуск Android, установка и замена Windows |
 
 Заметки и шаблоны **хранятся на конкретном устройстве**; их синхронизации пока нет. Серверные лимиты Telegram и доступ к Premium этим клиентом не отменяются.
@@ -76,7 +80,7 @@ CapybaraGram развивает привычный Telegram в сторону л
 
 | Артефакт / сценарий | Проверенный запуск |
 | --- | --- |
-| Android ARM64 APK с новым оформлением и первой реализацией «нечиталки» | [Сборка 34156952657](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34156952657) |
+| Android ARM64 APK с нечиталкой, архивом, локальным голосом и встроенным подключением | [Сборка 37196484742](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37196484742): подпись и состав проверены, запуск этой APK ещё не принят |
 | Android: установка, стартовые экраны и перезапуск | [Проверка 34159878677](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34159878677) |
 | Windows x64 Release EXE | [Сборка 37070585321](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37070585321) |
 | Windows: светлая и тёмная темы, переход к пустой форме номера | [Проверка 37155302094](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37155302094) |
@@ -86,7 +90,7 @@ CapybaraGram развивает привычный Telegram в сторону л
 
 ## Что дальше
 
-Приоритет — приёмка повседневных сценариев на обеих платформах: сообщения, медиа, аккаунты, заметки, шаблоны, папки, уведомления и сохранение входа при обновлении. Сейчас также проверяется новое оформление и готовится скачиваемая тестовая версия для обеих платформ. Расширение функций приватности, истории и голоса остаётся следующим этапом.
+Текущие приоритеты — нечиталка, архив полученного содержимого и локальный голос/подключение/наблюдаемые события на обеих платформах. Новые Android-модули скомпилированы; функциональная приёмка на живых аккаунтах остаётся. Полная Windows-сборка выполняется. Повседневные сообщения, аккаунты, папки, сохранение входа, основной интерфейс и финальная поставка также остаются в объёме проекта.
 
 Полная «нечиталка» секретных чатов, архив удалённых и исчезающих сообщений, локальная транскрипция и улучшение подключения **ещё не готовы**. [План разработки](docs/ROADMAP.md).
 
@@ -94,6 +98,8 @@ CapybaraGram развивает привычный Telegram в сторону л
 
 - [Первые шаги: установка, темы, заметки и шаблоны](docs/QUICKSTART.md)
 - [Оформление и доступ к инструментам чата](docs/APPEARANCE.md)
+- [Встроенное подключение Android и границы проверок](docs/ANDROID-CONNECTION.md)
+- [События скриншотов: добровольный обмен и ограничения](docs/SCREENSHOT-EVENTS.md)
 - [Архитектура и карта собственных модулей](docs/ARCHITECTURE.md)
 - [Подтверждённые результаты и границы тестирования](docs/VERIFICATION.md)
 - [Подготовка и запуск сборки](docs/BUILDING.md)
@@ -112,4 +118,4 @@ CapybaraGram развивает привычный Telegram в сторону л
 
 ## English summary
 
-**CapybaraGram is an unofficial native Telegram client for Android and Windows, under active development.** This repository contains custom modules, source transformations, tests and build workflows against pinned Telegram sources. Current builds include local chat notes, reply templates and ten account slots; Android also includes an initial silent-read implementation. Native startup and installer checks have passed. Real-account feature acceptance, the final interface and a stable public release remain in progress.
+**CapybaraGram is an unofficial native Telegram client for Android and Windows, under active development.** This repository contains custom modules, source transformations, tests and build workflows against pinned Telegram sources. Current builds include local chat notes, reply templates and ten account slots. The latest Android APK also compiles silent reading, the received-content archive, offline voice and experimental connection controls. Cooperative Android screenshot reporting is newly added source awaiting a full build. Earlier native startup and installer checks passed; they do not prove the latest APK runtime. Real-account feature acceptance, the final interface and a stable public release remain in progress.
