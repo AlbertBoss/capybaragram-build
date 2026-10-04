@@ -1,0 +1,34 @@
+{
+  "models": [
+    {
+      "repository": "ggerganov/whisper.cpp",
+      "revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+      "file": "ggml-tiny.bin",
+      "bytes": 77691713,
+      "sha256": "be07e048e1e599ad46341c8d2a135645097a538221678b7acdd1b1919c6e1b21",
+      "metadata_source": "https://huggingface.co/api/models/ggerganov/whisper.cpp/tree/5359861c739e955e79d9a303bcbc70fb988958b1?recursive=false&expand=false",
+      "id": "tiny"
+    },
+    {
+      "repository": "ggerganov/whisper.cpp",
+      "revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+      "file": "ggml-base-q5_1.bin",
+      "bytes": 59707625,
+      "sha256": "422f1ae452ade6f30a004d7e5c6a43195e4433bc370bf23fac9cc591f01a8898",
+      "metadata_source": "https://huggingface.co/api/models/ggerganov/whisper.cpp/tree/5359861c739e955e79d9a303bcbc70fb988958b1?recursive=false&expand=false",
+      "id": "base_q5_1"
+    }
+  ],
+  "language": "ru",
+  "sample_rows": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "selection": "Same first five preselected public rows for both models; no transcript-based filtering.",
+  "license": "MIT",
+  "model_source": "https://huggingface.co/ggerganov/whisper.cpp/tree/5359861c739e955e79d9a303bcbc70fb988958b1",
+  "purpose": "Test-only exact-APK JNI model comparison; production model and UI unchanged."
+}

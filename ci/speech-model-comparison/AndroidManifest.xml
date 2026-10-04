@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.capybaragram.speechmodeltest">
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="30" />
+    <application android:label="CapybaraGram public Russian model comparison" android:allowBackup="false" android:largeHeap="true" android:extractNativeLibs="true" />
+    <instrumentation android:name="org.capybaragram.voice.RussianModelComparisonInstrumentation" android:targetPackage="org.capybaragram.speechmodeltest" />
+</manifest>
