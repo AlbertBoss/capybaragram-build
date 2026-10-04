@@ -40,6 +40,7 @@ def build(work, report):
         raise ValueError('Expected x64 MSVC target')
     if os.environ.get('WindowsSDKVersion', '').rstrip('\\/') != '10.0.26100.0':
         raise ValueError('Expected production Windows SDK 10.0.26100.0')
+    toolset = os.environ['VCToolsVersion'].rstrip('\\/')
     pins = json.loads((HERE / 'source-provenance.json').read_text(encoding='utf-8'))
     for folder, field in [('connection', 'core_source_sha256'), ('windows-connection', 'worker_source_sha256')]:
         path = CI / folder
@@ -77,7 +78,7 @@ def build(work, report):
     if not library.is_file() or library.stat().st_size < 100000:
         raise ValueError('Connection static library missing')
     result = {'result': 'PASS', 'rust_version': RUST, 'target': TARGET,
-              'toolset': env['VCToolsVersion'].rstrip('\\/'), 'sdk': '10.0.26100.0',
+              'toolset': toolset, 'sdk': '10.0.26100.0',
               'crt': 'static release', 'rustflags': env['RUSTFLAGS'], 'compiler_path': cl,
               'library_path': str(library), 'library_bytes': library.stat().st_size,
               'library_sha256': hashlib.sha256(library.read_bytes()).hexdigest(),
