@@ -39,6 +39,50 @@ def run(args, *, timeout=120, **kwargs):
     kwargs.setdefault('env', tool_env)
     return subprocess.run(list(map(str, args)), check=True, timeout=timeout, **kwargs)
 
+def text_output(value):
+    if value is None:
+        return ''
+    return value.decode('utf-8', errors='replace') if isinstance(value, bytes) else value
+
+def preserve_observations(stdout, stderr, *, complete):
+    stdout, stderr = text_output(stdout), text_output(stderr)
+    (report / 'instrumentation.txt').write_text(stdout + stderr, encoding='utf-8')
+    records = [json.loads(value) for value in re.findall(
+        r'CAPY_RUSSIAN_OBSERVATION_JSON=(\{[^\r\n]+\})', stdout)]
+    expected = [(i, 'opus', 'auto') for i in range(5)] + [(0, 'aac', 'auto'), (0, 'opus', 'ru')]
+    actual = [(r['row_index'], r['codec'], r['language_argument']) for r in records]
+    if len(actual) > 7 or actual != expected[:len(actual)]:
+        raise RuntimeError('Partial native observations differ from their predefined sequence.')
+    for record in records:
+        sample = fixture_pin['samples'][record['row_index']]
+        if record['reference'] != sample['reference'] or record['reference_words'] <= 0:
+            raise RuntimeError('Partial native reference differs.')
+    partial = {'complete_instrumentation': complete,
+        'production_apk_run': APK_RUN, 'production_apk_sha256': APK_SHA,
+        'production_arm64_jni_sha256': hashlib.sha256(library).hexdigest(),
+        'fixture_manifest_sha256': hashlib.sha256(fixture_bytes).hexdigest(),
+        'phases': re.findall(r'CAPY_RUSSIAN_PHASE=([^\r\n]+)', stdout),
+        'observations': records, 'observation_count': len(records),
+        'general_russian_quality_proven': False, 'physical_arm64_device': False,
+        'live_telegram_chat_voice_acceptance': False, 'test_helper_internet_permission': False}
+    (report / 'partial-observations.json').write_text(json.dumps(partial, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+def failure_diagnostics(adb):
+    # Disposable helper/emulator only. There are no Telegram sessions or owner audio.
+    commands = [('helper memory', ['shell', 'dumpsys', 'meminfo', 'org.capybaragram.speechrutest']),
+                ('emulator CPU', ['shell', 'dumpsys', 'cpuinfo']),
+                ('last emulator log records', ['logcat', '-d', '-t', '500'])]
+    sections = []
+    for label, tail in commands:
+        try:
+            result = subprocess.run([str(adb), '-s', 'emulator-5554', *tail],
+                                    capture_output=True, timeout=20)
+            value = text_output(result.stdout) + text_output(result.stderr)
+            sections.append(label + '\n' + value[:1000000])
+        except subprocess.TimeoutExpired:
+            sections.append(label + '\nDiagnostic command timed out; no synthetic result.')
+    (report / 'diagnostics.log').write_text('\n\n'.join(sections), encoding='utf-8')
+
 classes = out / 'classes'
 dex = out / 'dex'
 classes.mkdir()
@@ -172,13 +216,21 @@ try:
     native_bridge = run([adb, '-s', 'emulator-5554', 'shell', 'getprop', 'ro.dalvik.vm.native.bridge'], capture_output=True, text=True).stdout.strip()
     if 'arm64-v8a' not in abi_list or not native_bridge:
         raise RuntimeError('Expected real emulator ARM64 native translation.')
-    result = run([adb, '-s', 'emulator-5554', 'shell', 'am', 'instrument', '-w', '-r',
-        '-e', 'model_sha', m['sha256'], '-e', 'fixture_manifest_sha', hashlib.sha256(fixture_bytes).hexdigest(),
-        'org.capybaragram.speechrutest/org.capybaragram.voice.RussianSpeechInstrumentation'],
-        capture_output=True, text=True, timeout=1200)
-    (report / 'instrumentation.txt').write_text(result.stdout + result.stderr)
+    try:
+        result = run([adb, '-s', 'emulator-5554', 'shell', 'am', 'instrument', '-w', '-r',
+            '-e', 'model_sha', m['sha256'], '-e', 'fixture_manifest_sha', hashlib.sha256(fixture_bytes).hexdigest(),
+            'org.capybaragram.speechrutest/org.capybaragram.voice.RussianSpeechInstrumentation'],
+            capture_output=True, text=True, timeout=1800)
+    except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as failure:
+        preserve_observations(failure.stdout, failure.stderr, complete=False)
+        failure_diagnostics(adb)
+        raise
+    technical_pass = ('CAPY_ANDROID_RUSSIAN_SPEECH=TECHNICAL_PASS' in result.stdout
+                      and 'INSTRUMENTATION_CODE: -1' in result.stdout)
+    preserve_observations(result.stdout, result.stderr, complete=technical_pass)
     print(result.stdout, flush=True)
-    if 'CAPY_ANDROID_RUSSIAN_SPEECH=TECHNICAL_PASS' not in result.stdout or 'INSTRUMENTATION_CODE: -1' not in result.stdout:
+    if not technical_pass:
+        failure_diagnostics(adb)
         raise RuntimeError('Native speech checks did not pass')
     runtime = run([adb, '-s', 'emulator-5554', 'shell', 'getprop', 'ro.build.fingerprint'],
                   capture_output=True, text=True).stdout.strip()

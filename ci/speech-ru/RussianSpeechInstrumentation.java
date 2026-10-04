@@ -78,11 +78,22 @@ public final class RussianSpeechInstrumentation extends Instrumentation {
         }
         return previous[actual.length];
     }
+    private void phase(int row, String codec, String language, String stage) {
+        Bundle status = new Bundle();
+        status.putString("stream", "CAPY_RUSSIAN_PHASE=" + row + ":" + codec + ":" + language + ":" + stage + "\n");
+        sendStatus(0, status);
+    }
+    private void observation(JSONObject record) {
+        Bundle status = new Bundle();
+        status.putString("stream", "CAPY_RUSSIAN_OBSERVATION_JSON=" + record.toString() + "\n");
+        sendStatus(0, status);
+    }
     private JSONObject recognize(File model, JSONObject sample, String codec, String language) throws Exception {
         JSONObject encoded = sample.getJSONObject(codec);
         File audio = assetFile(encoded.getString("file"), encoded.getInt("bytes"), encoded.getString("sha256"));
         float[] pcm = null;
         try {
+            phase(sample.getInt("row_index"), codec, language, "decode-start");
             pcm = AndroidPcmDecoder.decode(audio, () -> false);
             double expected = sample.getDouble("source_duration_seconds");
             if (pcm.length < 16000 || Math.abs(pcm.length / 16000.0 - expected) > 0.5)
@@ -94,6 +105,7 @@ public final class RussianSpeechInstrumentation extends Instrumentation {
                 signal |= Math.abs(p) > 0.01f;
             }
             if (!signal) throw new IllegalStateException("No decoded speech signal.");
+            phase(sample.getInt("row_index"), codec, language, "native-start");
             long started = android.os.SystemClock.elapsedRealtime();
             String text;
             try (OfflineSpeech speech = new OfflineSpeech()) { text = speech.run(model, pcm, language); }
@@ -127,10 +139,13 @@ public final class RussianSpeechInstrumentation extends Instrumentation {
                 JSONObject sample = samples.getJSONObject(i);
                 if (sample.getInt("row_index") != i) throw new IllegalStateException("Dataset selection differs.");
                 JSONObject record = recognize(model, sample, "opus", "auto");
+                observation(record);
                 records.put(record); totalWords += record.getInt("reference_words"); totalEdits += record.getInt("word_edits");
             }
-            records.put(recognize(model, samples.getJSONObject(0), "aac", "auto"));
-            records.put(recognize(model, samples.getJSONObject(0), "opus", "ru"));
+            JSONObject aac = recognize(model, samples.getJSONObject(0), "aac", "auto");
+            observation(aac); records.put(aac);
+            JSONObject explicitRu = recognize(model, samples.getJSONObject(0), "opus", "ru");
+            observation(explicitRu); records.put(explicitRu);
             JSONObject result = new JSONObject();
             result.put("technical_execution", "PASS"); result.put("observations", records);
             result.put("default_auto_opus_sample_count", 5); result.put("default_auto_reference_words", totalWords);
