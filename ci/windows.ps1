@@ -109,6 +109,10 @@ if ($Phase -eq 'Build') {
         if ($LASTEXITCODE -ne 0) { throw 'Desktop voice preparation failed.' }
         & python (Join-Path $PSScriptRoot 'windows-voice/prepare_windows_voice.py') $src --check
         if ($LASTEXITCODE -ne 0) { throw 'Desktop voice source verification failed.' }
+        & python (Join-Path $PSScriptRoot 'windows-archive/prepare_windows_archive.py') $src
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop archive preparation failed.' }
+        & python (Join-Path $PSScriptRoot 'windows-archive/prepare_windows_archive.py') $src --check
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop archive source verification failed.' }
         $env:CAPY_WINDOWS_API_CACHE = Join-Path $env:RUNNER_TEMP 'capy-windows-owner-api.cmake'
         & python (Join-Path $PSScriptRoot 'api_credentials.py') --windows-cache $env:CAPY_WINDOWS_API_CACHE
         if ($LASTEXITCODE -ne 0) { throw 'Owner API cache creation failed.' }
@@ -184,6 +188,11 @@ if /i not "%CAPY_WINDOWS_PROFILE%"=="Baseline" (
     "%GITHUB_WORKSPACE%\TBuild\tdesktop\out\capy-tests\%CAPY_WINDOWS_CONFIGURATION%\capy-read-policy-test.exe" > "%RUNNER_TEMP%\capy-read-policy-runtime-result.txt"
     if errorlevel 1 exit /b 1
     type "%RUNNER_TEMP%\capy-read-policy-runtime-result.txt"
+    cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target capy-archive-settings-test --config %CAPY_WINDOWS_CONFIGURATION% --parallel 2
+    if errorlevel 1 exit /b 1
+    "%GITHUB_WORKSPACE%\TBuild\tdesktop\out\capy-tests\%CAPY_WINDOWS_CONFIGURATION%\capy-archive-settings-test.exe" > "%RUNNER_TEMP%\capy-archive-settings-runtime-result.txt"
+    if errorlevel 1 exit /b 1
+    type "%RUNNER_TEMP%\capy-archive-settings-runtime-result.txt"
 )
 cmake --build "%GITHUB_WORKSPACE%\TBuild\tdesktop\out" --target Telegram --config %CAPY_WINDOWS_CONFIGURATION% --parallel 2
 if errorlevel 1 exit /b 1
@@ -213,6 +222,11 @@ if ($Profile -ne 'Baseline') {
         throw 'Missing successful native read-mode policy check.'
     }
     Copy-Item -LiteralPath $readResult -Destination (Join-Path $stage 'READ-POLICY-TEST.txt')
+    $archiveResult = Join-Path $env:RUNNER_TEMP 'capy-archive-settings-runtime-result.txt'
+    if (-not (Test-Path -LiteralPath $archiveResult) -or (Get-Content -LiteralPath $archiveResult -Raw) -notmatch '^CAPY_QT_ARCHIVE_SETTINGS=PASS checks=[0-9]+\s*$') {
+        throw 'Missing successful native archive setting serialization check.'
+    }
+    Copy-Item -LiteralPath $archiveResult -Destination (Join-Path $stage 'ARCHIVE-SETTINGS-TEST.txt')
 }
 $artifactName = if ($Profile -ne 'Baseline') { 'CapybaraGram.exe' } else { 'Telegram.exe' }
 Copy-Item -LiteralPath $exe -Destination (Join-Path $stage $artifactName)
@@ -228,6 +242,7 @@ Changes: identity, accounts and windows-notes patches; profile: APPDATA/Capybara
 Per-account silent-reading gate and explicit read confirmation. Full client compile does not prove live peer acceptance; that test is pending.
 Ten local account slots without Premium; multi-account UI, login and notification isolation require runtime verification.
 Native local chat/topic notes and response templates with preview/draft insertion. These features still require client runtime acceptance.
+Opt-in per-account local archive with native edit/delete/expiry hooks, retained received originals and image preview. Original voice/video playback and live peer acceptance pending. Windows secret-chat protocol is not implemented.
 Own IPC, toast activator and shortcuts. No automatic legacy data migration or URL association changes.
 Auto-update and crash reports disabled. No Updater packaged. UI launch, login and DLL requirements unverified.
 Run: $($env:GITHUB_RUN_ID)

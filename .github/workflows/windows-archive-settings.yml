@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: MIT
+name: Windows archive Qt setting runtime
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-windows-archive-settings
+  cancel-in-progress: false
+jobs:
+  runtime:
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install official MSYS2 test-only Qt Core and compiler
+        uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-qt6-base
+      - name: Compile and execute real Qt DataStream codec
+        shell: msys2 {0}
+        run: python ci/windows-archive/run_settings_runtime.py
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capy-windows-archive-settings-results
+          path: ci/windows-archive/settings-test-results/
+          retention-days: 1
+          if-no-files-found: error

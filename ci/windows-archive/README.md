@@ -1,11 +1,13 @@
-# Windows local archive: storage stage
+# Windows local archive: storage, worker and native integration
 
-This package implements storage, **not the Telegram UI or message lifecycle adapter**.
-It is not yet part of a downloadable Windows client. Secret-chat support is not
-provided by this package or by the pinned official Desktop base.
+Storage and its account-bound worker have passed synthetic native Windows tests.
+The source recipe now connects opt-in settings, chat/topic archive UI and native
+edit/delete/expiry hooks. **That native client integration has not yet been compiled
+or accepted with a live Telegram peer.** It is not yet in a downloadable archive
+client. Secret-chat protocol support is not provided by the pinned official
+Desktop base or this package.
 
-`archive_store` borrows a serialized `Capy::Vault::Store`. The future adapter must
-use an independent `tdata/capybara-archive` account registry, with the existing
+`archive_store` borrows a serialized `Capy::Vault::Store`. The native recipe uses an independent `tdata/capybara-archive` account registry, with the existing
 owner/authorization/generation binding, rather than the notes registry. The
 snapshot records typed peer, topic, message, timestamps, reason, bounded UTF-8
 text and versioned adapter metadata. Metadata is **not raw Telegram TL**.
@@ -37,8 +39,8 @@ such a result: its catalog entry already committed.
 Recovery validates **every catalog reference before deletion**. Missing, damaged,
 unknown-version catalogs, malformed records, missing chunks or reparse files fail
 without silently recreating the archive. A catalog is initialized only for an
-empty namespace. No archive clear API bypasses registry retirement; clearing will
-require a new generation in the future worker.
+empty namespace. No archive clear API bypasses registry retirement; the account-bound worker
+revokes old operations and retires its archive generation before later access.
 
 ## Verification boundary
 
@@ -57,10 +59,23 @@ hashes were independently checked after download. This includes actual deleted
 file handle streaming and does not include native Telegram integration. Reparse
 rejection is implemented; a junction/symlink runtime fixture is still pending.
 
-Pending: native opt-in settings and UI, native edit/delete/expiry
-hooks, original media admission before cache cleanup, account logout/passcode
-integration and full-client testing. Secret-chat protocol support is a separate
-required part of P2, not implied by this storage package.
+The guarded `prepare_windows_archive.py` applies after the read-mode and voice
+recipes. It binds 14 normalized native host hashes and 12 module hashes, validates
+all inputs before writing and refuses changed sources or existing module files.
+The adapter captures existing text before server edits/deletion notifications,
+before TTL destruction and before original cache cleanup. It also captures at
+the native timed-media viewer / TTL voice-round layer entry. Matching document
+bytes or exact Large photo bytes are retained in owned memory; completed native
+file locations use a verified held file handle. It does not download missing
+originals or substitute thumbnails. Limits/failed admission produce an explicit
+record without a media copy; repeated early/final TTL snapshots are not deduplicated
+yet. The UI supports chat/topic paging, account opt-in, account archive clear and
+bounded static image preview. Original video/voice playback is still pending.
+
+Application/account wiring uses an independent registry, the same authorization
+identity, per-account settings, passcode lock/unlock and logout/forgotten-passcode
+revocation. Full MSVC client compilation, restart tests and live peer acceptance
+are pending. Secret-chat protocol support remains a required separate part of P2.
 
 `VerifiedInput` admits an already complete, unencrypted original inside an explicit
 trusted local root, with its exact declared length. It rejects reparse ancestors,
@@ -89,9 +104,9 @@ opt-in. Incoming opt-in captures may run while locked, without exposing content.
 Foreground reads and posted callbacks require the unchanged unlocked UI epoch.
 Callbacks cannot dereference a destroyed Worker.
 
-This worker's source and synthetic runtime suite are added in the current stage;
-inspect its run before treating it as verified. It still needs application/account
-lifecycle wiring, persisted opt-in and native message adapters.
+The worker runtime below is verified. Application/account lifecycle wiring,
+persisted opt-in and native message adapters are now connected in source, with
+full client compilation and live acceptance still pending.
 
 The account-bound worker, typed-chat filtering and burst revision passed in
 [37175109886](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37175109886):
@@ -106,3 +121,8 @@ this is not a weak-PC or native Telegram performance benchmark.
 
 API basis: [CryptProtectData](https://learn.microsoft.com/en-us/windows/win32/api/dpapi/nf-dpapi-cryptprotectdata)
 and [CreateFileW](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew).
+
+Native references: [pinned Telegram Desktop source](https://github.com/telegramdesktop/tdesktop/tree/80158983dba09d3bf5d96701f21473d6c34bf5f5/Telegram/SourceFiles),
+[Qt QByteArray ownership](https://doc.qt.io/qt-6/qbytearray.html) and
+[Qt implicit sharing](https://doc.qt.io/qt-6/implicit-sharing.html). The adapter
+retains its own media resources rather than borrowing a view that can be cleared.
