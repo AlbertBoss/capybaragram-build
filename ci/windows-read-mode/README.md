@@ -25,3 +25,5 @@ The policy test checks ten-account isolation and permission misuse. Source tests
 do not establish Telegram behavior. A native client build and a real two-account
 test remain required. Windows secret chats are a separate, unimplemented feature.
 Online status and typing are not part of this mode.
+
+Full client run 37160170114 failed at the new menu translation unit: missing style_layers declarations and the three-argument menu callback. Both observed source errors were corrected; the pinned preparation and double-apply checks pass. Run 37171270131 compiles this correction together with the offline voice UI/worker. There is no successful Windows executable with this feature yet; live peer acceptance remains pending.
