@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "run": 37234600074,
+  "head": "c69897ba12c1778f70df5effe039ac639320fbd5",
+  "artifact_id": 11315421143,
+  "artifact_sha256": "32834665f619cb2949a97c1094505d9a368125baa3262b0e294cc36c94594640",
+  "proof_sha256": "721279a4ec14b8e39cfd840e64bf6de01a699a8a0de6d5d3003b3dbe1407f6b9",
+  "fixture_manifest_sha256": "6c6cc9d484fcdbef1efbcff1122cbb0a6a3cdfe0311bc86a77d4f20074f99991",
+  "source_admission_sha256": "555c18581b07cda5cff2b84da1ec272b83e5cc597ee6434ddf1dd26b11ff63fa",
+  "wheel_sha256": "25e025093c4399d7278f543568ed8cc5460ac3a4bf48c23673ace1e25d26619f",
+  "native_sha256": "85c4654de3acdeb99abab86eeb2a6e603927d37089597c0fcc33d8638dc2ccaf",
+  "model_sha256": "961d5ff98a17f4aa6de69864d0aa71fa5bac682301d2b5d17a3f24c5c99a46d4",
+  "selection": "Exactly first five predefined ru-RU MInDS-14 records, no reselection",
+  "model_lifecycle": "one-static-model/fresh-recognizer-per-clip",
+  "totals": {
+    "sample_count": 5,
+    "reference_words": 63,
+    "word_edits": 12,
+    "inference_milliseconds_sum": 4642.717000000001,
+    "model_load_milliseconds_sum": 516.806,
+    "word_error_rate": 0.19047619047619047
+  },
+  "all_observations": [
+    {
+      "row_index": 0,
+      "reference": "Здравствуйте я бы хотела пересмотреть свои предыдущие последние операции которые проходили по моей карте прямым помимо ему счёту Покажите пожалуйста операции последних трёх месяцев",
+      "transcript": "здравствуйте я бы хотела пересмотреть свои предыдущие последней операции которые проходили по моей карте прямым по моему счету покажите пожалуйста операции последних трёх месяцев спасибо",
+      "reference_words": 24,
+      "hypothesis_words": 25,
+      "word_edits": 4,
+      "word_error_rate": 0.16666666666666666,
+      "model_load_milliseconds": 516.806,
+      "model_reused": false,
+      "inference_milliseconds": 1535.352,
+      "pcm_bytes": 638976,
+      "pcm_sha256": "82ab0f0fe5371a8a24323a8a2dec37c27983c1a03cf9dd32e9d9ea9200cd3555"
+    },
+    {
+      "row_index": 1,
+      "reference": "Покажи мне мои последние транзакции если платёж который я не знаю Да я признаю платёж",
+      "transcript": "покажи мне мой последний транзакций если платёж который я не знаю да я признаю платёж",
+      "reference_words": 15,
+      "hypothesis_words": 15,
+      "word_edits": 3,
+      "word_error_rate": 0.2,
+      "model_load_milliseconds": 0.0,
+      "model_reused": true,
+      "inference_milliseconds": 968.451,
+      "pcm_bytes": 282356,
+      "pcm_sha256": "1f40720ad6d669d3363faf3264a18bf76ce3900ab9157ae56bc2060d7bac407e"
+    },
+    {
+      "row_index": 2,
+      "reference": "покажите мне мои последние последние транзакции",
+      "transcript": "покажите мне мои последней последний транзакции",
+      "reference_words": 6,
+      "hypothesis_words": 6,
+      "word_edits": 2,
+      "word_error_rate": 0.3333333333333333,
+      "model_load_milliseconds": 0.0,
+      "model_reused": true,
+      "inference_milliseconds": 601.901,
+      "pcm_bytes": 215724,
+      "pcm_sha256": "c442e766cb0f733d8a49f6e479d63b9e1f8ea8a590623fda9b4319a908a6f906"
+    },
+    {
+      "row_index": 3,
+      "reference": "Покажи мне информацию о всех моих платежах за последнюю неделю",
+      "transcript": "погружения информацию о всех моих платежам за последнюю неделю",
+      "reference_words": 10,
+      "hypothesis_words": 9,
+      "word_edits": 3,
+      "word_error_rate": 0.3,
+      "model_load_milliseconds": 0.0,
+      "model_reused": true,
+      "inference_milliseconds": 822.754,
+      "pcm_bytes": 199340,
+      "pcm_sha256": "d7bc9ed7b831dcc65820632cda94025f9a68216ec4277908cb1eb18801154b47"
+    },
+    {
+      "row_index": 4,
+      "reference": "Я хочу узнать свои последние транзакции за сегодня",
+      "transcript": "я хочу узнать свои последние транзакции за сегодня",
+      "reference_words": 8,
+      "hypothesis_words": 8,
+      "word_edits": 0,
+      "word_error_rate": 0.0,
+      "model_load_milliseconds": 0.0,
+      "model_reused": true,
+      "inference_milliseconds": 714.259,
+      "pcm_bytes": 300188,
+      "pcm_sha256": "e984fc21df7461642da5016c7a8cda2d0efc1ff1999fa0df0d09e8e24411a079"
+    }
+  ],
+  "process_outcome": {
+    "returncode": 0,
+    "signal_name": null,
+    "parent_wall_timeout": false,
+    "wall_seconds": 5.814,
+    "observed_peaks": {
+      "virtual_kib": 2662604,
+      "resident_kib": 266256,
+      "threads": 1,
+      "cpu_seconds": 5.63
+    },
+    "last_observed": {
+      "virtual_kib": 2662604,
+      "resident_kib": 266256,
+      "threads": 1,
+      "cpu_seconds": 5.63
+    },
+    "telemetry_interval_seconds": 0.2,
+    "address_space_limit_mib": 3072,
+    "cpu_limit_seconds": 120,
+    "network_prohibition_removed": false,
+    "production_changed": false
+  },
+  "worker_peak_rss_kib": 266292,
+  "sandbox": {
+    "network_and_unix_socket_creation_denied": true,
+    "execve_denied": true,
+    "verified_before_vendor_load": true,
+    "denied_syscalls": [
+      "socket",
+      "socketpair",
+      "connect",
+      "bind",
+      "listen",
+      "accept",
+      "accept4",
+      "sendto",
+      "sendmsg",
+      "sendmmsg",
+      "recvfrom",
+      "recvmsg",
+      "recvmmsg",
+      "execve",
+      "execveat"
+    ]
+  },
+  "decoder": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+  "decoder_executable_sha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+  "host_packages": [
+    "ffmpeg 7:6.1.1-3ubuntu5",
+    "libseccomp2 2.5.5-1ubuntu3.1"
+  ],
+  "limits": [
+    "Five bank-domain clips do not establish quality of arbitrary Telegram voice messages",
+    "Linux FFmpeg/C API is different from Android MediaCodec/translated ARM64; timings are not directly comparable",
+    "Repeated model unload/reload hung in run37233637714 and remains unaccepted",
+    "Old wheel identity does not prove source-build correspondence or full transitive security audit",
+    "No real account, client menu, physical Android or production integration was tested"
+  ],
+  "decision": {
+    "promoted_to_production": false,
+    "general_russian_quality_accepted": false,
+    "promising_for_further_admission": true,
+    "repeat_same_successful_suite_needed": false,
+    "remaining": [
+      "Source-built platform libraries and dependency/license review",
+      "Explain/fix model reload lifecycle and test cancellation/account isolation",
+      "Actual client and physical-device acceptance"
+    ]
+  }
+}
