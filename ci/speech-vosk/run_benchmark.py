@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import shutil
+import signal
 import stat
 import subprocess
 import sys
@@ -48,6 +49,46 @@ def check_zip(path, expected, limit):
                 raw = archive.read(entry)
                 actual[entry.filename] = {'bytes':len(raw),'sha256':sha(raw)}
         assert actual == expected
+
+def execute_worker(args, env, stage, reports):
+    """Retain exact outcome and bounded /proc telemetry even after native termination."""
+    log = reports / 'worker.txt'
+    start = time.monotonic()
+    clock_ticks = os.sysconf('SC_CLK_TCK')
+    peak = {'virtual_kib':0,'resident_kib':0,'threads':0,'cpu_seconds':0.0}
+    last = None
+    timed_out = False
+    with log.open('xb') as output:
+        child = subprocess.Popen(args,stdout=output,stderr=subprocess.STDOUT,env=env,cwd=stage)
+        while child.poll() is None:
+            try:
+                status = Path(f'/proc/{child.pid}/status').read_text()
+                values = {line.split(':',1)[0]:line.split(':',1)[1].strip() for line in status.splitlines() if ':' in line}
+                stat_text = Path(f'/proc/{child.pid}/stat').read_text()
+                fields = stat_text[stat_text.rindex(')')+2:].split()
+                last = {'virtual_kib':int(values.get('VmSize','0').split()[0]),
+                        'resident_kib':int(values.get('VmRSS','0').split()[0]),
+                        'threads':int(values.get('Threads','0')),
+                        'cpu_seconds':(int(fields[11])+int(fields[12]))/clock_ticks}
+                for name,value in last.items():
+                    peak[name] = max(peak[name],value)
+            except (FileNotFoundError,ProcessLookupError):
+                pass  # Reap authoritative child status; an observation race is not success.
+            if time.monotonic()-start >= 180:
+                timed_out = True
+                child.kill()
+                break
+            time.sleep(.2)
+        result = child.wait(timeout=5)
+    outcome = {'returncode':result,'signal_name':signal.Signals(-result).name if result < 0 else None,
+               'parent_wall_timeout':timed_out,'wall_seconds':round(time.monotonic()-start,3),
+               'observed_peaks':peak,'last_observed':last,'telemetry_interval_seconds':.2,
+               'address_space_limit_mib':3072,'cpu_limit_seconds':120,
+               'network_prohibition_removed':False,'production_changed':False}
+    (reports/'process-outcome.json').write_text(json.dumps(outcome,indent=2)+'\n')
+    assert log.stat().st_size <= 200000, 'Oversized public worker log retained, no inference success'
+    assert result == 0 and not timed_out, 'Native worker failed; inspect exact outcome, preserve evidence without retry'
+    return outcome
 
 def run():
     assert sys.platform == 'linux' and os.environ.get('GITHUB_ACTIONS') == 'true'
@@ -121,15 +162,7 @@ def run():
            if not any(marker in key.upper() for marker in ('TOKEN','SECRET','PASSWORD','CAPY_API','KEYSTORE'))}
     env.update(OPENBLAS_NUM_THREADS='2',OMP_NUM_THREADS='2',MKL_NUM_THREADS='2')
     print('Running one network-denied child; five fresh model/recognizer contexts,180s wall bound.',flush=True)
-    try:
-        result = subprocess.run([sys.executable,'-I',str(HERE / 'worker.py'),str(config_file)],
-                                capture_output=True,env=env,cwd=stage,timeout=180)
-    except subprocess.TimeoutExpired as failure:
-        (reports / 'worker.txt').write_bytes((failure.stdout or b'') + (failure.stderr or b''))
-        raise
-    assert len(result.stdout) + len(result.stderr) <= 200000
-    (reports / 'worker.txt').write_bytes(result.stdout + result.stderr)
-    assert result.returncode == 0, 'Native worker failed; preserve partial evidence without retry'
+    outcome = execute_worker([sys.executable,'-I',str(HERE / 'worker.py'),str(config_file)],env,stage,reports)
     observed = json.loads(worker_output.read_text(encoding='utf8'))
     assert observed['complete'] and observed['phase'] == 'complete'
     assert observed['sandbox']['verified_before_vendor_load'] and observed['sandbox']['execve_denied']
@@ -146,6 +179,7 @@ def run():
     totals['word_error_rate'] = totals['word_edits']/totals['reference_words']
     proof = dict(preparation,native_executed=True,state='TECHNICAL_PASS',observations=rows,totals=totals,
                  sandbox=observed['sandbox'],peak_rss_kib=observed['peak_rss_kib'],
+                 process_outcome=outcome,
                  real_telegram_ui_or_account_acceptance=False,physical_android=False,
                  general_russian_quality_accepted=False,full_vendor_security_audit=False,
                  speed_comparison_with_arm64_translation_valid=False)

@@ -89,7 +89,7 @@ def sha(data):
 def run(config_path):
     assert sys.platform == 'linux'
     resource.setrlimit(resource.RLIMIT_CPU, (120, 120))
-    resource.setrlimit(resource.RLIMIT_AS, (1536 * 1024 * 1024, 1536 * 1024 * 1024))
+    resource.setrlimit(resource.RLIMIT_AS, (3072 * 1024 * 1024, 3072 * 1024 * 1024))
     resource.setrlimit(resource.RLIMIT_FSIZE, (2 * 1024 * 1024, 2 * 1024 * 1024))
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     resource.setrlimit(resource.RLIMIT_NOFILE, (128, 128))
@@ -122,11 +122,12 @@ def run(config_path):
         function = getattr(native, name)
         function.argtypes = args
         function.restype = result
-    native.vosk_set_log_level(-1)
+    native.vosk_set_log_level(0)  # Public-data test only: preserve the last native loading stage.
 
     def save(complete, phase):
         result = {'complete':complete,'phase':phase,'sandbox':sandbox,'observations':observations,
-                  'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}
+                  'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+                  'address_space_limit_mib':3072,'cpu_limit_seconds':120}
         temp = output.with_suffix('.tmp')
         temp.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
         temp.replace(output)
