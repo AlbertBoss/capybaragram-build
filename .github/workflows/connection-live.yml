@@ -1,0 +1,67 @@
+# SPDX-License-Identifier: MIT
+name: Public Telegram round trips through frozen embedded transports
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-public-connection-observations
+  cancel-in-progress: false
+jobs:
+  network:
+    if: github.event.repository.private == false
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: windows
+            os: windows-2025
+          - variant: android-tls
+            os: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+      - name: Select frozen Rust compiler
+        shell: pwsh
+        run: |
+          rustup toolchain install 1.88.0 --profile minimal
+          if ($LASTEXITCODE -ne 0) { throw 'Rust compiler setup failed.' }
+      - name: Run Android Rustls source variant on the Linux host
+        if: matrix.variant == 'android-tls'
+        run: python3 ci/connection-live/run_probe.py --variant android-tls
+      - name: Run Windows source variant with pinned MSVC and SDK
+        if: matrix.variant == 'windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+          $instances = & $vswhere -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -format json
+          if ($LASTEXITCODE -ne 0) { throw 'MSVC discovery failed.' }
+          $dev = $null
+          foreach ($instance in @($instances | ConvertFrom-Json)) {
+            $vc = Join-Path $instance.installationPath 'VC\Tools\MSVC'
+            $matches = @(Get-ChildItem -LiteralPath $vc -Directory | Where-Object { $_.Name -like '14.44.*' })
+            if ($matches.Count -gt 0) { $dev = Join-Path $instance.installationPath 'Common7\Tools\VsDevCmd.bat'; break }
+          }
+          if (-not $dev -or -not (Test-Path -LiteralPath $dev)) { throw 'Pinned MSVC14.44 absent.' }
+          $env:CAPY_LIVE_VSDEVCMD = $dev
+          $batch = Join-Path $env:RUNNER_TEMP 'capy-public-live.cmd'
+          @('@echo off', 'call "%CAPY_LIVE_VSDEVCMD%" -no_logo -arch=x64 -host_arch=x64 -winsdk=10.0.26100.0 -vcvars_ver=14.44',
+            'if errorlevel 1 (exit /b 1) else if not errorlevel 0 (exit /b 1)',
+            'python "%GITHUB_WORKSPACE%\ci\connection-live\run_probe.py" --variant windows',
+            'exit /b %errorlevel%') | Set-Content -LiteralPath $batch -Encoding ascii
+          & $batch
+          if ($LASTEXITCODE -ne 0) { throw 'Public Windows transport observation failed; inspect its artifact.' }
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capy-connection-live-${{ matrix.variant }}
+          path: ci/connection-live/test-results/
+          retention-days: 3
+          if-no-files-found: error
