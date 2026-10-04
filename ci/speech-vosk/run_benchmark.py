@@ -161,10 +161,11 @@ def run():
     env = {key:value for key,value in os.environ.items()
            if not any(marker in key.upper() for marker in ('TOKEN','SECRET','PASSWORD','CAPY_API','KEYSTORE'))}
     env.update(OPENBLAS_NUM_THREADS='2',OMP_NUM_THREADS='2',MKL_NUM_THREADS='2')
-    print('Running one network-denied child; five fresh model/recognizer contexts,180s wall bound.',flush=True)
+    print('Running one network-denied child; one static model and five fresh recognizers,180s wall bound.',flush=True)
     outcome = execute_worker([sys.executable,'-I',str(HERE / 'worker.py'),str(config_file)],env,stage,reports)
     observed = json.loads(worker_output.read_text(encoding='utf8'))
     assert observed['complete'] and observed['phase'] == 'complete'
+    assert observed['model_lifecycle'] == 'one-static-model/fresh-recognizer-per-clip'
     assert observed['sandbox']['verified_before_vendor_load'] and observed['sandbox']['execve_denied']
     assert observed['sandbox']['network_and_unix_socket_creation_denied']
     rows = observed['observations']
@@ -180,6 +181,8 @@ def run():
     proof = dict(preparation,native_executed=True,state='TECHNICAL_PASS',observations=rows,totals=totals,
                  sandbox=observed['sandbox'],peak_rss_kib=observed['peak_rss_kib'],
                  process_outcome=outcome,
+                 model_lifecycle=observed['model_lifecycle'],
+                 repeated_model_unload_reload_accepted=False,
                  real_telegram_ui_or_account_acceptance=False,physical_android=False,
                  general_russian_quality_accepted=False,full_vendor_security_audit=False,
                  speed_comparison_with_arm64_translation_valid=False)

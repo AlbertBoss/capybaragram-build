@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Five public clips via C API in a resource-bounded, network-denied child."""
+"""Five fresh recognizers sharing one static model in a bounded network-denied child."""
 import ctypes
 import ctypes.util
 import errno
@@ -127,7 +127,8 @@ def run(config_path):
     def save(complete, phase):
         result = {'complete':complete,'phase':phase,'sandbox':sandbox,'observations':observations,
                   'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
-                  'address_space_limit_mib':3072,'cpu_limit_seconds':120}
+                  'address_space_limit_mib':3072,'cpu_limit_seconds':120,
+                  'model_lifecycle':'one-static-model/fresh-recognizer-per-clip'}
         temp = output.with_suffix('.tmp')
         temp.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
         temp.replace(output)
@@ -139,48 +140,51 @@ def run(config_path):
         assert len(result['text']) <= 16000
         return result['text'].strip()
 
-    for sample in config['samples']:
-        pcm_path = Path(sample['pcm_path']).resolve(strict=True)
-        pcm = pcm_path.read_bytes()
-        assert len(pcm) == sample['pcm_bytes'] and sha(pcm) == sample['pcm_sha256']
-        assert 32000 <= len(pcm) <= 2 * 16000 * 30 and len(pcm) % 2 == 0
-        assert abs(len(pcm) / 32000 - sample['source_duration_seconds']) <= 0.5
-        model_handle = recognizer = None
-        save(False, str(sample['row_index']) + ':model-start')
-        start = time.monotonic()
-        try:
-            model_handle = native.vosk_model_new(str(model).encode('utf8'))
-            assert model_handle, 'Pinned model could not load'
-            load_ms = round((time.monotonic() - start) * 1000, 3)
-            recognizer = native.vosk_recognizer_new(model_handle, ctypes.c_float(16000))
-            assert recognizer
-            save(False, str(sample['row_index']) + ':recognize-start')
-            inference_start = time.monotonic()
-            parts = []
-            for offset in range(0, len(pcm), 6400):
-                chunk = pcm[offset:offset + 6400]
-                status = native.vosk_recognizer_accept_waveform(recognizer, chunk, len(chunk))
-                assert status in (0, 1)
-                if status == 1:
-                    parts.append(text_from(native.vosk_recognizer_result(recognizer)))
-            parts.append(text_from(native.vosk_recognizer_final_result(recognizer)))
-            inference_ms = round((time.monotonic() - inference_start) * 1000, 3)
-            transcript = ' '.join(p for p in parts if p)
-            reference, actual = words(sample['reference']), words(transcript)
-            errors = edit_count(reference, actual)
-            observations.append({'row_index':sample['row_index'],'reference':sample['reference'],
-                                 'transcript':transcript,'reference_words':len(reference),
-                                 'hypothesis_words':len(actual),'word_edits':errors,
-                                 'word_error_rate':errors / len(reference),'model_load_milliseconds':load_ms,
-                                 'inference_milliseconds':inference_ms,'pcm_bytes':len(pcm),
-                                 'pcm_sha256':sample['pcm_sha256']})
-            save(False, str(sample['row_index']) + ':complete')
-        finally:
-            if recognizer:
-                native.vosk_recognizer_free(recognizer)
-            if model_handle:
-                native.vosk_model_free(model_handle)
-            pcm = b''
+    save(False, 'shared-model:start')
+    start = time.monotonic()
+    model_handle = native.vosk_model_new(str(model).encode('utf8'))
+    assert model_handle, 'Pinned static model could not load'
+    shared_load_ms = round((time.monotonic() - start) * 1000, 3)
+    try:
+        for sample in config['samples']:
+            pcm_path = Path(sample['pcm_path']).resolve(strict=True)
+            pcm = pcm_path.read_bytes()
+            assert len(pcm) == sample['pcm_bytes'] and sha(pcm) == sample['pcm_sha256']
+            assert 32000 <= len(pcm) <= 2 * 16000 * 30 and len(pcm) % 2 == 0
+            assert abs(len(pcm) / 32000 - sample['source_duration_seconds']) <= 0.5
+            recognizer = None
+            load_ms = shared_load_ms if sample['row_index'] == 0 else 0.0
+            try:
+                recognizer = native.vosk_recognizer_new(model_handle, ctypes.c_float(16000))
+                assert recognizer
+                save(False, str(sample['row_index']) + ':recognize-start')
+                inference_start = time.monotonic()
+                parts = []
+                for offset in range(0, len(pcm), 6400):
+                    chunk = pcm[offset:offset + 6400]
+                    status = native.vosk_recognizer_accept_waveform(recognizer, chunk, len(chunk))
+                    assert status in (0, 1)
+                    if status == 1:
+                        parts.append(text_from(native.vosk_recognizer_result(recognizer)))
+                parts.append(text_from(native.vosk_recognizer_final_result(recognizer)))
+                inference_ms = round((time.monotonic() - inference_start) * 1000, 3)
+                transcript = ' '.join(p for p in parts if p)
+                reference, actual = words(sample['reference']), words(transcript)
+                errors = edit_count(reference, actual)
+                observations.append({'row_index':sample['row_index'],'reference':sample['reference'],
+                                     'transcript':transcript,'reference_words':len(reference),
+                                     'hypothesis_words':len(actual),'word_edits':errors,
+                                     'word_error_rate':errors / len(reference),'model_load_milliseconds':load_ms,
+                                     'model_reused':sample['row_index'] != 0,
+                                     'inference_milliseconds':inference_ms,'pcm_bytes':len(pcm),
+                                     'pcm_sha256':sample['pcm_sha256']})
+                save(False, str(sample['row_index']) + ':complete')
+            finally:
+                if recognizer:
+                    native.vosk_recognizer_free(recognizer)
+                pcm = b''
+    finally:
+        native.vosk_model_free(model_handle)
     assert len(observations) == 5
     save(True, 'complete')
 
