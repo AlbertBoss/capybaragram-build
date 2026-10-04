@@ -19,6 +19,8 @@ public:
 	[[nodiscard]] static std::string Note(int type, std::uint64_t peer,
 		std::uint64_t topic = 0);
 	[[nodiscard]] static std::string Template(const std::string &id);
+	[[nodiscard]] static std::string Archive(const std::string &id);
+	[[nodiscard]] static std::string ArchiveChunk(const std::string &id, unsigned part);
 	// For the registry's durable cleanup queue, including after process restart.
 	static void RetireGeneration(const std::filesystem::path &root,
 		const std::string &generation);
@@ -32,6 +34,10 @@ public:
 	void write(const std::string &record, const std::string &text) const;
 	void erase(const std::string &record) const;
 	[[nodiscard]] std::vector<std::string> templates() const;
+	// Strict archive namespace only; sizes are ciphertext bytes, not plaintext estimates.
+	[[nodiscard]] std::vector<std::string> archiveRecords() const;
+	[[nodiscard]] std::uint64_t protectedBytes(const std::string &record) const;
+	void cleanupArchiveTemporary() const;
 	// Durable retirement marker stays in place even if cleanup is interrupted.
 	// Caller must persist a new generation for subsequent login, including same owner.
 	void retire() const;

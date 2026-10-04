@@ -1,0 +1,63 @@
+# SPDX-License-Identifier: MIT
+name: Windows protected archive runtime checks
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-windows-archive-runtime
+  cancel-in-progress: false
+jobs:
+  archive:
+    if: github.event.repository.private == false
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Compile and exercise archive and existing vault with actual Windows DPAPI
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+          $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if ($LASTEXITCODE -ne 0 -or -not $vs) { throw 'MSVC not found' }
+          $vcvars = Join-Path $vs 'VC\Auxiliary\Build\vcvars64.bat'
+          New-Item -ItemType Directory -Path archive-runtime-results | Out-Null
+          $jobs = @(
+            @{name='archive'; sources='ci/windows-vault/vault_store.cpp ci/windows-archive/archive_store.cpp ci/windows-archive/archive_store_test.cpp'; marker='CAPY_WINDOWS_ARCHIVE=PASS'},
+            @{name='vault'; sources='ci/windows-vault/vault_store.cpp ci/windows-vault/vault_store_test.cpp'; marker='CAPY_WINDOWS_VAULT=PASS'},
+            @{name='registry'; sources='ci/windows-vault/vault_store.cpp ci/windows-vault/vault_registry.cpp ci/windows-vault/vault_registry_test.cpp'; marker='CAPY_WINDOWS_REGISTRY=PASS'},
+            @{name='worker'; sources='ci/windows-vault/vault_store.cpp ci/windows-vault/vault_registry.cpp ci/windows-vault/vault_worker.cpp ci/windows-vault/vault_worker_test.cpp'; marker='CAPY_WINDOWS_WORKER=PASS'}
+          )
+          foreach ($job in $jobs) {
+            $exe = 'archive-runtime-results/' + $job.name + '-test.exe'
+            $compile = 'call "' + $vcvars + '" >nul && cl /nologo /std:c++20 /EHsc /W4 /WX /utf-8 /Ici/windows-vault ' + $job.sources + ' /Fe:' + $exe + ' /link crypt32.lib bcrypt.lib'
+            & cmd.exe /d /s /c $compile
+            if ($LASTEXITCODE -ne 0) { throw ('Compilation failed: ' + $job.name) }
+            & ('.\' + $exe) | Tee-Object -FilePath ('archive-runtime-results/' + $job.name + '.txt')
+            if ($LASTEXITCODE -ne 0) { throw ('Runtime failed: ' + $job.name) }
+            if (-not (Select-String -LiteralPath ('archive-runtime-results/' + $job.name + '.txt') -SimpleMatch $job.marker)) { throw 'Missing success marker' }
+          }
+          $paths = @(
+            'ci/windows-vault/vault_store.h','ci/windows-vault/vault_store.cpp','ci/windows-vault/vault_store_test.cpp',
+            'ci/windows-vault/vault_registry.h','ci/windows-vault/vault_registry.cpp','ci/windows-vault/vault_registry_test.cpp',
+            'ci/windows-vault/vault_worker.h','ci/windows-vault/vault_worker.cpp','ci/windows-vault/vault_worker_test.cpp',
+            'ci/windows-archive/archive_store.h','ci/windows-archive/archive_store.cpp','ci/windows-archive/archive_store_test.cpp'
+          )
+          $hashes = foreach ($path in $paths) {
+            $text = [IO.File]::ReadAllText((Join-Path $PWD $path)).Replace("`r`n", "`n")
+            $bytes = [Text.Encoding]::UTF8.GetBytes($text)
+            @{path=$path; sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)).ToLowerInvariant()}
+          }
+          @{commit=$env:GITHUB_SHA; normalizedSourceHashes=$hashes; fullClientTest=$false; syntheticDataOnly=$true} | ConvertTo-Json -Depth 4 | Set-Content -Encoding utf8 archive-runtime-results/provenance.json
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capybaragram-windows-archive-runtime-results
+          path: |
+            archive-runtime-results/*.txt
+            archive-runtime-results/provenance.json
+          retention-days: 1
+          if-no-files-found: error

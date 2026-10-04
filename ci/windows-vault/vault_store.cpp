@@ -54,6 +54,18 @@ struct Blob final {
 
 [[nodiscard]] bool IsRecord(const std::string &name) {
 	if (name.starts_with("template-")) return IsId(name.substr(9));
+	if (name == "archive-index") return true;
+	if (name.starts_with("archive-")) {
+		const auto tail = name.substr(8);
+		if (IsId(tail)) return true;
+		if (tail.size() < 34 || tail.size() > 36 || tail[32] != '-'
+			|| !IsId(tail.substr(0, 32))) return false;
+		const auto number = tail.substr(33);
+		if (!std::all_of(number.begin(), number.end(), [](char ch) {
+			return ch >= '0' && ch <= '9';
+		}) || (number.size() > 1 && number.front() == '0')) return false;
+		return std::stoul(number) < 512;
+	}
 	if (!name.starts_with("note-") || name.size() > 70) return false;
 	const auto tail = name.substr(5);
 	return std::count(tail.begin(), tail.end(), '-') == 2
@@ -160,6 +172,16 @@ std::string Store::Template(const std::string &id) {
 	return "template-" + id;
 }
 
+std::string Store::Archive(const std::string &id) {
+	if (!IsId(id)) Fail();
+	return "archive-" + id;
+}
+
+std::string Store::ArchiveChunk(const std::string &id, unsigned part) {
+	if (part >= 512) Fail();
+	return Archive(id) + '-' + std::to_string(part);
+}
+
 Store::Store(const std::filesystem::path &root, std::uint64_t owner,
 	const std::string &generation, bool create)
 : _directory(GenerationPath(root, generation))
@@ -233,6 +255,50 @@ std::vector<std::string> Store::templates() const {
 	}
 	std::sort(result.begin(), result.end());
 	return result;
+}
+
+std::vector<std::string> Store::archiveRecords() const {
+	checkActive();
+	auto result = std::vector<std::string>();
+	for (const auto &entry : std::filesystem::directory_iterator(_directory)) {
+		const auto name = entry.path().filename().string();
+		if (name.starts_with("archive-") && name.ends_with(".bin")) {
+			const auto record = name.substr(0, name.size() - 4);
+			if (!IsRecord(record)) Fail(); // unknown archive files must not be deleted
+			(void)protectedBytes(record); // reject links, directories and oversized files
+			result.push_back(record);
+		}
+	}
+	std::sort(result.begin(), result.end());
+	return result;
+}
+
+std::uint64_t Store::protectedBytes(const std::string &record) const {
+	checkActive();
+	if (!IsRecord(record)) Fail();
+	const auto file = Handle(CreateFileW(path(record).c_str(), 0,
+		FILE_SHARE_READ | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING,
+		FILE_FLAG_OPEN_REPARSE_POINT, nullptr));
+	auto info = BY_HANDLE_FILE_INFORMATION();
+	auto size = LARGE_INTEGER();
+	if (!GetFileInformationByHandle(file.value, &info)
+		|| (info.dwFileAttributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
+		|| !GetFileSizeEx(file.value, &size) || size.QuadPart < 1
+		|| size.QuadPart > 200000) Fail();
+	return static_cast<std::uint64_t>(size.QuadPart);
+}
+
+void Store::cleanupArchiveTemporary() const {
+	checkActive();
+	for (const auto &entry : std::filesystem::directory_iterator(_directory)) {
+		const auto name = entry.path().filename().string();
+		const auto split = name.find(".bin.tmp-");
+		if (!name.starts_with("archive-") || split == std::string::npos) continue;
+		if (!IsRecord(name.substr(0, split)) || !IsId(name.substr(split + 9))) Fail();
+		// Read verifies a regular, bounded non-reparse file before removing it.
+		(void)Read(entry.path());
+		if (!DeleteFileW(entry.path().c_str()) && GetLastError() != ERROR_FILE_NOT_FOUND) Fail();
+	}
 }
 
 void Store::retire() const {
