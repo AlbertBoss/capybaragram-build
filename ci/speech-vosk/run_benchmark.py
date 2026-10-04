@@ -64,15 +64,21 @@ def run():
     assert sha(fixture_raw) == '6c6cc9d484fcdbef1efbcff1122cbb0a6a3cdfe0311bc86a77d4f20074f99991'
     fixture = json.loads(fixture_raw)
     ffmpeg = shutil.which('ffmpeg')
-    assert ffmpeg, 'Trusted runner ffmpeg unavailable; no vendor install fallback'
-    version = subprocess.run([ffmpeg,'-version'],capture_output=True,check=True,timeout=10).stdout.decode().splitlines()[0]
     preparation = {'created_utc':datetime.now(timezone.utc).isoformat(),'fixture_manifest_sha256':sha(fixture_raw),
                    'source_admission_sha256':sha((HERE / 'source-admission.json').read_bytes()),
                    'wheel_sha256':admission['wheel']['sha256'],'model_sha256':admission['model']['sha256'],
                    'native_sha256':admission['wheel']['native_sha256'],'native_executed':False,
                    'owner_profile_or_audio_used':False,'production_client_changed':False,
-                   'state':'PREPARING, not runtime proof','decoder':version,
+                   'state':'PREPARING, not runtime proof','decoder':None,
                    'decoder_different_from_android_mediacodec':True,'same_encoded_clip_hashes':True}
+    (reports / 'preparation.json').write_text(json.dumps(preparation,indent=2)+'\n')
+    assert ffmpeg, 'Ubuntu decoder unavailable; preparation report retained, no vendor install fallback'
+    version = subprocess.run([ffmpeg,'-version'],capture_output=True,check=True,timeout=10).stdout.decode().splitlines()[0]
+    packages = subprocess.run(['dpkg-query','-W','-f=${Package} ${Version}\n','ffmpeg','libseccomp2'],
+                              capture_output=True,check=True,timeout=10).stdout.decode().splitlines()
+    preparation.update(decoder=version,decoder_executable_sha256=sha(Path(ffmpeg).read_bytes()),
+                       host_packages=packages,host_packages_from_ubuntu_repository=True,
+                       host_package_versions_pinned=False)
     (reports / 'preparation.json').write_text(json.dumps(preparation,indent=2)+'\n')
     print('Preparing five predefined public clips; no account or owner input.',flush=True)
     for key in ('wheel','model'):

@@ -17,6 +17,10 @@ jobs:
         with:
           path: control
           persist-credentials: false
+      - name: Install Ubuntu decoder and syscall filter for this disposable test host
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg libseccomp2
       - name: Test five public Russian clips through pinned offline C API
         run: python3 control/ci/speech-vosk/run_benchmark.py
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
