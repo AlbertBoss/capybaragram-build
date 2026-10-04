@@ -6,6 +6,7 @@
 #include "media/streaming/media_streaming_player.h"
 #include "media/streaming/media_streaming_reader.h"
 #include "styles/style_boxes.h"
+#include "styles/style_layers.h"
 #include <QPainter>
 #include <algorithm>
 

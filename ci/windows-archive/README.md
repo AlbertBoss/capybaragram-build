@@ -148,3 +148,11 @@ QBuffer loader source. A manually dispatched decoder policy probe embeds the
 exact pinned function (preserving its upstream notice), decodes synthetic Opus,
 AAC and H.264, and exercises file/HTTP playlist references with allowed and
 denied controls. Its result is separate from full client/player UI acceptance.
+
+## Full client compile repair
+
+The full candidate [37188581089](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37188581089)
+stopped at `capy_archive_player.cpp`: `st::boxWideWidth` and `st::boxPadding`
+require the explicitly included `styles/style_layers.h`. That header was
+added and the guarded payload digest refreshed. Native source preparation
+passes; a new full client build and live archive/player acceptance remain pending.
