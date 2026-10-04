@@ -54,5 +54,13 @@ hooks, original media admission before cache cleanup, account logout/passcode
 integration and full-client testing. Secret-chat protocol support is a separate
 required part of P2, not implied by this storage package.
 
+`VerifiedInput` admits an already complete, unencrypted original inside an explicit
+trusted local root, with its exact declared length. It rejects reparse ancestors,
+hard links, directories, device/ADS/ambiguous paths, root-prefix siblings, oversized
+and missing files. It holds a Win32 read handle that permits deletion but denies
+new writes; the worker streams that handle instead of reopening a mutable path.
+This is not a decryptor for Telegram's encrypted cache or a downloader of absent
+originals. Native media selection and ownership gates remain pending.
+
 API basis: [CryptProtectData](https://learn.microsoft.com/en-us/windows/win32/api/dpapi/nf-dpapi-cryptprotectdata)
 and [CreateFileW](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew).

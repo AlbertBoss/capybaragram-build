@@ -26,7 +26,7 @@ jobs:
           $vcvars = Join-Path $vs 'VC\Auxiliary\Build\vcvars64.bat'
           New-Item -ItemType Directory -Path archive-runtime-results | Out-Null
           $jobs = @(
-            @{name='archive'; sources='ci/windows-vault/vault_store.cpp ci/windows-archive/archive_store.cpp ci/windows-archive/archive_store_test.cpp'; marker='CAPY_WINDOWS_ARCHIVE=PASS'},
+            @{name='archive'; sources='ci/windows-vault/vault_store.cpp ci/windows-archive/archive_store.cpp ci/windows-archive/verified_input.cpp ci/windows-archive/archive_store_test.cpp'; marker='CAPY_WINDOWS_ARCHIVE=PASS'},
             @{name='vault'; sources='ci/windows-vault/vault_store.cpp ci/windows-vault/vault_store_test.cpp'; marker='CAPY_WINDOWS_VAULT=PASS'},
             @{name='registry'; sources='ci/windows-vault/vault_store.cpp ci/windows-vault/vault_registry.cpp ci/windows-vault/vault_registry_test.cpp'; marker='CAPY_WINDOWS_REGISTRY=PASS'},
             @{name='worker'; sources='ci/windows-vault/vault_store.cpp ci/windows-vault/vault_registry.cpp ci/windows-vault/vault_worker.cpp ci/windows-vault/vault_worker_test.cpp'; marker='CAPY_WINDOWS_WORKER=PASS'}
@@ -44,7 +44,8 @@ jobs:
             'ci/windows-vault/vault_store.h','ci/windows-vault/vault_store.cpp','ci/windows-vault/vault_store_test.cpp',
             'ci/windows-vault/vault_registry.h','ci/windows-vault/vault_registry.cpp','ci/windows-vault/vault_registry_test.cpp',
             'ci/windows-vault/vault_worker.h','ci/windows-vault/vault_worker.cpp','ci/windows-vault/vault_worker_test.cpp',
-            'ci/windows-archive/archive_store.h','ci/windows-archive/archive_store.cpp','ci/windows-archive/archive_store_test.cpp'
+            'ci/windows-archive/archive_store.h','ci/windows-archive/archive_store.cpp','ci/windows-archive/archive_store_test.cpp',
+            'ci/windows-archive/verified_input.h','ci/windows-archive/verified_input.cpp'
           )
           $hashes = foreach ($path in $paths) {
             $text = [IO.File]::ReadAllText((Join-Path $PWD $path)).Replace("`r`n", "`n")

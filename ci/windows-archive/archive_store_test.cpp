@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 #include "archive_store.h"
+#include "verified_input.h"
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
@@ -254,6 +255,48 @@ void MissingReferences() {
 	Check(vault.read(orphan).has_value());
 	Reject([&] { (void)archive.media(entry.id); });
 }
+
+void HeldOriginalFile() {
+	using Capy::Archive::VerifiedInput;
+	const auto sourceRoot = Root();
+	std::filesystem::create_directory(sourceRoot);
+	const auto path = sourceRoot / "synthetic-original.ogg";
+	const auto original = std::string(Archive::ChunkBytes + 19, 'f');
+	Put(path, original);
+	Reject([&] { (void)VerifiedInput::Open(sourceRoot, path, original.size() + 1); });
+	Reject([&] { (void)VerifiedInput::Open(sourceRoot, path, 0); });
+	Reject([&] { (void)VerifiedInput::Open(sourceRoot, path, Archive::MaxMediaBytes + 1); });
+	Reject([&] { (void)VerifiedInput::Open(sourceRoot, sourceRoot, original.size()); });
+	const auto sibling = std::filesystem::path(sourceRoot.wstring() + L"-sibling");
+	std::filesystem::create_directory(sibling);
+	const auto outside = sibling / "outside.ogg";
+	Put(outside, original);
+	Reject([&] { (void)VerifiedInput::Open(sourceRoot, outside, original.size()); });
+	Reject([&] { (void)VerifiedInput::Open(sourceRoot, path.parent_path() / ".." / sourceRoot.filename()
+		/ path.filename(), original.size()); });
+	const auto hardlink = sourceRoot / "hardlink.ogg";
+	Check(CreateHardLinkW(hardlink.c_str(), path.c_str(), nullptr) != FALSE);
+	Reject([&] { (void)VerifiedInput::Open(sourceRoot, hardlink, original.size()); });
+	Check(DeleteFileW(hardlink.c_str()) != FALSE);
+	auto input = VerifiedInput::Open(sourceRoot, path, original.size());
+	Check(input->size() == original.size());
+	{
+		const auto denied = CreateFileW(path.c_str(), GENERIC_WRITE,
+			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr,
+			OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+		Check(denied == INVALID_HANDLE_VALUE);
+	}
+	Check(DeleteFileW(path.c_str()) != FALSE); // retained handle must still yield original bytes
+	auto vault = Vault(Root(), 100, Vault::NewId(), true);
+	auto archive = Archive(vault);
+	const auto added = archive.add(Message(), input->size(), [input](std::span<char> out) {
+		return input->read(out);
+	});
+	Check(!added.cleanupPending && archive.media(added.id) == original);
+	input.reset();
+	Check(!std::filesystem::exists(path));
+	Reject([&] { (void)VerifiedInput::Open(sourceRoot, path, original.size()); });
+}
 } // namespace
 
 int main() {
@@ -262,6 +305,7 @@ int main() {
 		RejectionAndRollback();
 		RecoveryAndQuota();
 		MissingReferences();
+		HeldOriginalFile();
 		std::cout << "CAPY_WINDOWS_ARCHIVE=PASS checks=" << Checks << '\n';
 		return 0;
 	} catch (const std::exception &) {

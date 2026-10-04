@@ -8,6 +8,8 @@
 
 | Проверка | Результат | Граница |
 | --- | --- | --- |
+| [Android APK · 37170920572](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37170920572) | Полная ARM64-сборка с ранним сохранением открытого одноразового медиа; подпись, release-флаги и 23 production-класса проверены локально | Без входа и приёмки секретных/одноразовых медиа на настоящем ARM64-клиенте |
+| [Windows read-mode и голос · 37171862699](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37171862699) | Основная компиляция выполняется; исправлены ошибки UI read-mode и проверки CRLF исходников голоса | Готового EXE с этими функциями пока нет; архив Windows в этот запуск не включён |
 | [Android APK · 34156952657](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34156952657) | Полная сборка; подпись, release-флаги, ARM64, 12 production-классов DEX, точные новые темы | Без проверки «нечиталки» с живым собеседником |
 | [Android до входа · 34159878677](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34159878677) | Установка, значок, шесть страниц, темы, отказ в необязательном разрешении, форма входа и перезапуск; 12 ключевых снимков просмотрены | Без реального входа и физических телефонов; внутри чатов визуальная приёмка продолжается |
 | [Windows Release · 37070585321](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37070585321) | Release x64 и 95 проверок Qt-кода авторизации | Не все функции после входа и не производительность на любых компьютерах |
@@ -24,6 +26,9 @@ Android-скриншоты относятся к APK 34156952657 и тесту 3
 
 | Область | Подтверждение | Граница |
 | --- | --- | --- |
+| Windows-архив: хранилище | [37173151558](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37173151558): 57 утверждений на MSVC и настоящем DPAPI; дополнительно Store 240, Registry 94, Worker 58; SHA-256 артефакта и 12 исходников сверены | Синтетические данные. Нет UI, нативных хуков удаления/изменения, секретных чатов или проверки настоящего файла медиа; отдельный `VerifiedInput` добавляется следующим этапом |
+| Android-архив: ранний просмотр | [37170895734](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37170895734): 4206 утверждений, включая циклическую проверку 2000 записей; удержанный дескриптор, очередь и устаревший владелец проверены | Это не 4206 ручных сценариев. Нативный адаптер, дешифровка кеша и живой секретный чат остаются открытыми |
+| Локальный голос Windows | [37169057966](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37169057966): Opus/AAC, декодирование, ресэмплинг и Whisper на Windows и Linux | Нет приёмки интерфейса Telegram и точности русского голоса |
 | Android-хранилище | [33982998020](https://github.com/AlbertBoss/capybaragram-build/actions/runs/33982998020): 56 проверок на эмуляторе и проверка ключа; 53 JDK-проверки шифрования | Не полный интерфейс Telegram |
 | Windows-хранилище | [34002253267](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34002253267): Store 240, Registry 94, Worker 58 | Контролируемые владельцы и данные |
 | Android read-mode | [34058353588](https://github.com/AlbertBoss/capybaragram-build/actions/runs/34058353588): политика 21, адаптер 51, фабрика запросов 52 | Часть окружения заменена тестовыми объектами |
@@ -33,6 +38,7 @@ Android-скриншоты относятся к APK 34156952657 и тесту 3
 
 | Файл | SHA-256 |
 | --- | --- |
+| Android APK · 37170920572 | `2c31445b0ecd74bb0bbc599b122975794fafa4be6244967a41322bc833474cac` |
 | Android APK · 34156952657 | `0f45adefbb1658bf941888f860e015e9730d606ac10568ac428fc0d543f05510` |
 | Windows EXE · 37070585321 | `12c959b8e87fcefe0098acbf4d79442981ec9e76797b24aef90d95688ecb0b0a` |
 | Windows Setup · 37096165716 | `5c39cc71e3eeb252de94231e74b90e598863819f0076d1003642da0fb4f4d4e9` |
