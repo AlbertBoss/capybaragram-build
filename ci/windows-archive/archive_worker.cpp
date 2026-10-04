@@ -30,6 +30,9 @@ struct WipeResult final {
 		if (result.snapshot) {
 			const auto wipe = Wipe{*result.snapshot};
 		}
+		for (auto &snapshot : result.snapshots) {
+			const auto wipe = Wipe{snapshot};
+		}
 	}
 };
 } // namespace
@@ -283,6 +286,17 @@ bool Worker::page(const Handle &handle, std::size_t offset, Done done) {
 	return request(handle, [offset](Store &store) {
 		auto result = Result();
 		result.ids = store.page(offset);
+		result.ok = true;
+		return result;
+	}, std::move(done));
+}
+
+bool Worker::pageFor(const Handle &handle, Conversation conversation,
+		std::size_t offset, Done done) {
+	return request(handle, [conversation, offset](Store &store) {
+		auto result = Result();
+		result.ids = store.pageFor(conversation, offset);
+		for (const auto &id : result.ids) result.snapshots.push_back(store.read(id));
 		result.ok = true;
 		return result;
 	}, std::move(done));

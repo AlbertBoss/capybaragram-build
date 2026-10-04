@@ -38,6 +38,12 @@ struct Added final {
 	bool cleanupPending = false;
 };
 
+struct Conversation final {
+	std::uint8_t peerType = 0;
+	std::uint64_t peer = 0;
+	std::optional<std::uint64_t> topic; // absent: whole chat; present: exact topic
+};
+
 // One serialized worker; borrowed vault must have its own archive-only registry.
 // Chunks and snapshots are individually DPAPI protected. The encrypted catalog
 // is published last. No plaintext temporary file is used by this implementation.
@@ -51,6 +57,8 @@ public:
 		Reader reader = {});
 	[[nodiscard]] std::vector<std::string> page(std::size_t offset = 0,
 		std::size_t count = 20) const;
+	[[nodiscard]] std::vector<std::string> pageFor(Conversation conversation,
+		std::size_t offset = 0, std::size_t count = 20) const;
 	[[nodiscard]] Snapshot read(const std::string &id) const;
 	// Authenticates every chunk and verifies whole-file SHA-256 before returning.
 	[[nodiscard]] std::string media(const std::string &id) const;

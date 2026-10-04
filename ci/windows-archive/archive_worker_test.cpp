@@ -142,6 +142,15 @@ void Lifecycle() {
 		}
 		Check(worker.read(handles[0], ids[1], [&](auto result) { Check(!result.ok); }));
 		mailbox.take()();
+		Check(worker.pageFor(handles[0], {1, 200, {}}, 0, [&](auto result) {
+			Check(result.ok && result.ids == std::vector<std::string>{ids[0]}
+				&& result.snapshots.size() == 1 && result.snapshots[0].text == "slot0");
+		}));
+		mailbox.take()();
+		Check(worker.pageFor(handles[0], {2, 200, {}}, 0, [&](auto result) {
+			Check(result.ok && result.ids.empty() && result.snapshots.empty());
+		}));
+		mailbox.take()();
 		Check(worker.media(handles[0], ids[0], [&](auto result) { Check(!result.ok); }));
 		mailbox.take()();
 		auto staleCalled = false;

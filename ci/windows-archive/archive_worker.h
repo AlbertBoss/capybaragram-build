@@ -23,6 +23,7 @@ public:
 		std::string id;
 		std::vector<std::string> ids;
 		std::optional<Snapshot> snapshot;
+		std::vector<Snapshot> snapshots;
 		std::string media;
 	};
 	using Done = std::function<void(Result)>;
@@ -44,6 +45,8 @@ public:
 	[[nodiscard]] bool capture(const Handle &handle, Snapshot snapshot,
 		std::uint64_t bytes = 0, Store::Reader reader = {}, Done done = {});
 	[[nodiscard]] bool page(const Handle &handle, std::size_t offset, Done done);
+	[[nodiscard]] bool pageFor(const Handle &handle, Conversation conversation,
+		std::size_t offset, Done done);
 	[[nodiscard]] bool read(const Handle &handle, std::string id, Done done);
 	[[nodiscard]] bool media(const Handle &handle, std::string id, Done done);
 	// Revoke old operations immediately, retire only this archive generation.

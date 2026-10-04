@@ -256,6 +256,32 @@ void MissingReferences() {
 	Reject([&] { (void)archive.media(entry.id); });
 }
 
+void TypedConversationPages() {
+	const auto root = Root();
+	auto vault = Vault(root, 100, Vault::NewId(), true);
+	auto archive = Archive(vault);
+	const auto user = archive.add(Message(1));
+	auto snapshot = Message(2);
+	snapshot.peerType = 2;
+	const auto group = archive.add(snapshot);
+	snapshot.peerType = 3;
+	const auto channel = archive.add(snapshot);
+	snapshot.topic = 10;
+	snapshot.message = 3;
+	const auto topic = archive.add(snapshot);
+	snapshot.peer = 201;
+	(void)archive.add(snapshot);
+	Check(archive.pageFor({1, 200, {}}) == std::vector<std::string>{user.id});
+	Check(archive.pageFor({2, 200, {}}) == std::vector<std::string>{group.id});
+	Check(archive.pageFor({3, 200, {}}) == std::vector<std::string>{topic.id, channel.id});
+	Check(archive.pageFor({3, 200, 0}) == std::vector<std::string>{channel.id});
+	Check(archive.pageFor({3, 200, 10}) == std::vector<std::string>{topic.id});
+	Check(archive.pageFor({3, 200, {}}, 1, 1) == std::vector<std::string>{channel.id});
+	Check(archive.pageFor({3, 200, {}}, 2).empty());
+	Reject([&] { (void)archive.pageFor({0, 200, {}}); });
+	Reject([&] { (void)archive.pageFor({3, 0, {}}); });
+}
+
 void HeldOriginalFile() {
 	using Capy::Archive::VerifiedInput;
 	const auto sourceRoot = Root();
@@ -305,6 +331,7 @@ int main() {
 		RejectionAndRollback();
 		RecoveryAndQuota();
 		MissingReferences();
+		TypedConversationPages();
 		HeldOriginalFile();
 		std::cout << "CAPY_WINDOWS_ARCHIVE=PASS checks=" << Checks << '\n';
 		return 0;

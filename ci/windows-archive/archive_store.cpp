@@ -339,6 +339,24 @@ std::vector<std::string> Store::page(std::size_t offset, std::size_t count) cons
 	return result;
 }
 
+std::vector<std::string> Store::pageFor(Conversation conversation,
+		std::size_t offset, std::size_t count) const {
+	check();
+	if (conversation.peerType < 1 || conversation.peerType > 3 || !conversation.peer
+		|| !count || count > 20) Fail();
+	auto result = std::vector<std::string>();
+	auto skipped = std::size_t();
+	for (auto i = _ids.rbegin(); i != _ids.rend(); ++i) {
+		const auto snapshot = stored(*i);
+		if (snapshot.peerType != conversation.peerType || snapshot.peer != conversation.peer
+			|| (conversation.topic && snapshot.topic != *conversation.topic)) continue;
+		if (skipped < offset) { ++skipped; continue; }
+		result.push_back(*i);
+		if (result.size() == count) break;
+	}
+	return result;
+}
+
 Snapshot Store::read(const std::string &id) const {
 	check();
 	if (std::find(_ids.begin(), _ids.end(), id) == _ids.end()) Fail();
