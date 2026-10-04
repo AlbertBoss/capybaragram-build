@@ -1,0 +1,176 @@
+{
+  "created_utc": "2026-10-04T20:03:57.655977+00:00",
+  "purpose": "Test-only offline Russian alternative, no client integration or vendor code execution",
+  "wheel": {
+    "url": "https://files.pythonhosted.org/packages/fc/ca/83398cfcd557360a3d7b2d732aee1c5f6999f68618d1645f38d53e14c9ff/vosk-0.3.45-py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl",
+    "filename": "vosk-0.3.45-py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl",
+    "bytes": 7173758,
+    "sha256": "25e025093c4399d7278f543568ed8cc5460ac3a4bf48c23673ace1e25d26619f",
+    "metadata_url": "https://pypi.org/pypi/vosk/0.3.45/json",
+    "native_sha256": "85c4654de3acdeb99abab86eeb2a6e603927d37089597c0fcc33d8638dc2ccaf",
+    "members": {
+      "vosk/libvosk.so": {
+        "bytes": 25986496,
+        "sha256": "85c4654de3acdeb99abab86eeb2a6e603927d37089597c0fcc33d8638dc2ccaf"
+      },
+      "vosk/vosk_cffi.py": {
+        "bytes": 3984,
+        "sha256": "6fbb17ce6c450296af4de0eb805ba48c6052e04137f4eebebefea465f21a3cc0"
+      },
+      "vosk/__init__.py": {
+        "bytes": 9892,
+        "sha256": "8f9d782518fd7d3b042212b981f70c67f6ce6694302b9cc574a24ab00bbb60eb"
+      },
+      "vosk/transcriber/transcriber.py": {
+        "bytes": 7154,
+        "sha256": "17cf2c73a617344a299aa9febffe56b4c0a822d91014795667b5079e5b04f919"
+      },
+      "vosk/transcriber/__init__.py": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "vosk/transcriber/cli.py": {
+        "bytes": 2697,
+        "sha256": "145ddde114846705982711f386c3de68dc0251aea013a81fe6e1b062489a2dbd"
+      },
+      "vosk-0.3.45.dist-info/RECORD": {
+        "bytes": 867,
+        "sha256": "533f9d170e1789ae39b33d3d694b21cf037e85ac0b44254710057ff3e4c05ed0"
+      },
+      "vosk-0.3.45.dist-info/WHEEL": {
+        "bytes": 145,
+        "sha256": "851516c9209b752319545f4ef1263a878ab6c650706700ecd93d7bad8aabdc97"
+      },
+      "vosk-0.3.45.dist-info/top_level.txt": {
+        "bytes": 5,
+        "sha256": "5728422852271d6280be56da018a2a1c9d98df91ab40d600f94976091737d149"
+      },
+      "vosk-0.3.45.dist-info/METADATA": {
+        "bytes": 1831,
+        "sha256": "72ddc5df9cf8b78bcd0c9e5590a94abd4e801f8d86c4fa4241c19a1f88cee68d"
+      },
+      "vosk-0.3.45.dist-info/entry_points.txt": {
+        "bytes": 64,
+        "sha256": "e9cc1d2d01af02ea0b2a8c510759b6b33ef8d7e6a0b36fc88a7bd0c3226fce22"
+      }
+    }
+  },
+  "model": {
+    "url": "https://alphacephei.com/vosk/models/vosk-model-small-ru-0.22.zip",
+    "filename": "vosk-model-small-ru-0.22.zip",
+    "bytes": 46236750,
+    "sha256": "961d5ff98a17f4aa6de69864d0aa71fa5bac682301d2b5d17a3f24c5c99a46d4",
+    "license": "Apache-2.0 per official model page",
+    "license_source": "https://alphacephei.com/vosk/models",
+    "members": {
+      "vosk-model-small-ru-0.22/graph/phones/word_boundary.int": {
+        "bytes": 2166,
+        "sha256": "23081404fe1cc7338c013a4beec133637147d60472c06ab64ff88ee3d028a7b5"
+      },
+      "vosk-model-small-ru-0.22/graph/Gr.fst": {
+        "bytes": 32288259,
+        "sha256": "189b4f67c69eb34b9d8b47b12f184665e5445667ca5264579b61c6b9eb2cef1e"
+      },
+      "vosk-model-small-ru-0.22/graph/HCLr.fst": {
+        "bytes": 32993810,
+        "sha256": "0b096f4676f306aa3e60d2244ef1e24c5c699b8794acf3c3946b59bcc9dca831"
+      },
+      "vosk-model-small-ru-0.22/graph/disambig_tid.int": {
+        "bytes": 25,
+        "sha256": "c3af3dbc5eb301c4b282480d785c04b1642a8db83210a12332e9790e50146fd2"
+      },
+      "vosk-model-small-ru-0.22/am/final.mdl": {
+        "bytes": 15862383,
+        "sha256": "36d67b53dc90d96ea48097f9e17e7c5937689ad76cb8bed25091317bbaf25919"
+      },
+      "vosk-model-small-ru-0.22/README": {
+        "bytes": 660,
+        "sha256": "b662517cacda14945e159538d6dd8faff23bd706e024c4fb338b6013c9939b9e"
+      },
+      "vosk-model-small-ru-0.22/conf/model.conf": {
+        "bytes": 289,
+        "sha256": "dd7178da0e99fdbe489816c1e9702c3daa28e02accacc2993e0becb7af33b80c"
+      },
+      "vosk-model-small-ru-0.22/conf/mfcc.conf": {
+        "bytes": 131,
+        "sha256": "1e2228006d01d805ad1c267fee9f79709ca87ac51bd82b0e3f5c69ba543f0fc4"
+      },
+      "vosk-model-small-ru-0.22/ivector/final.dubm": {
+        "bytes": 168048,
+        "sha256": "7dffe22bd992d7274fba925632bded4756d82dfd9b962d3c703110251fdf35b8"
+      },
+      "vosk-model-small-ru-0.22/ivector/global_cmvn.stats": {
+        "bytes": 1077,
+        "sha256": "c600cbf4acfbfac99d587040d48dc31129cd635b112ff15bfa2e9d3b0cece1f8"
+      },
+      "vosk-model-small-ru-0.22/ivector/final.ie": {
+        "bytes": 9927287,
+        "sha256": "94f2558d00fe199ac01409281352eb16707ec075baaf9cc0d7b53011583cfa0e"
+      },
+      "vosk-model-small-ru-0.22/ivector/final.mat": {
+        "bytes": 44975,
+        "sha256": "956577d396b636fe359b4321f10df5ed6a76bdfdec366b4a2b7d3242e524f04f"
+      },
+      "vosk-model-small-ru-0.22/ivector/splice.conf": {
+        "bytes": 35,
+        "sha256": "9f0c5f7c82d18eaf25d8bce470efa9f7741f88411fe428774bc0a9bb69a24756"
+      },
+      "vosk-model-small-ru-0.22/ivector/online_cmvn.conf": {
+        "bytes": 95,
+        "sha256": "a2f3571754b64297cb7efb2e7ca3df61995c5a45fcbb97188f90613552bb2dfe"
+      }
+    },
+    "identity_limit": "Author model URL is versioned but mutable; observed archive hash is pinned for the benchmark, not an author-signed checksum"
+  },
+  "source": {
+    "repository": "alphacep/vosk-api",
+    "tag": "v0.3.45",
+    "commit": "cf2560c9f8a49d3d366b433fdabd78c518231bec",
+    "selected_files": {
+      "src/vosk_api.h": {
+        "url": "https://raw.githubusercontent.com/alphacep/vosk-api/cf2560c9f8a49d3d366b433fdabd78c518231bec/src/vosk_api.h",
+        "bytes": 12445,
+        "git_blob": "9816019829a3f7b234e9bda9a09d44a9c9a15b7b",
+        "sha256": "4c96a346cb233c0dd2f9e84aa0d1e54bad05d738e14545f0f0227a1ee94f4261"
+      },
+      "src/vosk_api.cc": {
+        "url": "https://raw.githubusercontent.com/alphacep/vosk-api/cf2560c9f8a49d3d366b433fdabd78c518231bec/src/vosk_api.cc",
+        "bytes": 6775,
+        "git_blob": "f146b22ca98942e6e8b386309d1c16aa980b1c07",
+        "sha256": "f9477ba0c5a47f512b2c6c3255fec7c022a1d5b9db6974a82f7dee87ac564dff"
+      },
+      "src/model.cc": {
+        "url": "https://raw.githubusercontent.com/alphacep/vosk-api/cf2560c9f8a49d3d366b433fdabd78c518231bec/src/model.cc",
+        "bytes": 14651,
+        "git_blob": "d0441984d5373c74e8ff4ee8b688709d91944a02",
+        "sha256": "cb6030f3c0250335a2a504a1e9caed2ce09a2f520826d3eb2e23ccb43d807a7b"
+      },
+      "src/recognizer.cc": {
+        "url": "https://raw.githubusercontent.com/alphacep/vosk-api/cf2560c9f8a49d3d366b433fdabd78c518231bec/src/recognizer.cc",
+        "bytes": 29325,
+        "git_blob": "f75c86bc1f538c6cde2be88d87ad59e2be5e374b",
+        "sha256": "8d481c75efa60d7195e69c3b62871d6ba699013e0c1af25adcd8496930e98c01"
+      },
+      "python/vosk/__init__.py": {
+        "url": "https://raw.githubusercontent.com/alphacep/vosk-api/cf2560c9f8a49d3d366b433fdabd78c518231bec/python/vosk/__init__.py",
+        "bytes": 9892,
+        "git_blob": "87cccadab987ce7405d21be06891fa40e34de34a",
+        "sha256": "8f9d782518fd7d3b042212b981f70c67f6ce6694302b9cc574a24ab00bbb60eb"
+      },
+      "COPYING": {
+        "url": "https://raw.githubusercontent.com/alphacep/vosk-api/cf2560c9f8a49d3d366b433fdabd78c518231bec/COPYING",
+        "bytes": 10173,
+        "git_blob": "ab6497f4aa0723b6f3bf344a4dc1a1f186bcc310",
+        "sha256": "bb618af833c817ab01c1564bd3ec75ba4b4f9cf30910a4a2168e30a674ee8cc6"
+      }
+    },
+    "binary_build_from_commit_proven": false
+  },
+  "complete_security_audit": false,
+  "vendor_code_executed": false,
+  "owner_audio_or_profile_used": false,
+  "production_client_modified": false,
+  "archive_structure_checks": "PASS",
+  "pypi_reported_vulnerabilities": [],
+  "vulnerability_database_empty_is_not_security_proof": true
+}

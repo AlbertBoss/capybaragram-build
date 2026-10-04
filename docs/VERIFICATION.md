@@ -1,3 +1,15 @@
+# Russian model comparison result (2026-10-04)
+
+The exact release ARM64 JNI completed all ten preselected Tiny/BaseQ5_1 `ru`
+calls in run37227986292. Both artifact digest and every word-edit count were
+independently verified: Tiny21/63 (33.33% WER), Base17/63 (26.98% WER).
+Base increased aggregate translated-emulator inference time from516.454 to
+943.569 seconds, worsened one record and retained semantic mistakes.
+It was not promoted as the production default. Russian quality acceptance
+remains open. All references, hypotheses, provenance and limitations are in
+[`speech-model-comparison/RESULTS.json`](../ci/speech-model-comparison/RESULTS.json).
+This does not establish live chat UI, phone speed or general speech quality.
+
 # Проверки и текущая стадия
 
 [← К проекту](../README.md)
