@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: MIT
+name: Windows connection source inventory
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-windows-connection-source-inventory
+  cancel-in-progress: false
+jobs:
+  sources:
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+      - name: Install pinned Cargo toolchain
+        shell: bash
+        run: rustup toolchain install 1.88.0 --profile minimal
+      - name: Collect source graph and original notices without executing vendor code
+        run: python ci/windows-connection-notices/run_inventory.py
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capybaragram-windows-connection-source-inventory
+          path: ci/windows-connection-notices/results/
+          retention-days: 3
+          if-no-files-found: error
