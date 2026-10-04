@@ -57,7 +57,7 @@ hashes were independently checked after download. This includes actual deleted
 file handle streaming and does not include native Telegram integration. Reparse
 rejection is implemented; a junction/symlink runtime fixture is still pending.
 
-Pending: bounded capture worker, opt-in settings and UI, native edit/delete/expiry
+Pending: native opt-in settings and UI, native edit/delete/expiry
 hooks, original media admission before cache cleanup, account logout/passcode
 integration and full-client testing. Secret-chat protocol support is a separate
 required part of P2, not implied by this storage package.
@@ -69,6 +69,27 @@ and missing files. It holds a Win32 read handle that permits deletion but denies
 new writes; the worker streams that handle instead of reopening a mutable path.
 This is not a decryptor for Telegram's encrypted cache or a downloader of absent
 originals. Native media selection and ownership gates remain pending.
+
+## Account-bound worker
+
+`archive_worker` owns an independent archive Registry on one serialized worker.
+Newly attached handles default to capture disabled; the host supplies each
+account's persisted opt-in. Captures are limited to four queued/active operations,
+foreground requests to eight. Rejecting an admission releases its owned reader.
+Readers must capture owned resources such as `shared_ptr<VerifiedInput>`.
+
+Per-session live/revision checks stop queued or streaming work after logout,
+replacement or archive clear. `clear()` revokes old results before asynchronously
+retiring the archive generation; it does not clear the notes registry. Failed
+retirement/recovery is retried before later access. Already admitted encrypted
+captures may finish on passcode lock or disabling capture; new captures require
+opt-in. Incoming opt-in captures may run while locked, without exposing content.
+Foreground reads and posted callbacks require the unchanged unlocked UI epoch.
+Callbacks cannot dereference a destroyed Worker.
+
+This worker's source and synthetic runtime suite are added in the current stage;
+inspect its run before treating it as verified. It still needs application/account
+lifecycle wiring, persisted opt-in and native message adapters.
 
 API basis: [CryptProtectData](https://learn.microsoft.com/en-us/windows/win32/api/dpapi/nf-dpapi-cryptprotectdata)
 and [CreateFileW](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew).
