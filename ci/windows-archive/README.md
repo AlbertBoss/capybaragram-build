@@ -126,3 +126,11 @@ Native references: [pinned Telegram Desktop source](https://github.com/telegramd
 [Qt QByteArray ownership](https://doc.qt.io/qt-6/qbytearray.html) and
 [Qt implicit sharing](https://doc.qt.io/qt-6/implicit-sharing.html). The adapter
 retains its own media resources rather than borrowing a view that can be cleared.
+
+The actual Qt setting codec passed 29 assertions on Windows/Qt 6.11.2 in
+[37177292930](https://github.com/AlbertBoss/capybaragram-build/actions/runs/37177292930).
+The artifact digest and all three tested source hashes were independently checked.
+This GCC/test-only MSYS2 Qt result covers boolean round trips, missing/truncated
+tails and unknown tags/versions/values; it does not prove native account restart
+or full MSVC client compilation. The full build separately compiles/runs the same
+codec against production Qt before compiling Telegram.
