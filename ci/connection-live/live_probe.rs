@@ -17,6 +17,11 @@ const CASES: [(u16, bool); 8] = [
     (203, false), (2, true), (4, true),
 ];
 const MAX_RESPONSE: usize = 4096;
+// Resource bound for this unauthenticated probe, not an encrypted-message rule.
+// The actual public replies contain trailing bytes beyond 0..15 TCP padding.
+// TDLib Handshake::on_res_pq uses fetch_result(..., false); transport padding
+// must not be conflated with all bytes after the declared MTProto body.
+const MAX_TRAILING_BYTES: usize = 1024;
 
 fn keyed(prekey: &[u8], secret: &[u8; 16]) -> [u8; 32] {
     let mut hash = Sha256::new();
@@ -65,8 +70,8 @@ fn validate_res_pq(packet: &[u8], nonce: &[u8; 16]) -> Result<usize, &'static st
     if message_id & 1 != 1 { return Err("Not a server message id"); }
     let body_size = read_u32(packet, 16)? as usize;
     if body_size < 56 || body_size % 4 != 0 || 20 + body_size > packet.len()
-        || packet.len() - 20 - body_size > 15 {
-        return Err("Invalid body length or transport padding");
+        || packet.len() - 20 - body_size > MAX_TRAILING_BYTES {
+        return Err("Invalid body length or excessive trailing bytes");
     }
     let body = &packet[20..20 + body_size];
     if read_u32(body, 0)? != 0x0516_2463 || body.get(4..20) != Some(nonce.as_slice()) {
@@ -191,9 +196,15 @@ mod tests {
             let mut broken = valid.clone(); broken[offset] ^= 0xff;
             assert!(validate_res_pq(&broken, &nonce).is_err());
         }
-        let mut padded = valid.clone(); padded.extend_from_slice(&[0; 15]);
-        assert_eq!(validate_res_pq(&padded, &nonce), Ok(1));
-        padded.push(0); assert!(validate_res_pq(&padded, &nonce).is_err());
+        for size in [0, 15, 16, 17, 35, 87, 117, MAX_TRAILING_BYTES] {
+            let mut padded = valid.clone(); padded.extend(vec![0; size]);
+            assert_eq!(validate_res_pq(&padded, &nonce), Ok(1));
+            assert!(validate_res_pq(&padded, &[8; 16]).is_err());
+        }
+        let mut too_large = valid.clone(); too_large.extend(vec![0; MAX_TRAILING_BYTES + 1]);
+        assert!(validate_res_pq(&too_large, &nonce).is_err());
+        let mut too_large_frame = valid.clone(); too_large_frame.resize(MAX_RESPONSE + 1, 0);
+        assert!(validate_res_pq(&too_large_frame, &nonce).is_err());
     }
 
     #[test]
