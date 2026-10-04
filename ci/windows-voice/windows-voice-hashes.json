@@ -1,0 +1,27 @@
+{
+  "source_sha": "80158983dba09d3bf5d96701f21473d6c34bf5f5",
+  "pre": {
+    "Telegram/CMakeLists.txt": "6323950e9892561a7ead65d52ba3ac53a463e531da178764c9b51491f55cf42b",
+    "Telegram/SourceFiles/core/application.h": "942cd6e5101d9ada8a4de4a104ee6528f34ca7b777ccb7c00779c5412bf9a456",
+    "Telegram/SourceFiles/core/application.cpp": "d8a7d085a89c82dae11df2573a9cad67b11d0e94bb58d3ed9e1fc0c956055d9f",
+    "Telegram/SourceFiles/history/view/history_view_context_menu.cpp": "ff8b1aa7ffe6671157dc8d1d86e139bb4055fb87f3bfc8eb1411c35bf79ad0a1"
+  },
+  "post": {
+    "Telegram/CMakeLists.txt": "1b26c7aaecebff04cbbf20dbe617ca0319871e5f5a0a71b256a517f9a435eb91",
+    "Telegram/SourceFiles/core/application.h": "415b7f74546ec3fba897ea39f8be35506e6688a8c8fbf587330ed737e900f887",
+    "Telegram/SourceFiles/core/application.cpp": "f26f8a1590b1410380939cca69ca9b7c3404951e61fe37ec78154299d2685221",
+    "Telegram/SourceFiles/history/view/history_view_context_menu.cpp": "c8a250929021f1b4a489eb02825d4de5a25663abe1a3080eb668a96713c0785d"
+  },
+  "added": {
+    "Telegram/SourceFiles/capybara/voice_worker.h": "8ce2b0ca20f23bb8dc007cc979ec8fb0c77b1136632bc655e3a5f20f7dab4a82",
+    "Telegram/SourceFiles/capybara/voice_worker.cpp": "0d2e140b71f15b0f16745d934afde39645a45f7a52beb6d34a722b0e58bb801b",
+    "Telegram/SourceFiles/capybara/voice_decoder.h": "60c3f0ee2eb9532e426d409e0499aa553a71aa5e512802b494e6e3abdd3ee381",
+    "Telegram/SourceFiles/capybara/voice_decoder.cpp": "38289c5f476e46a92ad24ad8cc59ea722345b6b638f1698a9a0cba1ae657f69a",
+    "Telegram/SourceFiles/capybara/capy_voice_ui.h": "f184a1efc1711c2db2ba5c46388f64c00bc0139e1997507a91388cca61be1e10",
+    "Telegram/SourceFiles/capybara/capy_voice_ui.cpp": "d341b33fd4253a7464de932910ea7b19e0aa71c5a5c928f8b234759638a00d9d",
+    "Telegram/SourceFiles/capybara/offline_voice/CMakeLists.txt": "e7991404acf8a46300039f7d285306c0913705cba2f9ca273ef07d236f9a1762",
+    "Telegram/SourceFiles/capybara/offline_voice/offline_engine.cpp": "dde8eeadf3656a043d91e1bdf11122a15147d8a03b89d2559c8b399938643d0b",
+    "Telegram/SourceFiles/capybara/offline_voice/offline_engine.h": "1518bed82b004cf29409527ee71a13aa008ce051d79ba42ef21031ed1f7b5948",
+    "Telegram/SourceFiles/capybara/offline_voice/UPSTREAM-LICENSE.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+  }
+}

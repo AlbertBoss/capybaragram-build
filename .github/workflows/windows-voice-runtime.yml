@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: MIT
+name: Desktop voice decoder and worker runtime
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-desktop-voice-runtime
+  cancel-in-progress: false
+jobs:
+  runtime:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Install official Ubuntu test-only Qt and FFmpeg packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq qt6-base-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev ffmpeg ninja-build
+      - name: Install official MSYS2 test-only Qt and FFmpeg packages
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-qt6-base
+            mingw-w64-ucrt-x86_64-ffmpeg
+      - name: Run actual Linux decoder and speech worker
+        if: runner.os == 'Linux'
+        run: python3 ci/windows-voice/run_runtime.py
+      - name: Run actual Windows decoder and speech worker
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: python ci/windows-voice/run_runtime.py
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capy-desktop-voice-${{ matrix.os }}-results
+          path: ci/windows-voice/test-results/
+          retention-days: 1
+          if-no-files-found: error

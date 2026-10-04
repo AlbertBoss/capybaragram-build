@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT
+cmake_minimum_required(VERSION 3.22)
+project(capy_desktop_voice_runtime LANGUAGES C CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(Qt6 REQUIRED COMPONENTS Core Network)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET libavcodec libavformat libavutil libswresample)
+set(CAPY_VOICE_EMBEDDED ON)
+add_subdirectory(../transcription capy-offline-voice)
+add_executable(capy_windows_voice_runtime voice_runtime_test.cpp voice_decoder.cpp voice_worker.cpp)
+target_link_libraries(capy_windows_voice_runtime PRIVATE capy_offline_voice Qt6::Core Qt6::Network PkgConfig::FFMPEG)

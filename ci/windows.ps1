@@ -104,6 +104,11 @@ if ($Phase -eq 'Build') {
         if ($LASTEXITCODE -ne 0) { throw 'Desktop silent-read preparation failed.' }
         & python (Join-Path $PSScriptRoot 'windows-read-mode/prepare_windows_read_mode.py') $src --check
         if ($LASTEXITCODE -ne 0) { throw 'Desktop silent-read verification failed.' }
+        $env:CAPY_WINDOWS_WHISPER_SOURCE = Join-Path $env:RUNNER_TEMP 'capy-windows-whisper-source'
+        & python (Join-Path $PSScriptRoot 'windows-voice/prepare_windows_voice.py') $src
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop voice preparation failed.' }
+        & python (Join-Path $PSScriptRoot 'windows-voice/prepare_windows_voice.py') $src --check
+        if ($LASTEXITCODE -ne 0) { throw 'Desktop voice source verification failed.' }
         $env:CAPY_WINDOWS_API_CACHE = Join-Path $env:RUNNER_TEMP 'capy-windows-owner-api.cmake'
         & python (Join-Path $PSScriptRoot 'api_credentials.py') --windows-cache $env:CAPY_WINDOWS_API_CACHE
         if ($LASTEXITCODE -ne 0) { throw 'Owner API cache creation failed.' }
@@ -239,4 +244,11 @@ Run: $($env:GITHUB_RUN_ID)
 foreach ($name in 'LICENSE','LEGAL') {
     $notice = Join-Path $src $name
     if (Test-Path -LiteralPath $notice) { Copy-Item -LiteralPath $notice -Destination (Join-Path $stage $name) }
+}
+
+if ($Profile -ne 'Baseline') {
+    $voiceNotice = Join-Path $src 'Telegram/SourceFiles/capybara/offline_voice/UPSTREAM-LICENSE.txt'
+    if (-not (Test-Path -LiteralPath $voiceNotice)) { throw 'Pinned voice engine notice is absent.' }
+    Copy-Item -LiteralPath $voiceNotice -Destination (Join-Path $stage 'WHISPER-LICENSE.txt')
+    Add-Content -LiteralPath (Join-Path $stage 'BUILD-INFO.txt') -Encoding utf8 -Value 'Offline voice transcription: native context menu, explicit public model download, local CPU processing. Live Telegram UI and Russian accuracy acceptance pending.'
 }

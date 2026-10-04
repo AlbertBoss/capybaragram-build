@@ -33,5 +33,13 @@
     "sha": "634f93cb2916e3fdff6788551b99b062d0335ce0",
     "manifest_sha256": "f81d687a5bb7c2c9428a2cfc32fc099c823d56faf533e7d0e1f3cdc0e10f9cc7",
     "url": "https://github.com/actions/download-artifact/tree/634f93cb2916e3fdff6788551b99b062d0335ce0"
+  },
+  {
+    "repository": "msys2/setup-msys2",
+    "tag": "v2 (resolved 2026-10-04)",
+    "sha": "ec48f7c5447b3140e2b088413ae3a55687bccb6e",
+    "manifest_sha256": "47b835c1bb4a9f484ed7a118682dcaf4ca995efc9fd976e0db4fd8e7a9598c66",
+    "url": "https://github.com/msys2/setup-msys2/tree/ec48f7c5447b3140e2b088413ae3a55687bccb6e",
+    "scope": "Disposable test-only Windows Qt/FFmpeg packages; read-only token, no owner secrets"
   }
 ]
