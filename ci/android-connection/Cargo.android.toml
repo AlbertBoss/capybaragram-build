@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: MIT
+# Android-only manifest. The verified Windows package remains unchanged.
+[package]
+name = "tglock"
+version = "2.0.0-beta.14"
+edition = "2021"
+rust-version = "1.88"
+license = "MIT"
+autobins = false
+
+[lib]
+name = "tglock"
+path = "src/lib.rs"
+crate-type = ["rlib", "staticlib"]
+
+[features]
+default = []
+# Only declared for the preserved upstream cfgs; neither frontend is built.
+gui = []
+cli = []
+
+[dependencies]
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+tokio = { version = "=1.53.1", features = ["rt-multi-thread", "net", "io-util", "time", "macros", "sync", "signal"] }
+# The pinned internal feature enables our explicit Rustls connector without
+# pulling an older root bundle or relying on an implicit crypto provider.
+tokio-tungstenite = { version = "=0.24.0", default-features = false, features = ["connect", "__rustls-tls"] }
+rustls = { version = "=0.23.45", default-features = false, features = ["std", "ring", "tls12"] }
+rustls-webpki = { version = "=0.103.15", default-features = false, features = ["std", "ring"] }
+ring = "=0.17.14"
+webpki-roots = "=1.0.9"
+tokio-rustls = { version = "=0.26.6", default-features = false, features = ["ring", "tls12"] }
+futures-util = "=0.3.33"
+aes = "=0.8.4"
+ctr = "=0.9.2"
+cipher = "=0.4.4"
+sha2 = "=0.10.9"
+rand = "=0.8.7"
+
+[dev-dependencies]
+tokio = { version = "=1.53.1", features = ["test-util"] }
+# Certificate generation is test-only and is never included in the APK.
+rcgen = { version = "=0.14.10", default-features = false, features = ["crypto", "ring"] }

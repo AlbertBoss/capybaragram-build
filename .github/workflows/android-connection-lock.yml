@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: MIT
+# Explicit one-off development lock resolution; no APK, account keys or signer.
+name: Android connection dependency lock and native checks
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-android-connection-lock
+  cancel-in-progress: false
+jobs:
+  lock:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+      - name: Install exact native toolchains
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.88.0 --profile minimal --component clippy
+          rustup target add --toolchain 1.88.0 aarch64-linux-android x86_64-linux-android
+          manager="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$manager"
+          "$manager" 'ndk;27.2.12479018' 'cmake;3.22.1'
+      - name: Resolve reviewable Android lock and run TLS and ABI compilation
+        run: python ci/android-connection/run_android_checks.py --bootstrap-lock-only
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capy-android-connection-lock
+          path: ci/android-connection/test-results/
+          retention-days: 1
+          if-no-files-found: error

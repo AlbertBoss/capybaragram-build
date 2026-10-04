@@ -1,0 +1,137 @@
+{
+  "upstream_repository": "by-sonic/tglock",
+  "upstream_revision": "8617d25f3ae9bddb158a6703d1d02e453ebd39ba",
+  "base_runtime_proof": 37184002484,
+  "core_source_sha256": {
+    "CMakeLists.txt": "89e8d48669ac871a43880399fb2ac3ab30c031aa1980b838ded67c25a71adcc1",
+    "diagnostic.rs": "6565e6d1e4ea56cf3935083b0f0e54ca13258afbb036c2edcdfe78ac8ebf9a2d",
+    "embedded.rs": "acd1118b3d542bd001784684220c5ae8f250940b04b959b6feb7009b3ac1e2e6",
+    "native_api.h": "6bca6b36bc9da29ac514195ccd1a2bdf08e47781587bcb8dd816e734f3fed321",
+    "native_api.rs": "b830e9e20dfdecdd05dea71ab5735e6ace66637edbdb27082c3a92f5dcc73c67",
+    "native_api_probe.cpp": "26841fc74c9dfb6fbc40eef0f93b4a231350c94476fd93224a102bbd55bc14b3",
+    "prepare_core.py": "767565021416999aec2ec66dbf2ddffb447558a707a1745e48c1a22472882178",
+    "proxy_regressions.rs": "09797506169802ee2b8af5c2d76c753a0a20f3dfa8897353053d3a1f28348b35",
+    "README.md": "73afc3e7722f4cab73dce4db80e498b63625e87f499f15e8b529e698c8e83de2",
+    "run_core_checks.py": "d1c7b7c8485689009a7079b7e2dbf96aa1c35ac973c5544e242ffbd9b86aa737",
+    "source-pins.json": "2c38bcb878613af527c97cdf73beeb18068bdba7a2616701303ee0430233738c",
+    "upstream/build.rs": "59d80c9bed9a905e28e18362d4ed7431b8d7f0d07b7d225e371068f9a163d9f7",
+    "upstream/Cargo.lock": "b9fac05c715930353370158ad6609fa0843f0d2324220b97efd8a5cf81f5f5ed",
+    "upstream/Cargo.toml": "e5fc233479fd754266012f41c1a21d1684daed83a0ac8c1214cf2fd8d93bdeaf",
+    "upstream/LICENSE": "412bff26064b5685c05e822e55325c6c5f1f88f2af59fdc832067e507d6fd55e",
+    "upstream/src/cli_settings.rs": "99f6d97ecb78bd932c73ceaeb9823bc39747fd72a8270a22c513a642fcfbde86",
+    "upstream/src/config.rs": "7b3f1c76fb952cdfeaacebaa56953fb8a738bc48dd637c4d224698649af3da50",
+    "upstream/src/lib.rs": "0d3614b7b318a334dddd25814d9b78df723fa0b5a7f8ff859c87ab8cec2cf3a3",
+    "upstream/src/main.rs": "cefec545baf3c030cefd847929d57820d36e23f19f722ff1d678c6572fbe4063",
+    "upstream/src/mtproto.rs": "57e436c6c548a7e0ac275dbdfb64131a8bb94ce5855963d27fae3f96659d072a",
+    "upstream/src/proxy.rs": "8f216dd4f0a5f37d231f227d7f10043a6f1899fde2ecefdb754d10a81c3daf94",
+    "upstream/src/telegram_net.rs": "5b43dbb544ddfb968b3ec98f49476796f6e5eae5c1e5569bdb04a1ab9f204c08",
+    "upstream/src/transport.rs": "cc25575eeacbffbca2e0013aa0c3b20dfd7d5330519f8dca9e72064aa2b3cc95",
+    "upstream/src/bin/cli.rs": "458cc5f0497d5a8c35008b24b16bb88bd12340ae7d17922b4b38acaf69548d7d"
+  },
+  "prepared_base": {
+    "upstream_repository": "https://github.com/by-sonic/tglock",
+    "upstream_revision": "8617d25f3ae9bddb158a6703d1d02e453ebd39ba",
+    "upstream_sha256": {
+      "Cargo.toml": "e5fc233479fd754266012f41c1a21d1684daed83a0ac8c1214cf2fd8d93bdeaf",
+      "Cargo.lock": "b9fac05c715930353370158ad6609fa0843f0d2324220b97efd8a5cf81f5f5ed",
+      "LICENSE": "412bff26064b5685c05e822e55325c6c5f1f88f2af59fdc832067e507d6fd55e",
+      "build.rs": "59d80c9bed9a905e28e18362d4ed7431b8d7f0d07b7d225e371068f9a163d9f7",
+      "src/lib.rs": "0d3614b7b318a334dddd25814d9b78df723fa0b5a7f8ff859c87ab8cec2cf3a3",
+      "src/config.rs": "7b3f1c76fb952cdfeaacebaa56953fb8a738bc48dd637c4d224698649af3da50",
+      "src/mtproto.rs": "57e436c6c548a7e0ac275dbdfb64131a8bb94ce5855963d27fae3f96659d072a",
+      "src/proxy.rs": "8f216dd4f0a5f37d231f227d7f10043a6f1899fde2ecefdb754d10a81c3daf94",
+      "src/telegram_net.rs": "5b43dbb544ddfb968b3ec98f49476796f6e5eae5c1e5569bdb04a1ab9f204c08",
+      "src/transport.rs": "cc25575eeacbffbca2e0013aa0c3b20dfd7d5330519f8dca9e72064aa2b3cc95",
+      "src/cli_settings.rs": "99f6d97ecb78bd932c73ceaeb9823bc39747fd72a8270a22c513a642fcfbde86",
+      "src/main.rs": "cefec545baf3c030cefd847929d57820d36e23f19f722ff1d678c6572fbe4063",
+      "src/bin/cli.rs": "458cc5f0497d5a8c35008b24b16bb88bd12340ae7d17922b4b38acaf69548d7d"
+    },
+    "prepared_sha256": {
+      "Cargo.toml": "e3e4786af265a22995a1e18148b664b9ac031a3fdc1f1a9af95e8a8a6d5d015c",
+      "Cargo.lock": "b9fac05c715930353370158ad6609fa0843f0d2324220b97efd8a5cf81f5f5ed",
+      "LICENSE": "412bff26064b5685c05e822e55325c6c5f1f88f2af59fdc832067e507d6fd55e",
+      "build.rs": "59d80c9bed9a905e28e18362d4ed7431b8d7f0d07b7d225e371068f9a163d9f7",
+      "src/lib.rs": "645d52847d1feba407d2d3837d8439861d8d515d30b21ba788df081b34bacd59",
+      "src/config.rs": "7b3f1c76fb952cdfeaacebaa56953fb8a738bc48dd637c4d224698649af3da50",
+      "src/mtproto.rs": "90ff257706dcea3e9c34c21ddcaf893381297dc7faf48a9dbf96a20100db50fb",
+      "src/proxy.rs": "74b179cc48832b01b31ca8108d84a085bf00e06013674baee550a1e9c001b95e",
+      "src/telegram_net.rs": "5b43dbb544ddfb968b3ec98f49476796f6e5eae5c1e5569bdb04a1ab9f204c08",
+      "src/transport.rs": "644e679c104bf8a3bf649af85ba8fbbf4467820548f188cc69ce4afbb2f11874",
+      "src/cli_settings.rs": "99f6d97ecb78bd932c73ceaeb9823bc39747fd72a8270a22c513a642fcfbde86",
+      "src/main.rs": "cefec545baf3c030cefd847929d57820d36e23f19f722ff1d678c6572fbe4063",
+      "src/bin/cli.rs": "e4a43baa234e6d52416a4701789082265b27a02a4b0f56bb2ae8b07d54de9866",
+      "src/diagnostic.rs": "6565e6d1e4ea56cf3935083b0f0e54ca13258afbb036c2edcdfe78ac8ebf9a2d",
+      "src/embedded.rs": "acd1118b3d542bd001784684220c5ae8f250940b04b959b6feb7009b3ac1e2e6",
+      "src/native_api.rs": "b830e9e20dfdecdd05dea71ab5735e6ace66637edbdb27082c3a92f5dcc73c67",
+      "src/capy_proxy_regressions.rs": "09797506169802ee2b8af5c2d76c753a0a20f3dfa8897353053d3a1f28348b35"
+    },
+    "cargo_lock_unchanged": true,
+    "gui_enabled": false,
+    "telegram_account_integration": false
+  },
+  "tls_registry": {
+    "tokio-tungstenite": {
+      "version": "0.24.0",
+      "checksum": "edc5f74e248dc973e0dbb7b74c7e0d6fcc301c694ff50049504004ef4d0cdcd9",
+      "rust_version": "1.63",
+      "yanked": false,
+      "license": "MIT"
+    },
+    "rustls": {
+      "version": "0.23.45",
+      "checksum": "0d41d731c7d2f962d1ccc364cec258de3c0e93b38c2fb3ba97ac74513048d634",
+      "rust_version": "1.71",
+      "yanked": false,
+      "license": "Apache-2.0 OR ISC OR MIT"
+    },
+    "rustls-webpki": {
+      "version": "0.103.15",
+      "checksum": "f3c3cf1d8b1e7d4927e2d154c3fcb02979afb9939629c62cd9048d4f07b60ac2",
+      "rust_version": "1.71",
+      "yanked": false,
+      "license": "ISC"
+    },
+    "ring": {
+      "version": "0.17.14",
+      "checksum": "a4689e6c2294d81e88dc6261c768b63bc4fcdb852be6d1352498b114f61383b7",
+      "rust_version": "1.66.0",
+      "yanked": false,
+      "license": "Apache-2.0 AND ISC"
+    },
+    "webpki-roots": {
+      "version": "1.0.9",
+      "checksum": "7dcd9d09a39985f5344844e66b0c530a33843579125f23e21e9f0f220850f22a",
+      "rust_version": "1.70",
+      "yanked": false,
+      "license": "CDLA-Permissive-2.0"
+    },
+    "tokio-rustls": {
+      "version": "0.26.6",
+      "checksum": "c9cc2678c2cdd569ef8215e2afd7954ada2ae20b4fdd2c5fe6139a3b02d105db",
+      "rust_version": "1.71",
+      "yanked": false,
+      "license": "MIT OR Apache-2.0"
+    },
+    "rcgen": {
+      "version": "0.14.10",
+      "checksum": "8774e05a7d0de114588e6a28fe7e71694b82614ed569d86d8b389dfbc98b8ad8",
+      "rust_version": "1.88",
+      "yanked": false,
+      "license": "MIT OR Apache-2.0"
+    }
+  },
+  "payload_sha256": {
+    "android_jni.cpp": "c35f22c47cb8e62d3135136b1c3671c88309709015b294b38c3b4c1c96e4110e",
+    "android_tls.rs": "3b32c5d79c295ad216063919592bd7d73df2397eb41df32928d39768bf471359",
+    "Cargo.android.toml": "724c1ab7c08cf0ead9864d0bb277e2579588ebdbf5d741cbfcee96138f9b8ca6",
+    "CMakeLists.txt": "24d4bd51393ec60a95d4cc1d29bb88c5c294abb3921d00f57487c9cd33ab6727",
+    "NativeTunnel.java": "4d2dfdd1d7e80d55fb575c4c1a2d382f05e7e014e49701ac9ea799d5225724bb",
+    "prepare_android_core.py": "685ad4ffc118f72a4437c24946312bde90016a83150a757e8d6215d23f57be11",
+    "README.md": "ae0e4d7fbd06a796336b3c21d26ccfac1831162fa77ce5226a33f34b9b1f5306",
+    "run_android_checks.py": "1beac4d5e29be437efeabe3c0412bfc6d219f52e6eca82c75ba4a2e15bd80ef0",
+    "tls_regressions.rs": "6d1efb63a18593f1e66f9c1ba56588348a5211baa92738e14a7ec8f9a6362bc9"
+  },
+  "cargo_lock_sha256": null,
+  "compiled_at_creation": false,
+  "client_integrated": false
+}
