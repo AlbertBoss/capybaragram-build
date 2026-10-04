@@ -1,0 +1,406 @@
+{
+  "schema": 1,
+  "purpose": "Separate Linux source-build admission, not a client feature or replacement of measured old wheel",
+  "source_inputs": {
+    "api": {
+      "repository": "alphacep/vosk-api",
+      "commit": "cf2560c9f8a49d3d366b433fdabd78c518231bec",
+      "archive_url": "https://codeload.github.com/alphacep/vosk-api/zip/cf2560c9f8a49d3d366b433fdabd78c518231bec",
+      "archive_sha256": "913855994626963548e158465e7a4450b4137da8ace08f18ff35691443ba3db9",
+      "archive_bytes": 713321,
+      "archive_root": "vosk-api-cf2560c9f8a49d3d366b433fdabd78c518231bec",
+      "uncompressed_bytes": 4170500,
+      "git_blobs_verified": 170,
+      "selected_review_files": {
+        "COPYING": {
+          "sha256": "bb618af833c817ab01c1564bd3ec75ba4b4f9cf30910a4a2168e30a674ee8cc6",
+          "git_blob": "ab6497f4aa0723b6f3bf344a4dc1a1f186bcc310",
+          "bytes": 10173
+        },
+        "src/Makefile": {
+          "sha256": "bb07de5722f25f5491a340d0a2276bf92c0dcbcde2aa2338ba112b3fbe9feeb1",
+          "git_blob": "cd697b15cb070f61c2c114078c8bd2251023f6a8",
+          "bytes": 3410
+        }
+      },
+      "symlink_count": 2,
+      "symlinks_extracted": false,
+      "recorded_archive_line_endings": []
+    },
+    "kaldi": {
+      "repository": "alphacep/kaldi",
+      "commit": "b692077807b4832cb4e1a8dd0889ed5f0a71b5b8",
+      "archive_url": "https://codeload.github.com/alphacep/kaldi/zip/b692077807b4832cb4e1a8dd0889ed5f0a71b5b8",
+      "archive_sha256": "5ffb1622438c6625a7d06276419d7df1a051b9e3c893de48aad4ff19fb1500ed",
+      "archive_bytes": 19778829,
+      "archive_root": "kaldi-b692077807b4832cb4e1a8dd0889ed5f0a71b5b8",
+      "uncompressed_bytes": 52591675,
+      "git_blobs_verified": 8266,
+      "selected_review_files": {
+        "COPYING": {
+          "sha256": "3fd3dd523b1717f1fb2ae40896df943d767fa5e664e46156c2dba7094f0d7172",
+          "git_blob": "5a5cab00a293b0056809fadf7498be9a7840d1dd",
+          "bytes": 17264
+        },
+        "src/Makefile": {
+          "sha256": "8a826793f33458faa741081ea8474d4a406dcdab92f6d6759f1e34eaa2a9f8b7",
+          "git_blob": "4d4efbc0172c398d8fef0a033868dda8ce5833eb",
+          "bytes": 8393
+        },
+        "src/configure": {
+          "sha256": "6f6417887eb32a810d759b592011dc96a09d0407ef88f13a8ec8d5eaf684e5f4",
+          "git_blob": "b02a2dc73b86da24b4a035a17fed3ae2601b70d2",
+          "bytes": 57914
+        },
+        "src/makefiles/android_openblas.mk": {
+          "sha256": "9d2b25c91a43f4c1bfc10406ac51028c8f20db9049b21171d65fb07877a8a0f3",
+          "git_blob": "c34ec01f109e7c081beecd56a40c90d71b742982",
+          "bytes": 1178
+        },
+        "src/makefiles/cuda_64bit.mk": {
+          "sha256": "43d202e25af1fe6b4a05c3274f614fbcb82de96aae3999bedc82f133a032e3f0",
+          "git_blob": "8785371b3e165dea45e6a3747d3fc9cc038b84b8",
+          "bytes": 839
+        },
+        "src/makefiles/cygwin.mk": {
+          "sha256": "67cc32de2235af36d768f6448ad554c33387fef59d4b1e7e04dfb54f70f51dcb",
+          "git_blob": "7a77a19453b114597d413cf74e2d3a4c764a55af",
+          "bytes": 854
+        },
+        "src/makefiles/darwin.mk": {
+          "sha256": "060febf42568603011c7b85f9818596a71de6732f40e55c01114366577f8635b",
+          "git_blob": "7da1dda47ba1dc7091dd911e1febdc63343618e3",
+          "bytes": 1128
+        },
+        "src/makefiles/darwin_clapack.mk": {
+          "sha256": "eee1bcb52783fe4c312b0f2e90acc4bfa9c9361344ecf6b4f5d8349129a0e921",
+          "git_blob": "6c262af1e860a6ef054fbe7dd7b5c7b714685e0d",
+          "bytes": 1569
+        },
+        "src/makefiles/default_rules.mk": {
+          "sha256": "165f175de4f1b4f96956c1cd02c16691dbfc2edf325e49ddcc030e75bc3ae821",
+          "git_blob": "edcb7e15bb85ac79739bd43381c76cd6b71226e7",
+          "bytes": 5356
+        },
+        "src/makefiles/ios.mk": {
+          "sha256": "e599ad53fb9707886b760d28604abc9c0125339552d1f011bbedb91ca2527e8a",
+          "git_blob": "535d2925f206f13a474a201abcf680a3508e2d29",
+          "bytes": 1092
+        },
+        "src/makefiles/linux_atlas.mk": {
+          "sha256": "cfea3bcb86a923fb0c54d25da6ba329fc2df9e5d8de63212bb7a09295b6aeddc",
+          "git_blob": "07264b79e2c432e16bc673ab68350879b80128f5",
+          "bytes": 1299
+        },
+        "src/makefiles/linux_atlas_arm.mk": {
+          "sha256": "491d13fabaeecc263e42627948f3fe12bba6755d580110ce85db528850cd6cac",
+          "git_blob": "5df8ac22965756d0aed408ee42a0c3dc780e6062",
+          "bytes": 1166
+        },
+        "src/makefiles/linux_atlas_ppc64le.mk": {
+          "sha256": "65d1dcc4110664f59ff153d50395b49d828c57f2e77009413bb6cd536015b6f4",
+          "git_blob": "cdd58293ca2e3ed3abf5bee378678b082b6103f1",
+          "bytes": 1355
+        },
+        "src/makefiles/linux_clapack.mk": {
+          "sha256": "010cfe1a97c110d099f8b1651172016ee0a031358ff458de6f62a995a2617e6c",
+          "git_blob": "e6f4f541d0b1f2f436ea2825d006f3d301c6701a",
+          "bytes": 1462
+        },
+        "src/makefiles/linux_clapack_arm.mk": {
+          "sha256": "647d66a633c14c55454c73c4569f947f2872ae15f8a01b5fe5964154f5d09a61",
+          "git_blob": "04acf18f27443a1ac9e25b0c223120f6b7258464",
+          "bytes": 1223
+        },
+        "src/makefiles/linux_openblas.mk": {
+          "sha256": "9de8047f414a7bff35ca1dd69931303c35f7ff00e82fb7509291b5e0c1fb7b1c",
+          "git_blob": "1ac67c355ff5badf56213f23f8d030c4473ee18c",
+          "bytes": 1307
+        },
+        "src/makefiles/linux_openblas_aarch64.mk": {
+          "sha256": "0761e410294cbe0b456c2853367b7e3e7fa1dc6b293507870c26e4726b594d53",
+          "git_blob": "d81990aed7a5fefbd25a45162e328a51cd0d5e55",
+          "bytes": 1315
+        },
+        "src/makefiles/linux_openblas_arm.mk": {
+          "sha256": "8278d48f130197c627d2cebc2d5f5ff57b8049e186de8e1ebe36c234d9735c5c",
+          "git_blob": "1b439cf141c11928ecc147c5ec7cee17b103c147",
+          "bytes": 1343
+        },
+        "src/makefiles/linux_openblas_ppc64le.mk": {
+          "sha256": "35e463f3c6c58b7edc585ad0fdac86c850ab2314108a1bf0dbabb34d45d396fe",
+          "git_blob": "4f74eea5637c57246c95867fb820c8349d208121",
+          "bytes": 1372
+        },
+        "src/makefiles/linux_x86_64_mkl.mk": {
+          "sha256": "99468814d76493969833db40392e3ec09a55d415e791c1c74c40a4d8cc6bd244",
+          "git_blob": "2489938a18ad9d5669b709f8d4dc008c7f65e7fb",
+          "bytes": 1462
+        },
+        "src/makefiles/mingw.mk": {
+          "sha256": "c34bc7ab2b7e13a76df44bae97575425fb911ea147d971f266dd098ab2e57f03",
+          "git_blob": "f326f78e8e925d19f539098c1cbdd48afad8e2c9",
+          "bytes": 893
+        },
+        "src/online2/Makefile": {
+          "sha256": "faf4b2bb0f3eeb9430f5f5aa8e74c31104e74c512050b4bd214a794551998e3c",
+          "git_blob": "177babef5fe077249aa5492d7b63d65ffdafdc09",
+          "bytes": 981
+        },
+        "tools/Makefile": {
+          "sha256": "a6f31fc5dc5df78019f2f0f3b70908112506125e30a23274a55019ff2571b7f1",
+          "git_blob": "1ab7bbb8d47ed15571a23dd40c098f84d3151711",
+          "bytes": 6793
+        },
+        "tools/extras/install_openblas_clapack.sh": {
+          "sha256": "b898bcf58c56533d5f2aab8e607c29df6b4d6e43b34beca31a5046337e7494b2",
+          "git_blob": "6ae52e96965bf98649ce35ce78a52a99b2c3b371",
+          "bytes": 598
+        }
+      },
+      "symlink_count": 792,
+      "symlinks_extracted": false,
+      "recorded_archive_line_endings": [
+        {
+          "path": "windows/NewGuidCmd.exe.config",
+          "archive_bytes": 148,
+          "git_blob_bytes": 142,
+          "archive_sha256": "8c7a46ad1a3bc3b92e116f5e649f5d86cf729cf1f1673b94a0dbf5dea28fbd96",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        },
+        {
+          "path": "windows/cuda_7.0.props",
+          "archive_bytes": 869,
+          "git_blob_bytes": 851,
+          "archive_sha256": "25a19ccb460dfc7456e9213694bf7a6c48e2a71e634874a059106784c8e777df",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        },
+        {
+          "path": "windows/kaldiwin_atlas.props",
+          "archive_bytes": 884,
+          "git_blob_bytes": 866,
+          "archive_sha256": "f944d218fcdf72cebf194d8ba1fe5eecc95d74fece4098471c162b34d4d04148",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        },
+        {
+          "path": "windows/kaldiwin_mkl.props",
+          "archive_bytes": 1012,
+          "git_blob_bytes": 993,
+          "archive_sha256": "cfdeb502931736257c28cb8899641586e2740b4c3e3a5ade4dc2b58f566bb21a",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        },
+        {
+          "path": "windows/kaldiwin_openblas.props",
+          "archive_bytes": 1021,
+          "git_blob_bytes": 1002,
+          "archive_sha256": "e1f2795639a660476072a8c85e1fe8cd12f8539289b9c7fbcacf65baf3f48ab1",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        },
+        {
+          "path": "windows/kaldiwin_win32.props",
+          "archive_bytes": 990,
+          "git_blob_bytes": 971,
+          "archive_sha256": "62de3b9863f14078a50e532479e52695cd5fb80b3d5faf4f2f7cd70e189a2cb9",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        },
+        {
+          "path": "windows/openfstwin_debug.props",
+          "archive_bytes": 786,
+          "git_blob_bytes": 770,
+          "archive_sha256": "e79065d24dd8c1baecbaa2a93c247eaff6157131a0a663ab89a9f394cac8b36a",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        },
+        {
+          "path": "windows/openfstwin_debug_win32.props",
+          "archive_bytes": 783,
+          "git_blob_bytes": 766,
+          "archive_sha256": "aad2aee76dbb04971be005439391717c45354716ccd4956bf854e2b01efb4c36",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        },
+        {
+          "path": "windows/openfstwin_release.props",
+          "archive_bytes": 785,
+          "git_blob_bytes": 768,
+          "archive_sha256": "d0f5cb3c6332ae607e341f6b023a279293b2b4ceac57132338e5eea2fd11f47d",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        },
+        {
+          "path": "windows/openfstwin_release_win32.props",
+          "archive_bytes": 785,
+          "git_blob_bytes": 768,
+          "archive_sha256": "302c70d97427910cf68e6f7275f794c43b89b6e7e3f350877108ec030661b2c9",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        },
+        {
+          "path": "windows/portaudio.props",
+          "archive_bytes": 815,
+          "git_blob_bytes": 798,
+          "archive_sha256": "b795fc7dc72ef43572a47fe9c9a62918cbc58ec4eafbd8ff0828feb6932bd634",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        },
+        {
+          "path": "windows/portaudio_debug.props",
+          "archive_bytes": 821,
+          "git_blob_bytes": 804,
+          "archive_sha256": "436494ad324adac2143714e2b243fc89bf968f46f1b55cb3d82162bbda608435",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        },
+        {
+          "path": "windows/portaudio_release.props",
+          "archive_bytes": 823,
+          "git_blob_bytes": 806,
+          "archive_sha256": "57ea0b834e3221598b674c93f8e1262ae145ebd4150da88d7563a9c95f9ec303",
+          "conversion": "CRLF to LF recovers exact Git blob"
+        }
+      ]
+    },
+    "openfst": {
+      "repository": "alphacep/openfst",
+      "commit": "7dfd808194105162f20084bb4d8e4ee4b65266d5",
+      "archive_url": "https://codeload.github.com/alphacep/openfst/zip/7dfd808194105162f20084bb4d8e4ee4b65266d5",
+      "archive_sha256": "f485ccd89bdaee328c862f786af9676a9e1dff5076aa35d8b096b6498e344f0d",
+      "archive_bytes": 1337744,
+      "archive_root": "openfst-7dfd808194105162f20084bb4d8e4ee4b65266d5",
+      "uncompressed_bytes": 6012006,
+      "git_blobs_verified": 484,
+      "selected_review_files": {
+        "COPYING": {
+          "sha256": "dd0c6c9378a98b6a0e96b559b285c8506434fe2691eeeef151e8a8c1c492778e",
+          "git_blob": "d88414a46bf43c550cc8291827b40455c384c41e",
+          "bytes": 559
+        },
+        "Makefile.am": {
+          "sha256": "3baad3bd5c999e672455ee9ee2bce7f04a3c84187a7b5b957b6c9e65e1d07061",
+          "git_blob": "a6f906d0b7aa025fe3d731541f272f1cbdc57f9c",
+          "bytes": 89
+        },
+        "configure.ac": {
+          "sha256": "faf896a09b271defb0cc2d03d96490dda068ad610dba0b242a57ec6a7b19ccc5",
+          "git_blob": "9ab882429211cccdc4763fa3e7c60f20a2dd1173",
+          "bytes": 6272
+        },
+        "src/Makefile.am": {
+          "sha256": "bfafa99da18b17c35c8d0aaa8777aaa1149dd7eb2096737b0d899120065cb1b8",
+          "git_blob": "b3ca481cdd22df6080f5a28111834ec3d300b4ae",
+          "bytes": 49
+        }
+      },
+      "symlink_count": 0,
+      "symlinks_extracted": false,
+      "recorded_archive_line_endings": []
+    },
+    "openblas": {
+      "repository": "OpenMathLib/OpenBLAS",
+      "commit": "e0166008be8e466242aa76b2ff75ce3f0fbf574a",
+      "archive_url": "https://codeload.github.com/OpenMathLib/OpenBLAS/zip/e0166008be8e466242aa76b2ff75ce3f0fbf574a",
+      "archive_sha256": "cfb403a051e34408a7471f061fea87e9981d1ff31f83d6047120252e14f4bee4",
+      "archive_bytes": 44210755,
+      "archive_root": "OpenBLAS-e0166008be8e466242aa76b2ff75ce3f0fbf574a",
+      "uncompressed_bytes": 184435567,
+      "git_blobs_verified": 12560,
+      "selected_review_files": {
+        "LICENSE": {
+          "sha256": "190b5a9c8d9723fe958ad33916bd7346d96fab3c5ea90832bb02d854f620fcff",
+          "git_blob": "22745000fc9132da66655b83e0a1659155db4f51",
+          "bytes": 1548
+        },
+        "Makefile": {
+          "sha256": "a897c4700ce90c1d42b183fabdf80e255a4afd281f61732830052696efc8d1c9",
+          "git_blob": "ae1da5e9fe870fd1ac7a08ef5700d53b62120be5",
+          "bytes": 13719
+        },
+        "Makefile.install": {
+          "sha256": "f1847077d1a15966baae0120051e5af5568a564b8df6a73cb3aa380d5ec81ca1",
+          "git_blob": "cbeab53f8122bacc81ac0541a8373444d8fcd0a6",
+          "bytes": 17807
+        },
+        "Makefile.prebuild": {
+          "sha256": "6145390daf88c0f0f22b1ba9d2bc268c65324ba68af2b831b50e8f2d9d5d5446",
+          "git_blob": "6b2567cb90eb0630ce78ce033043429d3ff0ac6e",
+          "bytes": 2750
+        },
+        "Makefile.rule": {
+          "sha256": "2b1b97c7ebc23dcb1586f694f58e3ff77061b1a47369941606b9c75273f55d58",
+          "git_blob": "019af2d4c7c7f0b28c79c9dbdf75d1e1a8b8aa0e",
+          "bytes": 14152
+        },
+        "Makefile.system": {
+          "sha256": "b8cdb5a36aa9fa3869b3c76b015e83e9503b2d98a710cb28d06e24bbaea33024",
+          "git_blob": "7ce8a3e04ee9b4e395151504405d3e632bfc7e19",
+          "bytes": 42464
+        },
+        "SECURITY.md": {
+          "sha256": "43199b22a30942e0917aee22a17ad5e610099c191f463a671d1e4dd4e7a26a53",
+          "git_blob": "6c0731597f38d81852f321cefc25b45e3e9b060f",
+          "bytes": 959
+        },
+        "cblas.h": {
+          "sha256": "e489fb980fbfe5fa1251f903f84296a95cfd8f1ccb7d7785399493053a8c79d5",
+          "git_blob": "9eb70281b9c62ed3f108ab97c52d52b19735eaad",
+          "bytes": 63175
+        }
+      },
+      "symlink_count": 0,
+      "symlinks_extracted": false,
+      "recorded_archive_line_endings": []
+    },
+    "clapack": {
+      "repository": "alphacep/clapack",
+      "commit": "f4e1647de96343fb20eea08a9d4f0e0d04c31c51",
+      "archive_url": "https://codeload.github.com/alphacep/clapack/zip/f4e1647de96343fb20eea08a9d4f0e0d04c31c51",
+      "archive_sha256": "930a3d1daa9b1a9fdc8f25d34d8280b943673995adf83f99df2e7659914a96ea",
+      "archive_bytes": 10647789,
+      "archive_root": "clapack-f4e1647de96343fb20eea08a9d4f0e0d04c31c51",
+      "uncompressed_bytes": 39217175,
+      "git_blobs_verified": 3090,
+      "selected_review_files": {
+        "BLAS/CMakeLists.txt": {
+          "sha256": "95bc3f1574a42d5121a283a76a4a246e03497478362c737af33f7990bb19c0c3",
+          "git_blob": "3387cd1491b3cc1b3a16f245527e6ee83377f40d",
+          "bytes": 48
+        },
+        "CMakeLists.txt": {
+          "sha256": "bed810320dcbf0d736335ec4265e58c18a1bb4ebf6506c80abf95bb204a4e67a",
+          "git_blob": "d56d59398a77e9e64cc0fb2ad8129e7e113ae7f7",
+          "bytes": 1253
+        },
+        "COPYING": {
+          "sha256": "23014869214a231525b38c39fdb5f82364fa24154ac80fdcab2a79671460fd09",
+          "git_blob": "d7bf9538203d9f42681b2caf23010a97c4eac49b",
+          "bytes": 1607
+        },
+        "F2CLIBS/CMakeLists.txt": {
+          "sha256": "4b0fb5976debc894b23912dc5bfa2016be5b332128f969cb6b62046470843729",
+          "git_blob": "4c4a92e342ad498bc1af7fa3d78d78065de4b017",
+          "bytes": 25
+        },
+        "F2CLIBS/libf2c/CMakeLists.txt": {
+          "sha256": "989548edbeee1087c2c47e3e0e4d652dae1dab406226f3b691ee135d14f866f8",
+          "git_blob": "26c45d5953a3a7663e165e2f9d9460fdad8987ce",
+          "bytes": 3455
+        },
+        "SRC/CMakeLists.txt": {
+          "sha256": "df52ae41f6eee7de3af1f9ca74a384ec4e449adc1192a33b922fbd2c238fd2b5",
+          "git_blob": "ac4cce3ebd79c3ce500497a52fc65c59ba6b989e",
+          "bytes": 19077
+        }
+      },
+      "symlink_count": 0,
+      "symlinks_extracted": false,
+      "recorded_archive_line_endings": []
+    }
+  },
+  "all_source_blobs_checked_against_git": true,
+  "selection": "Kaldi/OpenFST branch history before API v0.3.45; currently resolved CLAPACK v3.2.1 and stable OpenBLAS v0.3.34",
+  "source_archive_build_correspondence_proven": false,
+  "production_admitted": false,
+  "full_security_audit": false,
+  "limits": [
+    "Historical branch selection is reproducible but not proof of original wheel build dependencies",
+    "CLAPACK and old Kaldi/OpenFST still need deeper component review before production",
+    "Linux source-built C API does not establish ARM64 Android or Windows library compatibility",
+    "No private voices, sessions, API keys, microphone or Telegram account in this workflow",
+    "Source build commands execute only after network syscall denial; no mutable Docker image or vendor downloader",
+    "No binaries/models/source archives are uploaded by this experiment"
+  ]
+}

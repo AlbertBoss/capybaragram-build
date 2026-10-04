@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: MIT
+name: Pinned offline speech source-build admission
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: capybaragram-vosk-source-build
+  cancel-in-progress: false
+jobs:
+  source-build:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: control
+          persist-credentials: false
+      - name: Install official Ubuntu build tools for this disposable host
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends gcc-12 g++-12 make cmake autoconf automake libtool pkg-config ffmpeg libseccomp2 zlib1g-dev
+      - name: Compile five pinned source trees with network-denied compiler children
+        run: python3 control/ci/speech-vosk-source/build_source.py
+      - name: Exercise source-built C API and repeat model release and loading
+        run: python3 control/ci/speech-vosk-source/run_source_benchmark.py
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: capybaragram-vosk-source-admission-reports
+          path: |
+            vosk-source-build-report/*.json
+            vosk-source-build-report/*.txt
+            vosk-source-benchmark-report/*.json
+            vosk-source-benchmark-report/*.txt
+            vosk-source-benchmark-report/lifecycle/*.json
+            vosk-source-benchmark-report/lifecycle/*.txt
+          if-no-files-found: error
+          retention-days: 3
